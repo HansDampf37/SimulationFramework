@@ -71,9 +71,8 @@ public class PlatonSpace extends Simulation {
     }
 
     private void drawPoints(Graphics g) {
-        g.setColor(colorPoints);
         for (Point3d point : points) {
-            drawer.drawDot(point, g);
+            drawer.drawDot(point, 4, colorPoints, g);
         }
         double shortestDist = Integer.MAX_VALUE;
         for (int i = 0; i < points.length; i++) {

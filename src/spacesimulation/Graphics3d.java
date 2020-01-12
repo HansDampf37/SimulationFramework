@@ -31,13 +31,13 @@ public class Graphics3d {
         drawLine(a.x, a.y, a.z, b.x, b.y, b.z, g);
     }
 
-    public void drawDot(double x, double y, double z, Graphics g) {
-        int radius = 4;
+    public void drawDot(double x, double y, double z, int radius, Color color, Graphics g) {
+        g.setColor(color);
         g.fillOval(calcX(x, y, z) - radius, calcY(x, y, z) - radius, 2 * radius, 2 * radius);
     }
 
-    public void drawDot(Point3d a, Graphics g) {
-        drawDot(a.x, a.y, a.z, g);
+    public void drawDot(Point3d a, int radius, Color color, Graphics g) {
+        drawDot(a.x, a.y, a.z, radius, color, g);
     }
 
     private int calcX(double x, double y, double z) {

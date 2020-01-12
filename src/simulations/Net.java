@@ -98,10 +98,9 @@ public class Net extends Simulation {
     @Override
     public void render(Graphics g) {
         cart.render(drawer, g);
-        g.setColor(new Color(163, 153, 239));
         for (int x = 0; x < points.length; x++) {
             for (int y = 0; y < points[x].length; y++) {
-                drawer.drawDot(points[x][y], g);
+                drawer.drawDot(points[x][y], 4, new Color(163, 153, 239), g);
             }
         }
         for (int x = 0; x < points.length - 1; x++) {

@@ -81,12 +81,11 @@ public class Pendulum extends Simulation {
     @Override
     public void render(Graphics g) {
         cart.render(drawer, g);
-        g.setColor(Color.lightGray);
         for (int i = 0; i < points.length - 1; i++) {
-            drawer.drawDot(points[i], g);
+            drawer.drawDot(points[i], 4, Color.lightGray, g);
             drawer.drawLine(points[i], points[i + 1], g);
         }
-        drawer.drawDot(points[points.length - 1], g);
+        drawer.drawDot(points[points.length - 1], 4, Color.lightGray, g);
     }
 
     @Override
