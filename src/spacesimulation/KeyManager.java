@@ -4,7 +4,7 @@ import java.awt.event.*;
 
 public class KeyManager implements KeyListener {
 
-    private boolean pressed[] = new boolean[256];
+    private boolean pressed[] = new boolean[1000];
     public boolean w, s, a, d, y, n, out, space, f, g, v, b, up, down, left, right = false;
 
     public void tick() {

@@ -11,9 +11,9 @@ import spacesimulation.algebra.Vec;
 public abstract class MassSimulation extends Simulation {
     protected double frictionFactor;
     protected Vec gravity;
-    List<Mass> masses = new ArrayList<Mass>();
+    protected List<Mass> masses = new ArrayList<Mass>();
 
-    public MassSimulation(double frictionFactor, Vec gravity ,Simulator simulator) {
+    public MassSimulation(double frictionFactor, Vec gravity, Simulator simulator) {
         super(simulator);
         this.frictionFactor = frictionFactor;
         this.gravity = gravity;
@@ -24,6 +24,10 @@ public abstract class MassSimulation extends Simulation {
         masses.add(new Mass(mass, pos));
     }
 
+    public void addNewMass(Point3d pos) {
+        masses.add(new Mass(pos));
+    }
+
     @Override
     public void tick() {
         calcForces();
@@ -32,6 +36,7 @@ public abstract class MassSimulation extends Simulation {
             mass.accelerate(gravity);
             mass.velocity = mass.velocity.scale(frictionFactor);
         }
+        buffer();
     }
 
     @Override
@@ -39,17 +44,18 @@ public abstract class MassSimulation extends Simulation {
 
     public abstract void calcForces();
 
+    public abstract void buffer();
+
     @Override
     public abstract void reset();
 
-    class Mass {
-        private Point3d position;
-        private Vec velocity;
-        private Vec acceleration;
-        private double mass;
+    public class Mass extends Point3d {
+        public Vec velocity;
+        public Vec acceleration;
+        public double mass;
 
         public Mass(double mass, double x, double y, double z) {
-            position = new Point3d(x, y, z);
+            super(x, y, z);
             velocity = new Vec(0, 0, 0);
             acceleration = new Vec(0, 0, 0);
         }
@@ -80,7 +86,7 @@ public abstract class MassSimulation extends Simulation {
         }
 
         public void render(Graphics3d drawer, Graphics g) {
-            drawer.drawDot(position, 4, Color.white, g);
+            drawer.drawDot(this, 4, Color.white, g);
         }
 
         private void accelerate() {
@@ -89,15 +95,15 @@ public abstract class MassSimulation extends Simulation {
         }
 
         private void move() {
-            position.add(velocity);
+            add(velocity);
         }
 
         public void applyForce(Vec force) {
-            this.acceleration = force.scale(1/mass);
+            this.acceleration.add(force.scale(1/mass));
         }
 
         public void accelerate(Vec acceleration) {
-            this.acceleration = acceleration;
+            this.acceleration.add(acceleration);
         }
     }
 }
