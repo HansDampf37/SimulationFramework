@@ -1,6 +1,7 @@
 package simulations;
 
 import spacesimulation.Simulator;
+import spacesimulation.algebra.*;
 
 public class Launcher {
     public static void main(String[] args) {
@@ -10,5 +11,7 @@ public class Launcher {
         new Pend(20, simulator);
         // new Pendulum(2, simulator);
         simulator.start();
+        // Vec v = new Vec(1, -1, 0);
+        // System.out.println(v.hasSharpAngleTo(new Vec(0.01, -0.01, 10)));
     }
 }

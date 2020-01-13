@@ -49,6 +49,6 @@ public class Point3d {
 
     @Override
     public String toString() {
-        return "[" + (int)x + ", " + (int)y + ", " + (int)z + "], length:" + (int)getPositionVector().getLength();
+        return "[" + (int)x + ", " + (int)y + ", " + (int)z + "]";
     }
 }
