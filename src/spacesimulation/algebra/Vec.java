@@ -76,6 +76,7 @@ public class Vec {
     }
 
     public static Vec linearProjection(Vec willBeProjected, Vec ontoThisOne) {
+        if (ontoThisOne.getLength() == 0) return new Vec(0, 0, 0);
         Vec w = new Vec(ontoThisOne.x, ontoThisOne.y, ontoThisOne.z);
         double factor = willBeProjected.scalarProduct(w)/w.scalarProduct(w);
         w.scale(factor);

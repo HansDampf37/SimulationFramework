@@ -3,6 +3,7 @@ package spacesimulation;
 import java.awt.*;
 import spacesimulation.Display;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
 
 public class Simulator implements Runnable {
     private Thread thread;
@@ -11,19 +12,18 @@ public class Simulator implements Runnable {
     private BufferStrategy bs;
     private Graphics g;
     private KeyManager keymanager;
-    private Simulation simulation;
+    private ArrayList<Simulation> simulations;
 
     public Simulator() {
         display = new Display();
         keymanager = new KeyManager();
         display.getJFrame().addKeyListener(keymanager);
+        simulations = new ArrayList<Simulation>();
     }
 
     private void tick() {
-        if (simulation != null) {
-            simulation.parentTick();
-            keymanager.tick();
-        }
+        for (Simulation simulation : simulations) simulation.parentTick();
+        keymanager.tick();
     }
 
     private void render() {
@@ -34,13 +34,13 @@ public class Simulator implements Runnable {
         }
         g = bs.getDrawGraphics();
         g.clearRect(0, 0, display.getCanvas().getWidth(), display.getCanvas().getHeight());
-        if (simulation != null) simulation.parentRender(g);
+        for (Simulation simulation : simulations) simulation.parentRender(g);
         bs.show();
         g.dispose();
     }
 
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
+    public void addSimulation(Simulation simulation) {
+        simulations.add(simulation);
     }
 
     @Override

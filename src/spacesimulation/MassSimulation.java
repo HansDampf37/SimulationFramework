@@ -36,6 +36,7 @@ public abstract class MassSimulation extends Simulation {
     @Override
     public void tick() {
         calcForces();
+        System.out.println(masses.get(1));
         for (Mass mass : masses) {
             mass.tick();
             if (affectedByGravity.get(mass)) mass.accelerate(gravity);
@@ -55,9 +56,9 @@ public abstract class MassSimulation extends Simulation {
     public abstract void reset();
 
     public class Mass extends Point3d {
-        public Vec velocity;
-        public Vec acceleration;
-        public double mass;
+        private Vec velocity;
+        private Vec acceleration;
+        private double mass;
 
         public Mass(double mass, double x, double y, double z) {
             super(x, y, z);
@@ -99,6 +100,14 @@ public abstract class MassSimulation extends Simulation {
 
         public void accelerate(Vec acceleration) {
             this.acceleration.add(acceleration);
+        }
+
+        public void removeAccelerationInDireciont(Vec direction) {
+            acceleration.add(acceleration.linearProjection(direction).scale(-1));
+        }
+
+        public Vec getImpulse() {
+            return Vec.scale(velocity, mass);
         }
     }
 }

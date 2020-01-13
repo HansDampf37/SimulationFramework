@@ -10,7 +10,7 @@ public abstract class Simulation {
 
     public Simulation(Simulator sim) {
         simulator = sim;
-        simulator.setSimulation(this);
+        simulator.addSimulation(this);
         keymanager = simulator.getKeymanager();
         drawer = new Graphics3d();
     }

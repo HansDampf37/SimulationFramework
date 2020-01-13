@@ -7,7 +7,7 @@ public class Launcher {
         Simulator simulator = new Simulator();
         // new PlatonSpace(500, simulator);
         // new Net(simulator);
-        new Pend(2, simulator);
+        new Pend(20, simulator);
         // new Pendulum(2, simulator);
         simulator.start();
     }
