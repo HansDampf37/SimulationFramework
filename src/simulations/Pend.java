@@ -13,7 +13,7 @@ public class Pend extends MassSimulation {
     
     public Pend(int amountOfPoints, Simulator sim) {
         super(0.999, new Vec(0, -0.1, 0), sim);
-        for (int i = 0; i < amountOfPoints; i++) addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0));
+        for (int i = 0; i < amountOfPoints; i++) addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0), i != 0);
         drawer.setZoom(0.03);
     }
 
@@ -32,7 +32,6 @@ public class Pend extends MassSimulation {
     @Override
     public void calcForces() {
         getInput();
-        masses.get(0).accelerate(Vec.scale(gravity, -1));
         for (int i = 1; i < masses.size(); i++) {
             if (masses.get(i).getDistanceTo(masses.get(i - 1)) >= maxRopeSegmentLength) {
                 Vec ropeDir = masses.get(i).getDirectionTo(masses.get(i - 1));
@@ -40,7 +39,7 @@ public class Pend extends MassSimulation {
                     Vec velocityInRopeDirection = Vec.linearProjection(masses.get(1).velocity, ropeDir);
                     velocityInRopeDirection.scale(-2);
                     masses.get(1).accelerate(velocityInRopeDirection);
-                    masses.get(1).accelerate(Vec.linearProjection(masses.get(0).acceleration, velocityInRopeDirection));
+                    masses.get(1).applyForce(Vec.linearProjection(masses.get(0).acceleration, velocityInRopeDirection));
                 } else {
 
                 }
@@ -70,6 +69,6 @@ public class Pend extends MassSimulation {
     public void reset() {
         int size = masses.size();
         masses = new ArrayList<Mass>();
-        for (int i = 0; i < size; i++) addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0));
+        for (int i = 0; i < size; i++) addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0), i != 0);
     }
 }

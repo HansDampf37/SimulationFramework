@@ -3,6 +3,7 @@ package spacesimulation;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import spacesimulation.algebra.Point3d;
@@ -12,6 +13,7 @@ public abstract class MassSimulation extends Simulation {
     protected double frictionFactor;
     protected Vec gravity;
     protected List<Mass> masses = new ArrayList<Mass>();
+    protected HashMap<Mass, Boolean> affectedByGravity = new HashMap<Mass, Boolean>();
 
     public MassSimulation(double frictionFactor, Vec gravity, Simulator simulator) {
         super(simulator);
@@ -20,12 +22,15 @@ public abstract class MassSimulation extends Simulation {
         masses = new ArrayList<Mass>();
     }
 
-    public void addNewMass(double mass, Point3d pos) {
-        masses.add(new Mass(mass, pos));
+    public void addNewMass(double mass, Point3d pos, boolean affectedByGravity) {
+        Mass newMass = new Mass(mass, pos);
+        masses.add(newMass);
+        this.affectedByGravity.put(newMass, affectedByGravity);
+
     }
 
-    public void addNewMass(Point3d pos) {
-        masses.add(new Mass(pos));
+    public void addNewMass(Point3d pos, boolean affectedByGravity) {
+        addNewMass(1, pos, affectedByGravity);
     }
 
     @Override
@@ -33,7 +38,7 @@ public abstract class MassSimulation extends Simulation {
         calcForces();
         for (Mass mass : masses) {
             mass.tick();
-            mass.accelerate(gravity);
+            if (affectedByGravity.get(mass)) mass.accelerate(gravity);
             mass.velocity = mass.velocity.scale(frictionFactor);
         }
         buffer();
@@ -56,8 +61,10 @@ public abstract class MassSimulation extends Simulation {
 
         public Mass(double mass, double x, double y, double z) {
             super(x, y, z);
+            if (mass == 0) throw new IllegalArgumentException("Mass can't be equal to 0");
             velocity = new Vec(0, 0, 0);
             acceleration = new Vec(0, 0, 0);
+            this.mass = mass;
         }
 
         public Mass(double mass, Point3d pos) {
@@ -66,18 +73,6 @@ public abstract class MassSimulation extends Simulation {
 
         public Mass(double mass, Vec positionVector) {
             this (mass, positionVector.x, positionVector.y, positionVector.z);
-        }
-
-        public Mass(double x, double y, double z) {
-            this (1, x, y, z);
-        }
-
-        public Mass(Point3d pos) {
-            this (1, pos);
-        }
-
-        public Mass(Vec positionVector) {
-            this (1, positionVector);
         }
 
         public void tick() {
@@ -99,7 +94,7 @@ public abstract class MassSimulation extends Simulation {
         }
 
         public void applyForce(Vec force) {
-            this.acceleration.add(force.scale(1/mass));
+            this.acceleration.add(Vec.scale(force, 1.0/mass));
         }
 
         public void accelerate(Vec acceleration) {
