@@ -1,7 +1,6 @@
 package spacesimulation;
 
-import java.awt.Graphics;
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

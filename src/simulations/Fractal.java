@@ -24,7 +24,7 @@ public class Fractal extends Simulation {
 
     @Override
     public void tick() {
-        int speed = 1000;
+        int speed = 5;
         for (int i = 0; i < speed; i++) {
             Point3d corner = corners[(int)(Math.random() * corners.length)];
             points.add(new Point3d(points.get(points.size() - 1).getConnectingVectorTo(corner).scale(0.5).add(points.get(points.size() - 1).getPositionVector())));
