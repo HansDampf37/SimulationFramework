@@ -69,7 +69,7 @@ public class Vec {
      * 
      * @return A vector with the same direction as this one had before, but length 1.
      */
-    public Vec shortenToLenghtOne() {
+    public Vec shortenToLengthOne() {
         double length = getLength();
         x /= length;
         y /= length;
@@ -78,14 +78,14 @@ public class Vec {
     }
 
     /**
-     * Returns the standardscalarproduct (fundamental matrix = unit matrix)with the givn vector.
+     * Returns the standard dot product (fundamental matrix = unit matrix)with the given vector.
      */
     public double scalarProduct(Vec v) {
         return x * v.x + y * v.y + z * v.z;
     }
 
     /**
-     * Returns true if the angle between this vector and the given one is smaller than 90°. Otherwise returns false.
+     * Returns true if the angle between this vector and the given one is smaller than 90°. Otherwise, returns false.
      */
     public boolean hasSharpAngleTo(Vec v) {
         Vec w = linearProjection(v);
@@ -94,7 +94,7 @@ public class Vec {
 
     /**
      * Returns the part of this vector that is parallel to the given vector and updates the values of this instance to the parallel one's values.
-     * The returned vector is save to use.
+     * The returned vector is safe to use.
      */
     public Vec linearProjection(Vec ontoThisOne) {
         Vec w = new Vec(ontoThisOne.x, ontoThisOne.y, ontoThisOne.z);
@@ -110,7 +110,7 @@ public class Vec {
      * Scales this Vector by a given factor. Then returns this instance with updated values
      * 
      * @param scalar factor
-     * @return the result of scalarmultiplication: this * scalar
+     * @return the result of scalar multiplication: this * scalar
      */
     public Vec scale(double scalar) {
         x *= scalar;
@@ -120,7 +120,7 @@ public class Vec {
     }
 
     /**
-     * Returns the result of the vectoraddition v + w. The returned vector is save to use.
+     * Returns the result of the vector addition v + w. The returned vector is safe to use.
      * 
      * @param v first vector
      * @param w second vector
@@ -131,10 +131,10 @@ public class Vec {
     }
 
      /**
-     * Returns the result of the vectorsubtraction v - w. The returned vector is save to use.
+     * Returns the result of the vector subtraction v - w. The returned vector is safe to use.
      * 
-     * @param v first vector
-     * @param w second vector
+     * @param first first vector
+     * @param second second vector
      * @return v - w
      */
     public static Vec sub(Vec first, Vec second) {
@@ -142,20 +142,20 @@ public class Vec {
     }
 
     /**
-     * Returns a vector with the same direction as the given one, but length 1. The returned vector is save to use.
+     * Returns a vector with the same direction as the given one, but length 1. The returned vector is safe to use.
      * 
      * @return a vector with the same direction as the given one, but length 1.
      */
-    public static Vec shortenToLenghtOne(Vec v) {
+    public static Vec shortenToLengthOne(Vec v) {
         double length = v.getLength();
         return new Vec(v.x / length, v.y / length, v.z / length);
     }
     
     /**
-     * Returns the result of the scalarmultiplication v * scalar without changing v. The returned vector is safe to use.
+     * Returns the result of the scalar multiplication v * scalar without changing v. The returned vector is safe to use.
      * @param v Vector
      * @param scalar factor
-     * @return the result of the scalarmultiplication v * scalar
+     * @return the result of the scalar multiplication v * scalar
      */
     public static Vec scale(Vec v, double scalar) {
         return new Vec(v.x * scalar, v.y * scalar, v.z * scalar);
@@ -163,7 +163,7 @@ public class Vec {
 
    /**
      * Returns the part of this vector that is parallel to the given vector.
-     * The returned vector is save to use.
+     * The returned vector is safe to use.
      *
      * @param willBeProjected the returned vector builds this one
      * @param ontoThisOne the returned vector is parallel to this one
@@ -175,6 +175,15 @@ public class Vec {
         double factor = willBeProjected.scalarProduct(w)/w.scalarProduct(w);
         w.scale(factor);
         return w;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Vec) {
+            Vec v = (Vec) other;
+            return x == v.x && y == v.y && z == v.z;
+        }
+        return false;
     }
 
     @Override
