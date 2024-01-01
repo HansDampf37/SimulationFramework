@@ -71,6 +71,7 @@ public class Vec {
      */
     public Vec shortenToLengthOne() {
         double length = getLength();
+        if (length == 0) throw new ArithmeticException("Division by zero");
         x /= length;
         y /= length;
         z /= length;
@@ -148,6 +149,7 @@ public class Vec {
      */
     public static Vec shortenToLengthOne(Vec v) {
         double length = v.getLength();
+        if (length == 0) throw new ArithmeticException("Division by zero");
         return new Vec(v.x / length, v.y / length, v.z / length);
     }
     
@@ -170,6 +172,7 @@ public class Vec {
      * @return the part of this vector that is parallel to the given vector
      */
     public static Vec linearProjection(Vec willBeProjected, Vec ontoThisOne) {
+        if (ontoThisOne.equals(new Vec(0, 0, 0))) throw new ArithmeticException("Division by zero");
         if (ontoThisOne.getLength() == 0) return new Vec(0, 0, 0);
         Vec w = new Vec(ontoThisOne.x, ontoThisOne.y, ontoThisOne.z);
         double factor = willBeProjected.scalarProduct(w)/w.scalarProduct(w);
@@ -179,8 +182,7 @@ public class Vec {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Vec) {
-            Vec v = (Vec) other;
+        if (other instanceof Vec v) {
             return x == v.x && y == v.y && z == v.z;
         }
         return false;
