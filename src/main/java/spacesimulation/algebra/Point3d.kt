@@ -23,6 +23,10 @@ open class Point3d {
         z += delta.z
     }
 
+    operator fun plus(delta: Vec) = positionVector + delta
+    operator fun minus(delta: Vec) = positionVector - delta
+
+
     fun set(positionVector: Vec) {
         x = positionVector.x
         y = positionVector.y

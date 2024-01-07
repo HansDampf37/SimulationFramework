@@ -17,7 +17,7 @@ public class Simulator implements Runnable {
         display = new Display();
         keymanager = new KeyManager();
         display.getJFrame().addKeyListener(keymanager);
-        simulations = new ArrayList<Simulation>();
+        simulations = new ArrayList<>();
     }
 
     private void tick(double dtInSec) {

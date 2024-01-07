@@ -6,7 +6,7 @@ import spacesimulation.physics.Mass
 import java.awt.Graphics
 
 abstract class MassSimulation(
-    private var frictionFactor: Double = 0.95,
+    private var frictionFactor: Double = 1.0,
     private var gravity: Vec = Vec(0.0, -9.81, 0.0),
     simulator: Simulator) : Simulation(simulator) {
 
@@ -28,7 +28,7 @@ abstract class MassSimulation(
         for (mass in masses) {
             mass.tick(dtInSec)
             if (affectedByGravity[mass]!!) mass.accelerate(gravity)
-            mass.velocity = mass.velocity.scale(frictionFactor * dtInSec)
+            mass.velocity = mass.velocity.scale(frictionFactor)
         }
         buffer()
     }

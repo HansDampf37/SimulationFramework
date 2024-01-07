@@ -4,32 +4,16 @@ import kotlin.math.sqrt
 
 /**
  * Represents a Vector in 3d space.
+ * @param x x value
+ * @param y y value
+ * @param z z value
  */
-class Vec
-/**
- * Constructor
- * @param deltaX x value
- * @param deltaY y value
- * @param deltaZ z value
- */(
-    /**
-     * x value
-     */
-    @JvmField var x: Double,
-    /**
-     * y value
-     */
-    @JvmField var y: Double,
-    /**
-     * z value
-     */
-    @JvmField var z: Double
-) {
+class Vec(var x: Double, var y: Double, var z: Double) {
     /**
      * adds the given Vector to this Vector and returns this instance with updated values
      *
      * @param v other vector
-     * @return the result o the vectoraddition with this vector and v
+     * @return the result o the vector addition with this vector and v
      */
     fun add(v: Vec): Vec {
         x += v.x
@@ -38,11 +22,17 @@ class Vec
         return this
     }
 
+    operator fun plus(other: Vec) = add(this, other)
+    operator fun times(other: Vec) = scalarProduct(other)
+    operator fun times(scalar: Number) = scale(this, scalar.toDouble())
+    operator fun minus(other: Vec) = sub(this, other)
+    operator fun div(scalar: Number) = scale(this, 1/scalar.toDouble())
+
     /**
      * subtracts the given Vector from this Vector and returns this instance with updated values
      *
      * @param v other vector
-     * @return the result o the vectorsubtraction with this vector and v
+     * @return the result o the vector subtraction with this vector and v
      */
     fun sub(v: Vec): Vec {
         x -= v.x
@@ -123,6 +113,13 @@ class Vec
 
     override fun toString(): String {
         return "($x, $y, $z)"
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + z.hashCode()
+        return result
     }
 
     companion object {
