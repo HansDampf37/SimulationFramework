@@ -22,7 +22,7 @@ public class Connection implements Entity {
         this.maxDistance = maxDistance;
     }
 
-    public void tick() {
+    public void tick(double dtInSec) {
         if (m1.getDistanceTo(m2) >= maxDistance) {
             Vec ropeDir = m1.getDirectionTo(m2);
             Vec dif = Vec.sub(m1.getVelocity(), m2.getVelocity());

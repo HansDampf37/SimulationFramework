@@ -6,7 +6,7 @@ public abstract class Simulation {
     protected Simulator simulator;
     protected KeyManager keymanager;
     protected Graphics3d drawer;
-    private final boolean ANTI_ALIASING = false;
+    private final boolean ANTI_ALIASING = true;
 
     public Simulation(Simulator sim) {
         simulator = sim;
@@ -16,12 +16,12 @@ public abstract class Simulation {
 
     }
 
-    public abstract void tick();
+    public abstract void tick(double dtInSec);
 
-    public void parentTick() {
+    public void parentTick(double dtInSec) {
         listenForInput();
         drawer.setWindowHeightAndWidth(simulator.getWidth(), simulator.getHeight());
-        tick();
+        tick(dtInSec);
     }
 
     private void listenForInput() {

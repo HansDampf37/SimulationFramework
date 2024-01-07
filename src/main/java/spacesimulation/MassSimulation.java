@@ -34,10 +34,10 @@ public abstract class MassSimulation extends Simulation {
     }
 
     @Override
-    public void tick() {
-        calcForces();
+    public void tick(double dtInSec) {
+        calcForces(dtInSec);
         for (Mass mass : masses) {
-            mass.tick();
+            mass.tick(dtInSec);
             if (affectedByGravity.get(mass)) mass.accelerate(gravity);
             mass.setVelocity(mass.getVelocity().scale(frictionFactor));
         }
@@ -47,7 +47,7 @@ public abstract class MassSimulation extends Simulation {
     @Override
     public abstract void render(Graphics g);
 
-    public abstract void calcForces();
+    public abstract void calcForces(double dtInSec);
 
     public abstract void buffer();
 

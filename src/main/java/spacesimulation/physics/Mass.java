@@ -31,9 +31,9 @@ public class Mass extends Point3d implements Entity {
     }
 
     @Override
-    public void tick() {
-        accelerate();
-        move();
+    public void tick(double dtInSec) {
+        accelerate(dtInSec);
+        move(dtInSec);
     }
 
     @Override
@@ -41,13 +41,14 @@ public class Mass extends Point3d implements Entity {
         drawer.drawDot(this, 4, Color.white, g);
     }
 
-    private void accelerate() {
-        velocity.add(acceleration);
+    private void accelerate(double dtInSec) {
+        System.out.println(dtInSec);
+        velocity.add(Vec.scale(acceleration, dtInSec));
         acceleration.scale(0);
     }
 
-    private void move() {
-        add(velocity);
+    private void move(double dtInSec) {
+        add(Vec.scale(velocity, dtInSec));
     }
 
     public void applyForce(Vec force) {
@@ -59,7 +60,7 @@ public class Mass extends Point3d implements Entity {
     }
 
     public void removeAccelerationInDirection(Vec direction) {
-        acceleration.add(acceleration.linearProjection(direction).scale(-1));
+        acceleration.sub(acceleration.linearProjection(direction));
     }
 
     public Vec getImpulse() {

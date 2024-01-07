@@ -21,7 +21,7 @@ public class PlatonSpace extends Simulation {
         for (int i = 0; i < forces.length; i++) forces[i] = new Vec(0, 0, 0);
     }
 
-    public void tick() {
+    public void tick(double dtInSec) {
         calcResultingForceOnPoint3d();
         movePoints();
         keepPointsInOrb();

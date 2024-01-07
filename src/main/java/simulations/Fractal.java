@@ -23,7 +23,7 @@ public class Fractal extends Simulation {
     }
 
     @Override
-    public void tick() {
+    public void tick(double dtInSec) {
         int speed = 5;
         for (int i = 0; i < speed; i++) {
             Point3d corner = corners[(int)(Math.random() * corners.length)];

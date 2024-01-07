@@ -9,7 +9,7 @@ import spacesimulation.algebra.*;
 public class Pendulum extends Simulation {
     CartesianCoordinateSystem cart = new CartesianCoordinateSystem(true, 500, 500, Color.black);
     private final int maxRopeSegmentLength = 10000;
-    private final Vec gravity = new Vec(0, -0.1, 0);
+    private final Vec gravity = new Vec(0, -9.81, 0);
     private Point3d[] points;
     private Vec[] velocities;
     private Vec[] forces;
@@ -28,7 +28,7 @@ public class Pendulum extends Simulation {
     }
 
     @Override
-    public void tick() {
+    public void tick(double dtInSec) {
         getInput();
         calcForcesOnPoints();
         airResist();

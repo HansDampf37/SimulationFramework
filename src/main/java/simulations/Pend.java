@@ -12,17 +12,17 @@ import spacesimulation.physics.Mass;
 
 public class Pend extends MassSimulation {
     CartesianCoordinateSystem cart = new CartesianCoordinateSystem(true, 500000, 500000, Color.black);
-    private final int maxRopeSegmentLength;
+    private final double maxRopeSegmentLength;
     private final int amountOfPoints;
 
     private final List<Connection> connections = new ArrayList<>();
     
-    public Pend(int amountOfPoints, Simulator sim) {
+    public Pend(int amountOfPoints, Simulator sim, double length) {
         super(1, new Vec(0, -9.81, -0), sim);
         this.amountOfPoints = amountOfPoints;
-        maxRopeSegmentLength = 100/amountOfPoints;
+        maxRopeSegmentLength = (length/amountOfPoints);
         reset();
-        drawer.setZoom(3);
+        drawer.setZoom(30);
         drawer.setCameraAngleHorizontal(0.2);
     }
 
@@ -39,18 +39,18 @@ public class Pend extends MassSimulation {
     }
 
     @Override
-    public void calcForces() {
+    public void calcForces(double dtInSec) {
         getInput();
         for (Connection c : connections) {
-            c.tick();
+            c.tick(dtInSec);
         }
     }
 
     private void getInput() {
-        if (keymanager.f) masses.get(0).accelerate(new Vec(0.01, 0, 0));
-        if (keymanager.g) masses.get(0).accelerate(new Vec(-0.01, 0, 0));
-        if (keymanager.v) masses.get(0).accelerate(new Vec(0, 0, 5));
-        if (keymanager.b) masses.get(0).accelerate(new Vec(0, 0, -5));
+        if (keymanager.f) masses.get(0).accelerate(new Vec(10, 0, 0));
+        if (keymanager.g) masses.get(0).accelerate(new Vec(-10, 0, 0));
+        if (keymanager.v) masses.get(0).accelerate(new Vec(0, 0, 10));
+        if (keymanager.b) masses.get(0).accelerate(new Vec(0, 0, -10));
         if (keymanager.up) masses.get(1).applyForce(new Vec(10, 0, 0));
     }
 

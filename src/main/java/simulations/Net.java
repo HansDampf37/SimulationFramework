@@ -39,7 +39,7 @@ public class Net extends Simulation {
     }
 
     @Override
-    public void tick() {
+    public void tick(double dtInSec) {
         getInput();
         calcNetForces();
         airResist();

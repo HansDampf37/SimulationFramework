@@ -7,7 +7,7 @@ import java.awt.*;
  */
 public interface Entity {
 
-    public void tick();
+    public void tick(double dtInSec);
 
     public void render(Graphics3d drawer, Graphics g);
 }

@@ -26,4 +26,15 @@ class CollisionTest {
         assertEquals(m1.velocity, Vec(-0.5, 0.0, 0.0))
         assertEquals(m2.velocity, Vec(0.5, 0.0, 0.0))
     }
+
+    @Test
+    fun `no collision occurs if the velocities are orthogonal to connecting vector`() {
+        val m1 = Mass(1.0, Vec(.0,.0, .0))
+        val m2 = Mass(1.0, Vec(1.0,.0, .0))
+        m1.velocity = Vec(0.0, 0.5, 0.0)
+        m2.velocity = Vec(0.0, -0.5, 0.0)
+        Collision.occur(m1, m2)
+        assertEquals(m1.velocity, Vec(0.0, 0.5, 0.0))
+        assertEquals(m2.velocity, Vec(0.0, -0.5, 0.0))
+    }
 }

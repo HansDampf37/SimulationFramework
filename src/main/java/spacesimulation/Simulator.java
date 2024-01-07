@@ -20,8 +20,8 @@ public class Simulator implements Runnable {
         simulations = new ArrayList<Simulation>();
     }
 
-    private void tick() {
-        for (Simulation simulation : simulations) simulation.parentTick();
+    private void tick(double dtInSec) {
+        for (Simulation simulation : simulations) simulation.parentTick(dtInSec);
         keymanager.tick();
     }
 
@@ -45,18 +45,19 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         init();
-        long lastTime = System.nanoTime();
-        final double amountOfTicks = 60;
-        double nsPerTick = 1000000000.0 / amountOfTicks;
+        long lastTime = System.currentTimeMillis();
+        final double amountOfTicks = 25;
+        double msPerTick = 1000.0 / amountOfTicks;
         double delta = 0;
 
         while (running) {
-            long now = System.nanoTime();
-            delta += (now - lastTime) / nsPerTick;
+            long now = System.currentTimeMillis();
+            delta += (now - lastTime) / msPerTick;
             if (delta >= 1) {
-                tick();
+                tick((now - lastTime) / 1000.0);
                 render();
                 delta--;
+                lastTime = now;
             }
         }
         stop();

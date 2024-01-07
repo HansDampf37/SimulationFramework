@@ -6,10 +6,10 @@ class Collision {
     companion object{
         /**
          * Simulates the (inelastic) collision of two masses with k being the coefficient of restitution.
+         * **See** [wikipedia](https://en.wikipedia.org/wiki/Inelastic_collision)
          * @param mass1 the first mass
          * @param mass2 the second mass
          * @param k the coefficient of restitution
-         * @see [wikipedia][https://en.wikipedia.org/wiki/Inelastic_collision]
          */
         fun occur(mass1: Mass, mass2: Mass, k: Double = 1.0) {
             val dir = mass1.getDirectionTo(mass2)
