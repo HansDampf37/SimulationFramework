@@ -7,11 +7,11 @@ import java.util.ArrayList;
 public class Simulator implements Runnable {
     private Thread thread;
     private boolean running;
-    private Display display;
+    private final Display display;
     private BufferStrategy bs;
     private Graphics g;
-    private KeyManager keymanager;
-    private ArrayList<Simulation> simulations;
+    private final KeyManager keymanager;
+    private final ArrayList<Simulation> simulations;
 
     public Simulator() {
         display = new Display();

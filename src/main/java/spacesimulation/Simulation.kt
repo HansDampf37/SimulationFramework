@@ -1,47 +1,48 @@
-package spacesimulation;
+package spacesimulation
 
-import java.awt.*;
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 
-public abstract class Simulation {
-    protected Simulator simulator;
-    protected KeyManager keymanager;
-    protected Graphics3d drawer;
-    private final boolean ANTI_ALIASING = true;
+abstract class Simulation(protected var simulator: Simulator) {
+    protected var keyManager: KeyManager
+    protected var drawer: Graphics3d
+    private val antiAliasing = true
 
-    public Simulation(Simulator sim) {
-        simulator = sim;
-        simulator.addSimulation(this);
-        keymanager = simulator.getKeymanager();
-        drawer = new Graphics3d();
-
+    init {
+        simulator.addSimulation(this)
+        keyManager = simulator.keymanager
+        drawer = Graphics3d()
     }
 
-    public abstract void tick(double dtInSec);
-
-    public void parentTick(double dtInSec) {
-        listenForInput();
-        drawer.setWindowHeightAndWidth(simulator.getWidth(), simulator.getHeight());
-        tick(dtInSec);
+    abstract fun tick(dtInSec: Double)
+    fun parentTick(dtInSec: Double) {
+        listenForInput()
+        drawer.setWindowHeightAndWidth(simulator.width, simulator.height)
+        tick(dtInSec)
     }
 
-    private void listenForInput() {
-        if (keymanager.w) drawer.moveVerticalCamera(1);
-        if (keymanager.s) drawer.moveVerticalCamera(-1);
-        if (keymanager.d) drawer.moveHorizontalCamera(1);
-        if (keymanager.a) drawer.moveHorizontalCamera(-1);
-        if (keymanager.y) drawer.zoom(1);
-        if (keymanager.out) drawer.zoom(-1);
-        if (keymanager.n) reset();
+    private fun listenForInput() {
+        if (keyManager.w) drawer.moveVerticalCamera(1)
+        if (keyManager.s) drawer.moveVerticalCamera(-1)
+        if (keyManager.d) drawer.moveHorizontalCamera(1)
+        if (keyManager.a) drawer.moveHorizontalCamera(-1)
+        if (keyManager.y) drawer.zoom(1)
+        if (keyManager.out) drawer.zoom(-1)
+        if (keyManager.n) reset()
     }
 
-    public void parentRender(Graphics g) {
-        g.setColor(Color.white);
-        g.drawString(drawer.cameraSettingsToString(), 10, 10);
-        if (ANTI_ALIASING) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        render(g);
+    fun parentRender(g: Graphics) {
+        g.color = Color.white
+        g.drawString(drawer.cameraSettingsToString(), 10, 10)
+        if (antiAliasing) (g as Graphics2D).setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON
+        )
+        render(g)
     }
 
-    public abstract void render(Graphics g);
-
-    public abstract void reset();
+    abstract fun render(g: Graphics)
+    abstract fun reset()
 }

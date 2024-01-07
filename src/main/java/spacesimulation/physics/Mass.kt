@@ -1,97 +1,63 @@
-package spacesimulation.physics;
+package spacesimulation.physics
 
-import spacesimulation.Entity;
-import spacesimulation.Graphics3d;
-import spacesimulation.algebra.Point3d;
-import spacesimulation.algebra.Vec;
+import spacesimulation.Entity
+import spacesimulation.Graphics3d
+import spacesimulation.algebra.Point3d
+import spacesimulation.algebra.Vec
+import java.awt.Color
+import java.awt.Graphics
 
-import java.awt.*;
+class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
+    var velocity: Vec
+    private val currentForce: Vec
+    val mass: Double
+    var status = Status.Movable
 
-public class Mass extends Point3d implements Entity {
-    private final Vec velocity;
-    private final Vec acceleration;
-    private final double mass;
-
-    private Status status = Status.Movable;
-
-    public Mass(double mass, double x, double y, double z) {
-        super(x, y, z);
-        if (mass == 0) throw new IllegalArgumentException("Mass can't be equal to 0");
-        velocity = new Vec(0, 0, 0);
-        acceleration = new Vec(0, 0, 0);
-        this.mass = mass;
+    init {
+        require(mass != 0.0) { "Mass can't be equal to 0" }
+        velocity = Vec(0.0, 0.0, 0.0)
+        currentForce = Vec(0.0, 0.0, 0.0)
+        this.mass = mass
     }
 
-    public Mass(double mass, Point3d pos) {
-        this(mass, pos.x, pos.y, pos.z);
+    constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)
+    constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
+
+    override fun tick(dtInSec: Double) {
+        accelerate(dtInSec)
+        move(dtInSec)
     }
 
-    public Mass(double mass, Vec positionVector) {
-        this(mass, positionVector.x, positionVector.y, positionVector.z);
+    override fun render(drawer: Graphics3d, g: Graphics) {
+        drawer.drawDot(this, 4, Color.white, g)
     }
 
-    @Override
-    public void tick(double dtInSec) {
-        accelerate(dtInSec);
-        move(dtInSec);
+    private fun accelerate(dtInSec: Double) {
+        velocity.add(Vec.scale(currentForce, dtInSec))
+        currentForce.scale(0.0)
     }
 
-    @Override
-    public void render(Graphics3d drawer, Graphics g) {
-        drawer.drawDot(this, 4, Color.white, g);
+    private fun move(dtInSec: Double) {
+        add(Vec.scale(velocity, dtInSec))
     }
 
-    private void accelerate(double dtInSec) {
-        System.out.println(dtInSec);
-        velocity.add(Vec.scale(acceleration, dtInSec));
-        acceleration.scale(0);
+    fun applyForce(force: Vec) {
+        currentForce.add(Vec.scale(force, 1.0 / mass))
     }
 
-    private void move(double dtInSec) {
-        add(Vec.scale(velocity, dtInSec));
+    fun accelerate(acceleration: Vec) {
+        currentForce.add(acceleration)
     }
 
-    public void applyForce(Vec force) {
-        this.acceleration.add(Vec.scale(force, 1.0 / mass));
+    fun removeAccelerationInDirection(direction: Vec) {
+        currentForce.sub(currentForce.linearProjection(direction))
     }
 
-    public void accelerate(Vec acceleration) {
-        this.acceleration.add(acceleration);
-    }
+    val impulse: Vec
+        get() = Vec.scale(velocity, mass)
 
-    public void removeAccelerationInDirection(Vec direction) {
-        acceleration.sub(acceleration.linearProjection(direction));
-    }
 
-    public Vec getImpulse() {
-        return Vec.scale(velocity, mass);
-    }
-
-    public Vec getCurrentForce() {
-        return acceleration;
-    }
-
-    public Vec getVelocity() { return velocity; }
-
-    public void setVelocity(Vec velocity) {
-        this.velocity.x = velocity.x;
-        this.velocity.y = velocity.y;
-        this.velocity.z = velocity.z;
-    }
-
-    public double getMass() { return mass; }
-
-    public Vec getAcceleration() { return acceleration; }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public enum Status {
+    enum class Status {
         Immovable,
         Movable
     }

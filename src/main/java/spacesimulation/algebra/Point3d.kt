@@ -1,54 +1,52 @@
-package spacesimulation.algebra;
+package spacesimulation.algebra
 
-public class Point3d {
-    public double x;
-    public double y;
-    public double z;
+open class Point3d {
+    var x: Double
+    var y: Double
+    var z: Double
 
-    public Point3d(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    constructor(x: Double, y: Double, z: Double) {
+        this.x = x
+        this.y = y
+        this.z = z
     }
 
-    public Point3d(Vec positionVector) {
-        x = positionVector.x;
-        y = positionVector.y;
-        z = positionVector.z;
+    constructor(positionVector: Vec) {
+        x = positionVector.x
+        y = positionVector.y
+        z = positionVector.z
     }
 
-    public void add(Vec delta) {
-        x += delta.x;
-        y += delta.y;
-        z += delta.z;
+    fun add(delta: Vec) {
+        x += delta.x
+        y += delta.y
+        z += delta.z
     }
 
-    public void set(Vec positionVector) {
-        x = positionVector.x;
-        y = positionVector.y;
-        z = positionVector.z;
+    fun set(positionVector: Vec) {
+        x = positionVector.x
+        y = positionVector.y
+        z = positionVector.z
     }
 
-    public Vec getConnectingVectorTo(Point3d other) {
-        return new Vec(other.x - x, other.y - y, other.z - z);
+    fun getConnectingVectorTo(other: Point3d): Vec {
+        return Vec(other.x - x, other.y - y, other.z - z)
     }
 
-    public Vec getDirectionTo(Point3d other) {
-        Vec result = getConnectingVectorTo(other);
-        result.scale(1/result.getLength());
-        return result;
+    fun getDirectionTo(other: Point3d): Vec {
+        val result = getConnectingVectorTo(other)
+        result.scale(1 / result.length)
+        return result
     }
 
-    public double getDistanceTo(Point3d other) {
-        return getConnectingVectorTo(other).getLength();
+    fun getDistanceTo(other: Point3d): Double {
+        return getConnectingVectorTo(other).length
     }
 
-    public Vec getPositionVector() {
-        return new Vec(x, y, z);
-    }
+    val positionVector: Vec
+        get() = Vec(x, y, z)
 
-    @Override
-    public String toString() {
-        return "[" + (int)x + ", " + (int)y + ", " + (int)z + "]";
+    override fun toString(): String {
+        return "[" + x.toInt() + ", " + y.toInt() + ", " + z.toInt() + "]"
     }
 }

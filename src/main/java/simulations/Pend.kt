@@ -1,81 +1,69 @@
-package simulations;
+package simulations
 
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.awt.Color;
-import java.util.List;
+import spacesimulation.MassSimulation
+import spacesimulation.Simulator
+import spacesimulation.algebra.Point3d
+import spacesimulation.algebra.Vec
+import spacesimulation.physics.Connection
+import spacesimulation.physics.Mass
+import java.awt.Graphics
 
-import spacesimulation.*;
-import spacesimulation.algebra.*;
-import spacesimulation.physics.Connection;
-import spacesimulation.physics.Mass;
+class Pend(private val amountOfPoints: Int, sim: Simulator, length: Double) :
+    MassSimulation(1.0, Vec(0.0, -9.81, -0.0), sim) {
+    private val maxRopeSegmentLength: Double
+    private val connections: MutableList<Connection> = ArrayList()
 
-public class Pend extends MassSimulation {
-    CartesianCoordinateSystem cart = new CartesianCoordinateSystem(true, 500000, 500000, Color.black);
-    private final double maxRopeSegmentLength;
-    private final int amountOfPoints;
-
-    private final List<Connection> connections = new ArrayList<>();
-    
-    public Pend(int amountOfPoints, Simulator sim, double length) {
-        super(1, new Vec(0, -9.81, -0), sim);
-        this.amountOfPoints = amountOfPoints;
-        maxRopeSegmentLength = (length/amountOfPoints);
-        reset();
-        drawer.setZoom(30);
-        drawer.setCameraAngleHorizontal(0.2);
+    init {
+        maxRopeSegmentLength = length / amountOfPoints
+        reset()
+        drawer.setZoom(30.0)
+        drawer.setCameraAngleHorizontal(0.2)
     }
 
-    @Override
-    public void buffer() {
-        for (int i = 1; i < masses.size(); i++) {
-            if (masses.get(i - 1).getConnectingVectorTo(masses.get(i)).getLength() > maxRopeSegmentLength) {
-                Vec posVec = masses.get(i - 1).getConnectingVectorTo(masses.get(i));
-                double scalar = maxRopeSegmentLength / posVec.getLength();
-                posVec.scale(scalar);
-                masses.get(i).set(masses.get(i - 1).getPositionVector().add(posVec));
+    override fun buffer() {
+        for (i in 1 until masses.size) {
+            if (masses[i - 1].getConnectingVectorTo(masses[i]).length > maxRopeSegmentLength) {
+                val posVec = masses[i - 1].getConnectingVectorTo(masses[i])
+                val scalar = maxRopeSegmentLength / posVec.length
+                posVec.scale(scalar)
+                masses[i].set(masses[i - 1].positionVector.add(posVec))
             }
         }
     }
 
-    @Override
-    public void calcForces(double dtInSec) {
-        getInput();
-        for (Connection c : connections) {
-            c.tick(dtInSec);
+    override fun calcForces(dtInSec: Double) {
+        input
+        for (c in connections) {
+            c.tick(dtInSec)
         }
     }
 
-    private void getInput() {
-        if (keymanager.f) masses.get(0).accelerate(new Vec(10, 0, 0));
-        if (keymanager.g) masses.get(0).accelerate(new Vec(-10, 0, 0));
-        if (keymanager.v) masses.get(0).accelerate(new Vec(0, 0, 10));
-        if (keymanager.b) masses.get(0).accelerate(new Vec(0, 0, -10));
-        if (keymanager.up) masses.get(1).applyForce(new Vec(10, 0, 0));
-    }
+    private val input: Unit
+        private get() {
+            if (keyManager.f) masses[0].accelerate(Vec(10.0, 0.0, 0.0))
+            if (keyManager.g) masses[0].accelerate(Vec(-10.0, 0.0, 0.0))
+            if (keyManager.v) masses[0].accelerate(Vec(0.0, 0.0, 10.0))
+            if (keyManager.b) masses[0].accelerate(Vec(0.0, 0.0, -10.0))
+            if (keyManager.up) masses[1].applyForce(Vec(10.0, 0.0, 0.0))
+        }
 
-    @Override
-    public void render(Graphics g) {
-        cart.render(drawer, g);
-        for (Mass m : masses) m.render(drawer, g);
-        for (Connection c : connections) c.render(drawer, g);
-
-        for (int i = 0; i < masses.size(); i++) {
-             g.drawString(masses.get(i).toString(), 10, 100 + i * 20);
+    override fun render(g: Graphics) {
+        for (m in masses) m.render(drawer, g)
+        for (c in connections) c.render(drawer, g)
+        for (i in masses.indices) {
+            g.drawString(masses[i].toString(), 10, 100 + i * 20)
         }
     }
 
-    @Override
-    public void reset() {
-        masses.clear();
-        for (int i = 0; i < amountOfPoints; i++) {
-            addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.7, -i * maxRopeSegmentLength * 0.7), i != 0);
+    override fun reset() {
+        masses.clear()
+        for (i in 0 until amountOfPoints) {
+            addNewMass(Point3d(0.0, -i * maxRopeSegmentLength * 0.7, -i * maxRopeSegmentLength * 0.7), i != 0)
         }
-        masses.get(0).setStatus(Mass.Status.Immovable);
-
-        connections.clear();
-        for (int i = 0; i < amountOfPoints - 1; i++) {
-            connections.add(new Connection(masses.get(i), masses.get(i + 1), maxRopeSegmentLength));
+        masses[0].status = Mass.Status.Immovable
+        connections.clear()
+        for (i in 0 until amountOfPoints - 1) {
+            connections.add(Connection(masses[i], masses[i + 1], maxRopeSegmentLength))
         }
     }
 }

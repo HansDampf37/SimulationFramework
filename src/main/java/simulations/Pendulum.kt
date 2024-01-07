@@ -1,101 +1,94 @@
-package simulations;
+package simulations
 
-import java.awt.Graphics;
-import java.awt.Color;
+import spacesimulation.Simulation
+import spacesimulation.Simulator
+import spacesimulation.algebra.CartesianCoordinateSystem
+import spacesimulation.algebra.Point3d
+import spacesimulation.algebra.Vec
+import java.awt.Color
+import java.awt.Graphics
 
-import spacesimulation.*;
-import spacesimulation.algebra.*;
+class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
+    var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
+    private val maxRopeSegmentLength = 10000
+    private val gravity = Vec(0.0, -9.81, 0.0)
+    private lateinit var points: Array<Point3d>
+    private lateinit var velocities: Array<Vec>
+    private lateinit var forces: Array<Vec>
+    private val airResist = 0.999
 
-public class Pendulum extends Simulation {
-    CartesianCoordinateSystem cart = new CartesianCoordinateSystem(true, 500, 500, Color.black);
-    private final int maxRopeSegmentLength = 10000;
-    private final Vec gravity = new Vec(0, -9.81, 0);
-    private Point3d[] points;
-    private Vec[] velocities;
-    private Vec[] forces;
-    private final double airResist = 0.999;
-    
-    public Pendulum(int amountOfPoints, Simulator sim) {
-        super(sim);
-        points = new Point3d[amountOfPoints];
-        velocities = new Vec[amountOfPoints];
-        forces = new Vec[amountOfPoints];
-        for (int i = 0; i < points.length; i++) {
-            points[i] = new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0);
-            forces[i] = new Vec(0, 0, 0);
+    init {
+        reset()
+        drawer.setZoom(0.03)
+    }
+
+    override fun tick(dtInSec: Double) {
+        input
+        calcForcesOnPoints()
+        airResist()
+        movePoints()
+    }
+
+    private val input: Unit
+        private get() {
+            if (keyManager.up) forces[0] = Vec(10.0, 0.0, 0.0)
+            if (keyManager.down) forces[0] = Vec(-10.0, 0.0, 0.0)
+            if (keyManager.left) forces[0] = Vec(0.0, 0.0, 10.0)
+            if (keyManager.right) forces[0] = Vec(0.0, 0.0, -10.0)
         }
-        drawer.setZoom(0.03);
-    }
 
-    @Override
-    public void tick(double dtInSec) {
-        getInput();
-        calcForcesOnPoints();
-        airResist();
-        movePoints();
-    }
-
-    private void getInput() {
-        if (keymanager.up) forces[0] = (new Vec(10, 0, 0));
-        if (keymanager.down) forces[0] = (new Vec(-10, 0, 0));
-        if (keymanager.left) forces[0] = (new Vec(0, 0, 10));
-        if (keymanager.right) forces[0] = (new Vec(0, 0, -10));
-    }
-
-    private void airResist() {
-        for (int i = 0; i < forces.length; i++) {
-            forces[i].scale(airResist);
+    private fun airResist() {
+        for (i in forces.indices) {
+            forces[i]!!.scale(airResist)
         }
     }
 
-    private void movePoints() {
-        points[0].add(forces[0]);
-        for (int i = 1; i < points.length; i++) {
-            points[i].add(forces[i]);
-            if (points[i - 1].getConnectingVectorTo(points[i]).getLength() > maxRopeSegmentLength) {
-                Vec posVec = points[i - 1].getConnectingVectorTo(points[i]);
-                double scalar = maxRopeSegmentLength / posVec.getLength();
-                posVec.scale(scalar);
-                points[i].set(points[i - 1].getPositionVector().add(posVec));
+    private fun movePoints() {
+        points[0]!!.add(forces[0])
+        for (i in 1 until points.size) {
+            points[i]!!.add(forces[i])
+            if (points[i - 1]!!.getConnectingVectorTo(points[i]).length > maxRopeSegmentLength) {
+                val posVec = points[i - 1]!!.getConnectingVectorTo(points[i])
+                val scalar = maxRopeSegmentLength / posVec.length
+                posVec.scale(scalar)
+                points[i]!!.set(points[i - 1]!!.positionVector.add(posVec))
             }
         }
     }
 
-    private void calcForcesOnPoints() {
-        for (int i = 1; i < points.length; i++) {
-            if (points[i].getDistanceTo(points[i - 1]) >= maxRopeSegmentLength) {
-                Vec ropeDir = points[i].getDirectionTo(points[i - 1]);
+    private fun calcForcesOnPoints() {
+        for (i in 1 until points.size) {
+            if (points[i]!!.getDistanceTo(points[i - 1]) >= maxRopeSegmentLength) {
+                val ropeDir = points[i]!!.getDirectionTo(points[i - 1])
                 if (i == 1) {
-                    Vec forceInRopeDir = Vec.linearProjection(forces[1], ropeDir);
-                    forceInRopeDir.scale(-2);
-                    forces[1].add(forceInRopeDir);
-                    forces[1].add(Vec.linearProjection(forces[0], forceInRopeDir));
+                    val forceInRopeDir = Vec.linearProjection(forces[1], ropeDir)
+                    forceInRopeDir.scale(-2.0)
+                    forces[1]!!.add(forceInRopeDir)
+                    forces[1]!!.add(Vec.linearProjection(forces[0], forceInRopeDir))
                 } else {
-
                 }
             }
-            forces[i].add(gravity);
+            forces[i]!!.add(gravity)
         }
     }
 
-    @Override
-    public void render(Graphics g) {
-        cart.render(drawer, g);
-        for (int i = 0; i < points.length - 1; i++) {
-            drawer.drawDot(points[i], 4, Color.lightGray, g);
-            drawer.drawLine(points[i], points[i + 1], g);
+    override fun render(g: Graphics) {
+        cart.render(drawer, g)
+        for (i in 0 until points.size - 1) {
+            drawer.drawDot(points[i]!!, 4, Color.lightGray, g)
+            drawer.drawLine(points[i]!!, points[i + 1]!!, g)
         }
-        drawer.drawDot(points[points.length - 1], 4, Color.lightGray, g);
+        drawer.drawDot(points[points.size - 1]!!, 4, Color.lightGray, g)
     }
 
-    @Override
-    public void reset() {
-        points = new Point3d[points.length];
-        forces = new Vec[points.length];
-        for (int i = 0; i < points.length; i++) {
-            points[i] = new Point3d(0, -i * maxRopeSegmentLength * 0.5, 0);
-            forces[i] = new Vec(0, 0, 0);
-            velocities[i] = new Vec(0, 0, 0);
+    override fun reset() {
+        points = Array(amountOfPoints) { i -> Point3d(0.0, -i * maxRopeSegmentLength * 0.5, 0.0) }
+        velocities = Array(amountOfPoints) { _ -> Vec(0.0, 0.0, 0.0) }
+        forces = Array(amountOfPoints) { _ -> Vec(0.0, 0.0, 0.0) }
+        for (i in points.indices) {
+            points[i] = Point3d(0.0, -i * maxRopeSegmentLength * 0.5, 0.0)
+            forces[i] = Vec(0.0, 0.0, 0.0)
+            velocities[i] = Vec(0.0, 0.0, 0.0)
         }
     }
 }

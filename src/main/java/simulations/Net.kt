@@ -1,137 +1,147 @@
-package simulations;
+package simulations
 
-import java.awt.*;
+import spacesimulation.Simulation
+import spacesimulation.Simulator
+import spacesimulation.algebra.CartesianCoordinateSystem
+import spacesimulation.algebra.Point3d
+import spacesimulation.algebra.Vec
+import java.awt.Color
+import java.awt.Graphics
 
-import spacesimulation.Simulation;
-import spacesimulation.Simulator;
-import spacesimulation.algebra.CartesianCoordinateSystem;
-import spacesimulation.algebra.Point3d;
-import spacesimulation.algebra.Vec;
+class Net(sim: Simulator) : Simulation(sim) {
+    private val airResist = 0.999
+    private val gravity = Vec(0.0, -100.0, 0.0)
+    private lateinit var points: Array<Array<Point3d>>
+    private lateinit var forces: Array<Array<Vec>>
+    private val colors: Array<Array<Color>>
+    var cart = CartesianCoordinateSystem(false, 1000, 1000.0, Color.black)
 
-public class Net extends Simulation {
-    private static final int size = 30;
-    private static final int distBetweenPoints = 300;
-    private double airResist = 0.999;
-    private Vec gravity = new Vec(0, -100, 0);
-    private Point3d[][] points;
-    private Vec[][] forces;
-
-    private Color[][] colors;
-    CartesianCoordinateSystem cart = new CartesianCoordinateSystem(false, 1000, 1000, Color.black);
-
-    public Net(Simulator sim) {
-        super(sim);
-        points = new Point3d[size][size];
-        forces = new Vec[size][size];
-        colors = new Color[size][size];
-        for (int x = 0; x < points.length; x++) {
-            for (int y = 0; y < points[x].length; y++) {
-                points[x][y] = new Point3d(distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2, distBetweenPoints * (Math.random() - 0.5) - 50, distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2);
-                forces[x][y] = new Vec(0, 0, 0);
-                colors[x][y] = new Color((int) (163 + 40 * Math.random() - 20),
-                        (int) (153 + 40 * Math.random() - 20),
-                        (int) (239 + 20 * Math.random() - 10));
-            }
-        }
-        drawer.setCameraAngleHorizontal(Math.PI / 4);
-        drawer.setCameraAngleVertical(Math.PI / 4);
-        drawer.setZoom(0.1);
+    init {
+        reset()
+        colors = Array(size) { Array(size) { Color(
+            (163 + 40 * Math.random() - 20).toInt(),
+            (153 + 40 * Math.random() - 20).toInt(),
+            (239 + 20 * Math.random() - 10).toInt()
+        ) } }
+        drawer.setCameraAngleHorizontal(Math.PI / 4)
+        drawer.setCameraAngleVertical(Math.PI / 4)
+        drawer.setZoom(0.1)
     }
 
-    @Override
-    public void tick(double dtInSec) {
-        getInput();
-        calcNetForces();
-        airResist();
-        movePoints();
+    override fun tick(dtInSec: Double) {
+        input
+        calcNetForces()
+        airResist()
+        movePoints()
     }
 
-    private void movePoints() {
-        for (int x = 1; x < points.length - 1; x++) {
-            for (int y = 1; y < points[x].length - 1; y++) {
-                points[x][y].add(forces[x][y]);
-                points[x][y].add(gravity);
+    private fun movePoints() {
+        for (x in 1 until points.size - 1) {
+            for (y in 1 until points[x].size - 1) {
+                points[x][y]!!.add(forces[x][y])
+                points[x][y]!!.add(gravity)
             }
         }
     }
 
-    private void getInput() {
-        if (keymanager.f) {
-            moveEdge(new Vec(0, 100, 0));
+    private val input: Unit
+        private get() {
+            if (keyManager.f) {
+                moveEdge(Vec(0.0, 100.0, 0.0))
+            }
+            if (keyManager.g) {
+                moveEdge(Vec(0.0, -100.0, 0.0))
+            }
+            if (keyManager.v) {
+                moveEdge(Vec(100.0, 0.0, 0.0))
+            }
+            if (keyManager.b) {
+                moveEdge(Vec(-100.0, 0.0, 0.0))
+            }
         }
-        if (keymanager.g) {
-            moveEdge(new Vec(0, -100, 0));
-        }
-        if (keymanager.v) {
-            moveEdge(new Vec(100, 0, 0));
-        }
-        if (keymanager.b) {
-            moveEdge(new Vec(-100, 0, 0));
-        }
-    }
 
-    private void airResist() {
-        for (int x = 1; x < points.length - 1; x++) {
-            for (int y = 1; y < points[x].length - 1; y++) {
-                forces[x][y].scale(airResist);
+    private fun airResist() {
+        for (x in 1 until points.size - 1) {
+            for (y in 1 until points[x].size - 1) {
+                forces[x][y]!!.scale(airResist)
             }
         }
     }
 
-    private void calcNetForces() {
-        for (int x = 1; x < points.length - 1; x++) {
-            for (int y = 1; y < points[x].length - 1; y++) {
-                forces[x][y].add(points[x][y].getConnectingVectorTo(points[x][y + 1]).getLength() > 60 ? points[x][y].getConnectingVectorTo(points[x][y + 1]).scale(0.1) : new Vec(0, 0, 0));
-                forces[x][y].add(points[x][y].getConnectingVectorTo(points[x + 1][y]).getLength() > 60 ? points[x][y].getConnectingVectorTo(points[x + 1][y]).scale(0.1) : new Vec(0, 0, 0));
-                forces[x][y].add(points[x][y].getConnectingVectorTo(points[x][y - 1]).getLength() > 60 ? points[x][y].getConnectingVectorTo(points[x][y - 1]).scale(0.1) : new Vec(0, 0, 0));
-                forces[x][y].add(points[x][y].getConnectingVectorTo(points[x - 1][y]).getLength() > 60 ? points[x][y].getConnectingVectorTo(points[x - 1][y]).scale(0.1) : new Vec(0, 0, 0));
-                forces[x][y].scale(0.99);
+    private fun calcNetForces() {
+        for (x in 1 until points.size - 1) {
+            for (y in 1 until points[x].size - 1) {
+                forces[x][y]!!.add(
+                    if (points[x][y]!!
+                            .getConnectingVectorTo(points[x][y + 1]).length > 60
+                    ) points[x][y]!!
+                        .getConnectingVectorTo(points[x][y + 1]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                )
+                forces[x][y]!!.add(
+                    if (points[x][y]!!
+                            .getConnectingVectorTo(points[x + 1][y]).length > 60
+                    ) points[x][y]!!
+                        .getConnectingVectorTo(points[x + 1][y]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                )
+                forces[x][y]!!.add(
+                    if (points[x][y]!!
+                            .getConnectingVectorTo(points[x][y - 1]).length > 60
+                    ) points[x][y]!!
+                        .getConnectingVectorTo(points[x][y - 1]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                )
+                forces[x][y]!!.add(
+                    if (points[x][y]!!
+                            .getConnectingVectorTo(points[x - 1][y]).length > 60
+                    ) points[x][y]!!
+                        .getConnectingVectorTo(points[x - 1][y]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                )
+                forces[x][y]!!.scale(0.99)
             }
         }
     }
 
-    private void moveEdge(Vec delta) {
-        for (int i = 0; i < points.length; i++) {
-            points[0][i].add(delta);
-            points[points.length - 1][i].add(delta);
+    private fun moveEdge(delta: Vec) {
+        for (i in points.indices) {
+            points[0][i]!!.add(delta)
+            points[points.size - 1][i]!!.add(delta)
         }
-        for (int i = 1; i < points.length - 1; i++) {
-            points[i][0].add(delta);
-            points[i][points.length - 1].add(delta);
+        for (i in 1 until points.size - 1) {
+            points[i][0]!!.add(delta)
+            points[i][points.size - 1]!!.add(delta)
         }
     }
 
-    @Override
-    public void render(Graphics g) {
-        cart.render(drawer, g);
+    override fun render(g: Graphics) {
+        cart.render(drawer, g)
         // ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        for (int x = 0; x < points.length; x++) {
-            for (int y = 0; y < points[x].length; y++) {
-                drawer.drawDot(points[x][y], 4, colors[x][y], g);
+        for (x in points.indices) {
+            for (y in points[x].indices) {
+                drawer.drawDot(points[x][y]!!, 4, colors[x][y], g)
             }
         }
-        for (int x = 0; x < points.length - 1; x++) {
-            for (int y = 0; y < points[x].length - 1; y++) {
-                drawer.drawLine(points[x][y], points[x + 1][y], g);
-                drawer.drawLine(points[x][y], points[x][y + 1], g);
+        for (x in 0 until points.size - 1) {
+            for (y in 0 until points[x].size - 1) {
+                drawer.drawLine(points[x][y]!!, points[x + 1][y]!!, g)
+                drawer.drawLine(points[x][y]!!, points[x][y + 1]!!, g)
             }
         }
-
-        for (int i = 0; i < points.length - 1; i++) {
-            drawer.drawLine(points[i][points[i].length - 1], points[i + 1][points[i].length - 1], g);
-            drawer.drawLine(points[points.length - 1][i], points[points.length - 1][i + 1], g);
+        for (i in 0 until points.size - 1) {
+            drawer.drawLine(points[i][points[i].size - 1]!!, points[i + 1][points[i].size - 1]!!, g)
+            drawer.drawLine(points[points.size - 1][i]!!, points[points.size - 1][i + 1]!!, g)
         }
     }
 
-    @Override
-    public void reset() {
-        points = new Point3d[size][size];
-        forces = new Vec[size][size];
-        for (int x = 0; x < points.length; x++) {
-            for (int y = 0; y < points[x].length; y++) {
-                points[x][y] = new Point3d(distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2, distBetweenPoints * (Math.random() - 0.5) - 50, distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2);
-                forces[x][y] = new Vec(0, 0, 0);
-            }
-        }
+    override fun reset() {
+        points = Array(size) { x -> Array(size) { y -> Point3d(
+            distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2,
+            distBetweenPoints * (Math.random() - 0.5) - 50,
+            distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2
+        ) } }
+        forces = Array(size) { Array(size) { Vec(0.0, 0.0, 0.0) } }
+    }
+
+    companion object {
+        private const val size = 30
+        private const val distBetweenPoints = 300
     }
 }

@@ -1,54 +1,53 @@
-package simulations;
+package simulations
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.List;
+import spacesimulation.Simulation
+import spacesimulation.Simulator
+import spacesimulation.algebra.CartesianCoordinateSystem
+import spacesimulation.algebra.Point3d
+import java.awt.Color
+import java.awt.Graphics
+import kotlin.math.cos
+import kotlin.math.sin
 
-import spacesimulation.*;
-import spacesimulation.algebra.*;
+class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
+    var cart = CartesianCoordinateSystem(false, 100, 10.0, Color.white)
+    private lateinit var corners: Array<Point3d>
+    private lateinit var points: MutableList<Point3d>
 
-public class Fractal extends Simulation {
-    CartesianCoordinateSystem cart = new CartesianCoordinateSystem(false, 100, 10, Color.white);
-    private Point3d[] corners;
-    private List<Point3d> points;
-
-    private int dim;
-
-    public Fractal(int dim, Simulator sim) {
-        super(sim);
-        this.dim = dim;
-        corners = new Point3d[dim];
-        reset();
+    init {
+        reset()
     }
 
-    @Override
-    public void tick(double dtInSec) {
-        int speed = 5;
-        for (int i = 0; i < speed; i++) {
-            Point3d corner = corners[(int)(Math.random() * corners.length)];
-            points.add(new Point3d(points.get(points.size() - 1).getConnectingVectorTo(corner).scale(0.5).add(points.get(points.size() - 1).getPositionVector())));
+    override fun tick(dtInSec: Double) {
+        val speed = 5
+        for (i in 0 until speed) {
+            val corner = corners[(Math.random() * corners.size).toInt()]
+            points.add(
+                Point3d(
+                    points[points.size - 1].getConnectingVectorTo(corner).scale(0.5).add(
+                        points[points.size - 1].positionVector
+                    )
+                )
+            )
         }
-        drawer.setCameraAngleHorizontal(0);
-        drawer.setCameraAngleVertical(0);
+        drawer.setCameraAngleHorizontal(0.0)
+        drawer.setCameraAngleVertical(0.0)
     }
 
-    @Override
-    public void render(Graphics g) {
+    override fun render(g: Graphics) {
         // cart.render(drawer, g);
-        for (Point3d point : corners) drawer.drawDot(point, 4, Color.green, g);
-        for (Point3d point : points) drawer.drawDot(point, 1, Color.white, g);
+        for (point in corners) drawer.drawDot(point!!, 4, Color.green, g)
+        for (point in points!!) drawer.drawDot(point, 1, Color.white, g)
     }
 
-    @Override
-    public void reset() {
-        double radius = 100;
-        points = new ArrayList<Point3d>();
-        for (int i = 0; i < dim; i++) {
-            double phi = 2 * Math.PI / dim * i;
-            double x = radius * Math.cos(phi + Math.PI/2);
-            double y = radius * Math.sin(phi + Math.PI/2);
-            corners[i] = new Point3d(x, y, 0);
+    override fun reset() {
+        val radius = 100.0
+        points = ArrayList()
+        corners = Array(dim) { i ->
+            val phi = 2 * Math.PI / dim * i
+            val x = radius * cos(phi + Math.PI / 2)
+            val y = radius * sin(phi + Math.PI / 2)
+            Point3d(x, y, 0.0)
         }
         // for (int i = 0; i < (int)((double)corners.length / 2.0 + 0.6); i++) corners[i] = new Point3d(Math.random() * scale * 2 - scale, Math.random() * scale * 2 - scale, 0);
         // for (int i = (int)((double)corners.length / 2.0 + 0.6); i < corners.length; i++) corners[i] = new Point3d(corners[i - corners.length / 2].getPositionVector().scale(-1));
@@ -60,7 +59,7 @@ public class Fractal extends Simulation {
         //corners[0] = new Point3d(0,-100,0);
         //corners[1] = new Point3d(-95,-31,0);
         //corners[2] = new Point3d(-59,81,0);
-        points.add(new Point3d(Math.random() * radius * 2 - radius, Math.random() * radius * 2 - radius, 0));
-        drawer.setZoom(4.7);
+        points.add(Point3d(Math.random() * radius * 2 - radius, Math.random() * radius * 2 - radius, 0.0))
+        drawer.setZoom(4.7)
     }
 }

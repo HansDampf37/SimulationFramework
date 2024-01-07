@@ -1,13 +1,11 @@
-package spacesimulation;
+package spacesimulation
 
-import java.awt.*;
+import java.awt.Graphics
 
 /**
  * An entity can be drawn and moved
  */
-public interface Entity {
-
-    public void tick(double dtInSec);
-
-    public void render(Graphics3d drawer, Graphics g);
+interface Entity {
+    fun tick(dtInSec: Double)
+    fun render(drawer: Graphics3d, g: Graphics)
 }
