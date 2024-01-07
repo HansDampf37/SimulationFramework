@@ -7,6 +7,8 @@ import java.util.List;
 
 import spacesimulation.*;
 import spacesimulation.algebra.*;
+import spacesimulation.physics.Connection;
+import spacesimulation.physics.Mass;
 
 public class Pend extends MassSimulation {
     CartesianCoordinateSystem cart = new CartesianCoordinateSystem(true, 500000, 500000, Color.black);
@@ -16,12 +18,12 @@ public class Pend extends MassSimulation {
     private final List<Connection> connections = new ArrayList<>();
     
     public Pend(int amountOfPoints, Simulator sim) {
-        super(1, new Vec(0, -30, -0), sim);
+        super(1, new Vec(0, -9.81, -0), sim);
         this.amountOfPoints = amountOfPoints;
-        maxRopeSegmentLength = 1000000/amountOfPoints;
+        maxRopeSegmentLength = 100/amountOfPoints;
         reset();
-        drawer.setZoom(0.0003);
-        drawer.setCameraAngleHorizontal(0);
+        drawer.setZoom(3);
+        drawer.setCameraAngleHorizontal(0.2);
     }
 
     @Override
@@ -45,8 +47,8 @@ public class Pend extends MassSimulation {
     }
 
     private void getInput() {
-        if (keymanager.f) masses.get(0).accelerate(new Vec(5, 0, 0));
-        if (keymanager.g) masses.get(0).accelerate(new Vec(-5, 0, 0));
+        if (keymanager.f) masses.get(0).accelerate(new Vec(0.01, 0, 0));
+        if (keymanager.g) masses.get(0).accelerate(new Vec(-0.01, 0, 0));
         if (keymanager.v) masses.get(0).accelerate(new Vec(0, 0, 5));
         if (keymanager.b) masses.get(0).accelerate(new Vec(0, 0, -5));
         if (keymanager.up) masses.get(1).applyForce(new Vec(10, 0, 0));
@@ -55,14 +57,12 @@ public class Pend extends MassSimulation {
     @Override
     public void render(Graphics g) {
         cart.render(drawer, g);
-        for (int i = 0; i < masses.size() - 1; i++) {
-            masses.get(i).render(drawer, g);
-            drawer.drawLine(masses.get(i), masses.get(i + 1), g);
+        for (Mass m : masses) m.render(drawer, g);
+        for (Connection c : connections) c.render(drawer, g);
+
+        for (int i = 0; i < masses.size(); i++) {
+             g.drawString(masses.get(i).toString(), 10, 100 + i * 20);
         }
-        masses.get(masses.size() - 1).render(drawer, g);
-        // for (int i = 0; i < masses.size(); i++) {
-        //     g.drawString(masses.get(i).toString(), 100, 100 + i * 20);
-        // }
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Pend extends MassSimulation {
         for (int i = 0; i < amountOfPoints; i++) {
             addNewMass(new Point3d(0, -i * maxRopeSegmentLength * 0.7, -i * maxRopeSegmentLength * 0.7), i != 0);
         }
-        masses.get(0).setStatus(Mass.InteractionStatus.Immovable);
+        masses.get(0).setStatus(Mass.Status.Immovable);
 
         connections.clear();
         for (int i = 0; i < amountOfPoints - 1; i++) {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import spacesimulation.algebra.Point3d;
 import spacesimulation.algebra.Vec;
+import spacesimulation.physics.Mass;
 
 public abstract class MassSimulation extends Simulation {
     protected double frictionFactor;

@@ -1,7 +1,6 @@
 package spacesimulation;
 
 import java.awt.*;
-import spacesimulation.Display;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 

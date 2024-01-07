@@ -1,5 +1,7 @@
-package spacesimulation;
+package spacesimulation.physics;
 
+import spacesimulation.Entity;
+import spacesimulation.Graphics3d;
 import spacesimulation.algebra.Point3d;
 import spacesimulation.algebra.Vec;
 
@@ -10,7 +12,7 @@ public class Mass extends Point3d implements Entity {
     private final Vec acceleration;
     private final double mass;
 
-    private InteractionStatus status = InteractionStatus.Movable;
+    private Status status = Status.Movable;
 
     public Mass(double mass, double x, double y, double z) {
         super(x, y, z);
@@ -80,15 +82,15 @@ public class Mass extends Point3d implements Entity {
 
     public Vec getAcceleration() { return acceleration; }
 
-    public InteractionStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(InteractionStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
-    public enum InteractionStatus {
+    public enum Status {
         Immovable,
         Movable
     }
