@@ -32,14 +32,11 @@ class Pend(private val amountOfPoints: Int, sim: Simulator, length: Double) :
     }
 
     override fun calcForces(dtInSec: Double) {
-        input
-        for (c in connections) {
-            c.tick(dtInSec)
-        }
+        input()
+        connections.forEach { it.tick(dtInSec) }
     }
 
-    private val input: Unit
-        private get() {
+    private fun input() {
             if (keyManager.f) masses[0].accelerate(Vec(10.0, 0.0, 0.0))
             if (keyManager.g) masses[0].accelerate(Vec(-10.0, 0.0, 0.0))
             if (keyManager.v) masses[0].accelerate(Vec(0.0, 0.0, 10.0))

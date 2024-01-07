@@ -5,8 +5,11 @@ import spacesimulation.algebra.Vec
 import spacesimulation.physics.Mass
 import java.awt.Graphics
 
-abstract class MassSimulation(protected var frictionFactor: Double, protected var gravity: Vec, simulator: Simulator) :
-    Simulation(simulator) {
+abstract class MassSimulation(
+    private var frictionFactor: Double = 0.95,
+    private var gravity: Vec = Vec(0.0, -9.81, 0.0),
+    simulator: Simulator) : Simulation(simulator) {
+
     protected var masses: MutableList<Mass> = ArrayList()
     private var affectedByGravity = HashMap<Mass, Boolean>()
 
@@ -25,7 +28,7 @@ abstract class MassSimulation(protected var frictionFactor: Double, protected va
         for (mass in masses) {
             mass.tick(dtInSec)
             if (affectedByGravity[mass]!!) mass.accelerate(gravity)
-            mass.velocity = mass.velocity.scale(frictionFactor)
+            mass.velocity = mass.velocity.scale(frictionFactor * dtInSec)
         }
         buffer()
     }
