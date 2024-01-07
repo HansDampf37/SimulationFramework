@@ -16,6 +16,7 @@ public class Display {
         width = 1600;
         frame.setPreferredSize(new Dimension(width, height));
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
