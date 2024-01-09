@@ -21,6 +21,8 @@ class KeyManager : KeyListener {
     var down = false
     var left = false
     var right = false
+    var shift = false
+
     fun tick() {
         w = pressed[KeyEvent.VK_W]
         s = pressed[KeyEvent.VK_S]
@@ -38,6 +40,7 @@ class KeyManager : KeyListener {
         down = pressed[KeyEvent.VK_DOWN]
         left = pressed[KeyEvent.VK_LEFT]
         right = pressed[KeyEvent.VK_RIGHT]
+        shift = pressed[KeyEvent.VK_SHIFT]
     }
 
     override fun keyTyped(e: KeyEvent) {}

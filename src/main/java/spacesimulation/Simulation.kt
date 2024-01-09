@@ -1,26 +1,21 @@
 package spacesimulation
 
+import spacesimulation.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 
 abstract class Simulation(protected var simulator: Simulator) {
-    protected var keyManager: KeyManager
-    protected var drawer: Graphics3d
+    protected var drawer: Graphics3d = Graphics3d()
     private val antiAliasing = true
+    lateinit var keyManager: KeyManager
 
-    init {
-        simulator.addSimulation(this)
-        keyManager = simulator.keymanager
-        drawer = Graphics3d()
-    }
-
-    abstract fun tick(dtInSec: Double)
-    fun parentTick(dtInSec: Double) {
+    abstract fun tick(dt: Seconds)
+    fun parentTick(dt: Seconds) {
         listenForInput()
         drawer.setWindowHeightAndWidth(simulator.width, simulator.height)
-        tick(dtInSec)
+        tick(dt)
     }
 
     private fun listenForInput() {

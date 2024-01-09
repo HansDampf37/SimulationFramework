@@ -5,6 +5,7 @@ import spacesimulation.Simulator
 import spacesimulation.algebra.CartesianCoordinateSystem
 import spacesimulation.algebra.Point3d
 import spacesimulation.algebra.Vec
+import spacesimulation.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
@@ -22,7 +23,7 @@ class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
         drawer.setZoom(0.03)
     }
 
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         input
         calcForcesOnPoints()
         airResist()
@@ -75,10 +76,10 @@ class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
     override fun render(g: Graphics) {
         cart.render(drawer, g)
         for (i in 0 until points.size - 1) {
-            drawer.drawDot(points[i]!!, 4, Color.lightGray, g)
-            drawer.drawLine(points[i]!!, points[i + 1]!!, g)
+            drawer.drawDot(points[i], 0.25, Color.lightGray, g)
+            drawer.drawLine(points[i], points[i + 1], g)
         }
-        drawer.drawDot(points[points.size - 1]!!, 4, Color.lightGray, g)
+        drawer.drawDot(points[points.size - 1], 0.25, Color.lightGray, g)
     }
 
     override fun reset() {

@@ -11,6 +11,7 @@ class Collision {
          * @param mass1 the first mass
          * @param mass2 the second mass
          * @param k the coefficient of restitution
+         * @return energy transmitted in the collision
          */
         fun occur(mass1: Mass, mass2: Mass, k: Double = 1.0): Double {
             val dir = mass1.getDirectionTo(mass2)
@@ -30,9 +31,11 @@ class Collision {
                 mass2.velocity = v2New + v2O
                 return m1 * m2 / (2 * m1 + 2 * m2) * (v1.length - v2.length).pow(2) * (1-k.pow(2))
             } else if (mass1.status == Mass.Status.Immovable && mass2.status == Mass.Status.Movable) {
+                // if mass 1 is not movable treat it like its mass is infinity
                 mass2.velocity = v1 + (v1 - v2) * k + v2O
                 return (k-1).pow(2)/2 * mass1.mass * (v1.length - v2.length).pow(2)
             } else if (mass1.status == Mass.Status.Movable && mass2.status == Mass.Status.Immovable) {
+                // if mass 2 is not movable treat it like its mass is infinity
                 mass1.velocity = v2 + (v2 - v1) * k + v1O
                 return (k-1).pow(2)/2 * mass2.mass * (v1.length - v2.length).pow(2)
             }

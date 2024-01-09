@@ -1,10 +1,12 @@
 package simulations
 
+import spacesimulation.KeyManager
 import spacesimulation.Simulation
 import spacesimulation.Simulator
 import spacesimulation.algebra.CartesianCoordinateSystem
 import spacesimulation.algebra.Point3d
 import spacesimulation.algebra.Vec
+import spacesimulation.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
@@ -28,7 +30,7 @@ class Net(sim: Simulator) : Simulation(sim) {
         drawer.setZoom(0.1)
     }
 
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         input
         calcNetForces()
         airResist()
@@ -116,18 +118,18 @@ class Net(sim: Simulator) : Simulation(sim) {
         // ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (x in points.indices) {
             for (y in points[x].indices) {
-                drawer.drawDot(points[x][y]!!, 4, colors[x][y], g)
+                drawer.drawDot(points[x][y], 0.25, colors[x][y], g)
             }
         }
         for (x in 0 until points.size - 1) {
             for (y in 0 until points[x].size - 1) {
-                drawer.drawLine(points[x][y]!!, points[x + 1][y]!!, g)
-                drawer.drawLine(points[x][y]!!, points[x][y + 1]!!, g)
+                drawer.drawLine(points[x][y], points[x + 1][y], g)
+                drawer.drawLine(points[x][y], points[x][y + 1], g)
             }
         }
         for (i in 0 until points.size - 1) {
-            drawer.drawLine(points[i][points[i].size - 1]!!, points[i + 1][points[i].size - 1]!!, g)
-            drawer.drawLine(points[points.size - 1][i]!!, points[points.size - 1][i + 1]!!, g)
+            drawer.drawLine(points[i][points[i].size - 1], points[i + 1][points[i].size - 1], g)
+            drawer.drawLine(points[points.size - 1][i], points[points.size - 1][i + 1], g)
         }
     }
 

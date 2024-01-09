@@ -4,6 +4,7 @@ import spacesimulation.Simulation
 import spacesimulation.Simulator
 import spacesimulation.algebra.CartesianCoordinateSystem
 import spacesimulation.algebra.Point3d
+import spacesimulation.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos
@@ -18,7 +19,7 @@ class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
         reset()
     }
 
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         val speed = 5
         for (i in 0 until speed) {
             val corner = corners[(Math.random() * corners.size).toInt()]
@@ -36,8 +37,8 @@ class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
 
     override fun render(g: Graphics) {
         // cart.render(drawer, g);
-        for (point in corners) drawer.drawDot(point!!, 4, Color.green, g)
-        for (point in points!!) drawer.drawDot(point, 1, Color.white, g)
+        for (point in corners) drawer.drawDot(point, 4.0, Color.green, g)
+        for (point in points) drawer.drawDot(point, 1.0, Color.white, g)
     }
 
     override fun reset() {

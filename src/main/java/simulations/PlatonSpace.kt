@@ -5,6 +5,7 @@ import spacesimulation.Simulator
 import spacesimulation.algebra.CartesianCoordinateSystem
 import spacesimulation.algebra.Point3d
 import spacesimulation.algebra.Vec
+import spacesimulation.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.pow
@@ -22,7 +23,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
         reset()
     }
 
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         calcResultingForceOnPoint3d()
         movePoints()
         keepPointsInOrb()
@@ -81,13 +82,13 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
 
     private fun drawPoints(g: Graphics) {
         for (point in points) {
-            drawer.drawDot(point!!, 4, colorPoints, g)
+            drawer.drawDot(point, 0.25, colorPoints, g)
         }
         var shortestDist = Int.MAX_VALUE.toDouble()
         for (i in points.indices) {
             for (j in i until points.size) {
                 if (j != i) {
-                    val dist = points[i]!!.getDistanceTo(points[j])
+                    val dist = points[i].getDistanceTo(points[j])
                     if (dist < shortestDist) shortestDist = dist
                 }
             }
@@ -95,9 +96,9 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
         for (i in points.indices) {
             for (j in i until points.size) {
                 if (j != i) {
-                    if (points[i]!!.getDistanceTo(points[j]) < 1.3 * shortestDist) {
+                    if (points[i].getDistanceTo(points[j]) < 1.3 * shortestDist) {
                         g.color = colorLines
-                        drawer.drawLine(points[i]!!, points[j]!!, g)
+                        drawer.drawLine(points[i], points[j], g)
                     }
                 }
             }

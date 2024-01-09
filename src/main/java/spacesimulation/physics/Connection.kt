@@ -13,7 +13,7 @@ abstract class Connection(
     protected val m2: Mass,
     protected val maxEnergy: Double,
     protected var broken: Boolean = false) : Entity {
-    abstract override fun tick(dtInSec: Double)
+    abstract override fun tick(dt: Seconds)
 
     override fun render(drawer: Graphics3d, g: Graphics) {
         if (!broken) drawer.drawLine(m1, m2, g)
@@ -21,17 +21,23 @@ abstract class Connection(
 }
 
 class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, maxEnergy: Double) : Connection(m1, m2, maxEnergy) {
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         if (broken) return
         if (m1.getDistanceTo(m2) >= maxDistance) {
             val ropeDir = m1.getDirectionTo(m2)
             val dif = m1.velocity - m2.velocity
             if (!dif.hasSharpAngleTo(ropeDir)) {
-                val energy = occur(m1, m2, 0.8)
+                val energy = occur(m1, m2, 0.95)
                 if (energy > maxEnergy) {
                     broken = true;
                 }
             }
+            if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
+                val distFromEquilibrium = m1.getDistanceTo(m2) - maxDistance
+                m1.set(m1 + m1.getDirectionTo(m2) * distFromEquilibrium / 2)
+                m2.set(m2 + m2.getDirectionTo(m1) * distFromEquilibrium / 2)
+            } else if (m2.status == Mass.Status.Movable) m2.set(m1 + m1.getDirectionTo(m2) * maxDistance)
+            else if (m1.status == Mass.Status.Movable) m1.set(m2 + m2.getDirectionTo(m1) * maxDistance)
         }
     }
 
@@ -45,7 +51,7 @@ class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, max
 }
 
 class SpringConnection(m1: Mass, m2: Mass, private val maxDistance: Double, private val springConstant: Double = 1000.0, maxEnergy: Double) : Connection(m1, m2, maxEnergy) {
-    override fun tick(dtInSec: Double) {
+    override fun tick(dt: Seconds) {
         val ropeDir = m1.getDirectionTo(m2)
         val force = springConstant * (m1.getDistanceTo(m2) - maxDistance).pow(2)
         if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
@@ -59,19 +65,14 @@ class SpringConnection(m1: Mass, m2: Mass, private val maxDistance: Double, priv
     }
 }
 
-class FlexibleImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, private val springConstant: Double = 100000.0, maxEnergy: Double) : Connection(m1, m2, maxEnergy) {
-    override fun tick(dtInSec: Double) {
+class FlexibleConnection(m1: Mass, m2: Mass, private val maxDistance: Double, private val springConstant: Double = 100000.0, maxEnergy: Double) : Connection(m1, m2, maxEnergy) {
+    override fun tick(dt: Seconds) {
+        if (broken) return
         if (m1.getDistanceTo(m2) >= maxDistance) {
             val ropeDir = m1.getDirectionTo(m2)
-            val dif = m1.velocity - m2.velocity
-            if (!dif.hasSharpAngleTo(ropeDir)) occur(m1, m2, 1.0)
+            val distanceFromEquilibrium = m1.getDistanceTo(m2) - maxDistance
 
-            var posVec = m1.getConnectingVectorTo(m2)
-            val scalar = maxDistance / posVec.length
-            posVec *= scalar
-            m2.set(m1.positionVector.add(posVec))
-
-            val force = springConstant * (m1.getDistanceTo(m2) - maxDistance)
+            val force = springConstant * (distanceFromEquilibrium)
             if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
                 m1.applyForce(Vec.scale(ropeDir, force / 2))
                 m2.applyForce(Vec.scale(ropeDir, -force / 2))
@@ -80,6 +81,8 @@ class FlexibleImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Dou
             } else if (m1.status == Mass.Status.Immovable && m2.status == Mass.Status.Movable) {
                 m2.applyForce(Vec.scale(ropeDir, -force))
             }
+            val energy = springConstant * distanceFromEquilibrium.pow(2) / 2
+            if (energy > maxEnergy) broken = true
         }
     }
 

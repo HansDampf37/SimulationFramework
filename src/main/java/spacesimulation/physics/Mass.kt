@@ -7,7 +7,7 @@ import spacesimulation.algebra.Vec
 import java.awt.Color
 import java.awt.Graphics
 
-class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
+open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Entity {
     var velocity: Vec
     private val currentForce: Vec
     val mass: Double
@@ -23,22 +23,22 @@ class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), En
     constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)
     constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
 
-    override fun tick(dtInSec: Double) {
-        accelerate(dtInSec)
-        move(dtInSec)
+    override fun tick(dt: Seconds) {
+        accelerate(dt)
+        move(dt)
     }
 
     override fun render(drawer: Graphics3d, g: Graphics) {
-        drawer.drawDot(this, 4, Color.white, g)
+        drawer.drawDot(this, 0.25, Color.white, g)
     }
 
-    private fun accelerate(dtInSec: Double) {
-        velocity.add(Vec.scale(currentForce, dtInSec))
+    private fun accelerate(dt: Seconds) {
+        velocity.add(Vec.scale(currentForce, dt))
         currentForce.scale(0.0)
     }
 
-    private fun move(dtInSec: Double) {
-        add(Vec.scale(velocity, dtInSec))
+    private fun move(dt: Seconds) {
+        add(Vec.scale(velocity, dt))
     }
 
     fun applyForce(force: Vec) {

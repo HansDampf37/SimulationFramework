@@ -32,12 +32,16 @@ class Graphics3d @JvmOverloads constructor(
         drawLine(a.x, a.y, a.z, b.x, b.y, b.z, g)
     }
 
-    fun drawDot(x: Double, y: Double, z: Double, radius: Int, color: Color?, g: Graphics) {
+    fun drawDot(x: Double, y: Double, z: Double, radius: Double, color: Color?, g: Graphics) {
         g.color = color
-        g.fillOval(calcX(x, y, z) - radius, calcY(x, y, z) - radius, 2 * radius, 2 * radius)
+        g.fillOval(
+            (calcX(x, y, z) - radius * zoom).toInt(),
+            (calcY(x, y, z) - radius * zoom).toInt(),
+            (2 * radius * zoom).toInt(),
+            (2 * radius * zoom).toInt())
     }
 
-    fun drawDot(a: Point3d, radius: Int, color: Color?, g: Graphics) {
+    fun drawDot(a: Point3d, radius: Double, color: Color?, g: Graphics) {
         drawDot(a.x, a.y, a.z, radius, color, g)
     }
 

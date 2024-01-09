@@ -3,30 +3,26 @@ package spacesimulation
 import spacesimulation.algebra.Point3d
 import spacesimulation.algebra.Vec
 import spacesimulation.physics.Mass
+import spacesimulation.physics.Seconds
 import java.awt.Graphics
 
-abstract class MassSimulation(
+abstract class MassSimulation<T : Mass>(
     private var frictionFactor: Double = 1.0,
     private var gravity: Vec = Vec(0.0, -9.81, 0.0),
     simulator: Simulator) : Simulation(simulator) {
 
-    protected var masses: MutableList<Mass> = ArrayList()
-    private var affectedByGravity = HashMap<Mass, Boolean>()
+    protected var masses: MutableList<T> = ArrayList()
+    private var affectedByGravity = HashMap<T, Boolean>()
 
-    fun addNewMass(mass: Double, pos: Point3d?, affectedByGravity: Boolean) {
-        val newMass = Mass(mass, pos!!)
-        masses.add(newMass)
-        this.affectedByGravity[newMass] = affectedByGravity
+    fun addNewMass(mass: T, affectedByGravity: Boolean) {
+        masses.add(mass)
+        this.affectedByGravity[mass] = affectedByGravity
     }
 
-    fun addNewMass(pos: Point3d?, affectedByGravity: Boolean) {
-        addNewMass(1.0, pos, affectedByGravity)
-    }
-
-    override fun tick(dtInSec: Double) {
-        calcForces(dtInSec)
+    override fun tick(dt: Seconds) {
+        calcForces(dt)
         for (mass in masses) {
-            mass.tick(dtInSec)
+            mass.tick(dt)
             if (affectedByGravity[mass]!!) mass.accelerate(gravity)
             mass.velocity = mass.velocity.scale(frictionFactor)
         }
@@ -34,7 +30,7 @@ abstract class MassSimulation(
     }
 
     abstract override fun render(g: Graphics)
-    abstract fun calcForces(dtInSec: Double)
-    abstract fun buffer()
+    abstract fun calcForces(dt: Seconds)
+    protected fun buffer() = Unit
     abstract override fun reset()
 }

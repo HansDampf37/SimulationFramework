@@ -2,6 +2,7 @@ package spacesimulation;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.security.Key;
 import java.util.ArrayList;
 
 public class Simulator implements Runnable {
@@ -10,18 +11,17 @@ public class Simulator implements Runnable {
     private final Display display;
     private BufferStrategy bs;
     private Graphics g;
-    private final KeyManager keymanager;
+    private final KeyManager keymanager = new KeyManager();
     private final ArrayList<Simulation> simulations;
 
     public Simulator() {
         display = new Display();
-        keymanager = new KeyManager();
         display.getJFrame().addKeyListener(keymanager);
         simulations = new ArrayList<>();
     }
 
-    private void tick(double dtInSec) {
-        for (Simulation simulation : simulations) simulation.parentTick(dtInSec);
+    private void tick(double dt) {
+        for (Simulation simulation : simulations) simulation.parentTick(dt);
         keymanager.tick();
     }
 
@@ -40,13 +40,14 @@ public class Simulator implements Runnable {
 
     public void addSimulation(Simulation simulation) {
         simulations.add(simulation);
+        simulation.keyManager = keymanager;
     }
 
     @Override
     public void run() {
         init();
         long lastTime = System.currentTimeMillis();
-        final double amountOfTicks = 25;
+        final double amountOfTicks = 160;
         double msPerTick = 1000.0 / amountOfTicks;
         double delta = 0;
 
