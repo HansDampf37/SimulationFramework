@@ -122,6 +122,8 @@ class Vec(var x: Double, var y: Double, var z: Double) {
         return result
     }
 
+    operator fun unaryMinus(): Vec = Vec(-x, -y, -z)
+
     companion object {
         /**
          * Returns the result of the vector addition v + w. The returned vector is safe to use.

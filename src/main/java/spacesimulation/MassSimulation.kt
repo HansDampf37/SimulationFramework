@@ -1,13 +1,13 @@
 package spacesimulation
 
-import spacesimulation.algebra.Point3d
 import spacesimulation.algebra.Vec
 import spacesimulation.physics.Mass
 import spacesimulation.physics.Seconds
-import java.awt.Graphics
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 abstract class MassSimulation<T : Mass>(
-    private var frictionFactor: Double = 1.0,
+    private var frictionPerSecond: Double = .2,
     private var gravity: Vec = Vec(0.0, -9.81, 0.0),
     simulator: Simulator) : Simulation(simulator) {
 
@@ -24,13 +24,9 @@ abstract class MassSimulation<T : Mass>(
         for (mass in masses) {
             mass.tick(dt)
             if (affectedByGravity[mass]!!) mass.accelerate(gravity)
-            mass.velocity = mass.velocity.scale(frictionFactor)
+            mass.velocity = mass.velocity.scale((1-frictionPerSecond * dt))
         }
-        buffer()
     }
 
-    abstract override fun render(g: Graphics)
     abstract fun calcForces(dt: Seconds)
-    protected fun buffer() = Unit
-    abstract override fun reset()
 }

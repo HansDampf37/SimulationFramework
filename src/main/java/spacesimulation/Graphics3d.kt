@@ -6,7 +6,13 @@ import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos
 
-class Graphics3d @JvmOverloads constructor(
+/**
+ * Objects of this class maintain information about camera-angles and zoom and use these properties to map 3-dimensional
+ * coordinates onto the 2-dimensional plane. Most of its methods draw geometric shapes in 3d space. Internally,
+ * the coordinates are mapped and the corresponding methods are called in [Graphics] objects that are also given as
+ * arguments.
+ */
+class Graphics3d(
     cameraAngleHorizontal: Double = Math.PI / 4,
     cameraAngleVertical: Double = Math.PI / 4,
     zoom: Double = 0.3
@@ -57,13 +63,7 @@ class Graphics3d @JvmOverloads constructor(
                 * zoom + originY).toInt()
     }
 
-    // private int calcX(Point3d a) {
-    //     return calcX(a.x, a.y, a.z);
-    // }
-    // private int calcY(Point3d a) {
-    //     return calcY(a.x, a.y, a.z);
-    // }
-    fun fillTriangle(
+    private fun fillTriangle(
         x1: Double,
         y1: Double,
         z1: Double,
@@ -140,19 +140,19 @@ class Graphics3d @JvmOverloads constructor(
         g.fillPolygon(xValues, yValues, 4)
     }
 
-    fun moveHorizontalCamera(dir: Int) {
-        if (dir > 0) cameraAngleHorizontal += 0.003 else if (dir < 0) cameraAngleHorizontal -= 0.003
+    fun moveHorizontalCamera(dir: Double) {
+        cameraAngleHorizontal += dir
     }
 
-    fun moveVerticalCamera(dir: Int) {
-        if (dir > 0) cameraAngleVertical += 0.003 else if (dir < 0) cameraAngleVertical -= 0.003
+    fun moveVerticalCamera(dir: Double) {
+        cameraAngleVertical += dir
         if (cameraAngleVertical > Math.PI / 2) cameraAngleVertical = Math.PI / 2
         if (cameraAngleVertical < -Math.PI / 2) cameraAngleVertical = -Math.PI / 2
     }
 
-    fun zoom(dir: Int) {
+    fun zoom(dir: Double) {
         try {
-            zoom *= if (dir > 0) 1.005 else 0.995
+            zoom *= dir
         } catch (e: ArithmeticException) {
             //Too small or large
             println("Zoom limit reached")

@@ -3,6 +3,9 @@ package spacesimulation.physics
 import spacesimulation.algebra.Vec
 import kotlin.math.pow
 
+/**
+ * Use [Collision.occur] to calculate the new velocities after the collision and the amount of energy transmitted.
+ */
 class Collision {
     companion object{
         /**
@@ -20,8 +23,6 @@ class Collision {
             val v2 = Vec.linearProjection(mass2.velocity, dir)
             val v1O = mass1.velocity - v1
             val v2O = mass2.velocity - v2
-            require((v1 + v1O - mass1.velocity).length < 0.1) { "error" }
-            require((v2 + v2O - mass2.velocity).length < 0.1) { "error" }
             if (listOf(mass1, mass2).all { it.status == Mass.Status.Movable }) {
                 val m1: Double = mass1.mass
                 val m2: Double = mass2.mass

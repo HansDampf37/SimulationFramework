@@ -9,7 +9,7 @@ public class Launcher {
         // new Net(simulator);
         // new PlatonSpace(5, simulator);
         // new Pend(40, simulator, 10);
-        simulator.addSimulation(new Cloth(simulator, 30));
+        simulator.addSimulation(new Cloth(simulator, 20));
         // new Pend(4, simulator);
         // new Fractal(5, simulator);
         simulator.start();

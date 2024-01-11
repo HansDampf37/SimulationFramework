@@ -6,6 +6,11 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 
+/**
+ * Simulations are run in [Simulator]s. They implement a [tick] method that updates simulated objects and a [render]-method
+ * that displays the objects.The [drawer] object can be used in the render method
+ * to map the three-dimensional space into the drawing plane.
+ */
 abstract class Simulation(protected var simulator: Simulator) {
     protected var drawer: Graphics3d = Graphics3d()
     private val antiAliasing = true
@@ -13,18 +18,18 @@ abstract class Simulation(protected var simulator: Simulator) {
 
     abstract fun tick(dt: Seconds)
     fun parentTick(dt: Seconds) {
-        listenForInput()
+        listenForInput(dt)
         drawer.setWindowHeightAndWidth(simulator.width, simulator.height)
         tick(dt)
     }
 
-    private fun listenForInput() {
-        if (keyManager.w) drawer.moveVerticalCamera(1)
-        if (keyManager.s) drawer.moveVerticalCamera(-1)
-        if (keyManager.d) drawer.moveHorizontalCamera(1)
-        if (keyManager.a) drawer.moveHorizontalCamera(-1)
-        if (keyManager.y) drawer.zoom(1)
-        if (keyManager.out) drawer.zoom(-1)
+    private fun listenForInput(dt: Seconds) {
+        if (keyManager.w) drawer.moveVerticalCamera(dt)
+        if (keyManager.s) drawer.moveVerticalCamera(-dt)
+        if (keyManager.d) drawer.moveHorizontalCamera(dt)
+        if (keyManager.a) drawer.moveHorizontalCamera(-dt)
+        if (keyManager.y) drawer.zoom( 1 + dt)
+        if (keyManager.out) drawer.zoom(1 - dt)
         if (keyManager.n) reset()
     }
 

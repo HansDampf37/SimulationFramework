@@ -20,24 +20,35 @@ abstract class Connection(
     }
 }
 
-class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, maxEnergy: Double) : Connection(m1, m2, maxEnergy) {
+class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, maxEnergy: Double, private val springConstant: Double = 300.0) : Connection(m1, m2, maxEnergy) {
     override fun tick(dt: Seconds) {
         if (broken) return
-        if (m1.getDistanceTo(m2) >= maxDistance) {
+        val dist = m1.getDistanceTo(m2)
+        if (dist >= maxDistance) {
             val ropeDir = m1.getDirectionTo(m2)
-            val dif = m1.velocity - m2.velocity
-            if (!dif.hasSharpAngleTo(ropeDir)) {
-                val energy = occur(m1, m2, 0.95)
-                if (energy > maxEnergy) {
-                    broken = true;
-                }
+            val delta = dist - maxDistance
+
+            val difVelocity = m1.velocity - m2.velocity
+            var energy: Double = if (!difVelocity.hasSharpAngleTo(ropeDir)) occur(m1, m2, 0.95) else 0.0
+            val force = ropeDir * (delta).pow(3) * springConstant / 3
+            energy += springConstant * delta.pow(4) / 4
+            if (energy > maxEnergy) {
+                broken = true
+                return
             }
             if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
-                val distFromEquilibrium = m1.getDistanceTo(m2) - maxDistance
-                m1.set(m1 + m1.getDirectionTo(m2) * distFromEquilibrium / 2)
-                m2.set(m2 + m2.getDirectionTo(m1) * distFromEquilibrium / 2)
-            } else if (m2.status == Mass.Status.Movable) m2.set(m1 + m1.getDirectionTo(m2) * maxDistance)
-            else if (m1.status == Mass.Status.Movable) m1.set(m2 + m2.getDirectionTo(m1) * maxDistance)
+                m1.applyForce(force)
+                m2.applyForce(-force)
+                //m1.set(m1 + ropeDir * delta)
+                //m2.set(m2 - ropeDir * delta)
+            } else if (m2.status == Mass.Status.Movable) {
+                m2.applyForce(-force)
+                //m2.set(m1 + ropeDir * maxDistance)
+            }
+            else if (m1.status == Mass.Status.Movable) {
+                m1.applyForce(force)
+                //m1.set(m2 - ropeDir * maxDistance)
+            }
         }
     }
 

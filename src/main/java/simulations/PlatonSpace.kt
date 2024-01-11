@@ -10,6 +10,10 @@ import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.pow
 
+/**
+ * Simulation that simulated points that are repelling each other yet can not leave the surface of a sphere.
+ */
+@SuppressWarnings("unused")
 class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Simulation(simulator!!) {
     private lateinit var points: Array<Point3d>
     private lateinit var forces: Array<Vec>
@@ -17,7 +21,6 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
     private var coordSys = CartesianCoordinateSystem(true, radius * 2, (radius / 10).toDouble(), Color(110, 106, 160))
     private var colorLines = Color(200, 200, 200)
     private var colorPoints = Color(163, 153, 239)
-    var colorInput = Color(200, 200, 200)
 
     init {
         reset()
@@ -33,21 +36,21 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
     override fun render(g: Graphics) {
         coordSys.render(drawer, g)
         drawPoints(g)
-        if (simulator.keymanager.f) drawForces(g)
+        if (simulator.keyManager.f) drawForces(g)
     }
 
     private fun drawForces(g: Graphics) {
         for (i in points.indices) {
             val force = forces[i]
             g.color = Color.ORANGE
-            val shorten = 1 / force!!.length
+            val shorten = 1 / force.length
             drawer.drawLine(
-                points[i]!!.x,
-                points[i]!!.y,
-                points[i]!!.z,
-                points[i]!!.x + force.x * shorten,
-                points[i]!!.y + force.y * shorten,
-                points[i]!!.z + force.z * shorten,
+                points[i].x,
+                points[i].y,
+                points[i].z,
+                points[i].x + force.x * shorten,
+                points[i].y + force.y * shorten,
+                points[i].z + force.z * shorten,
                 g
             )
         }
@@ -55,16 +58,16 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
 
     private fun keepPointsInOrb() {
         for (i in points.indices) {
-            if (points[i]!!.positionVector.length > radius) {
-                val positionVector = points[i]!!.positionVector
-                points[i]!!.set(positionVector.scale(radius / positionVector.length))
+            if (points[i].positionVector.length > radius) {
+                val positionVector = points[i].positionVector
+                points[i].set(positionVector.scale(radius / positionVector.length))
             }
         }
     }
 
     private fun movePoints() {
         for (i in points.indices) {
-            points[i]!!.add(forces[i])
+            points[i].add(forces[i])
         }
     }
 
@@ -73,8 +76,8 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
             val first = points[i]
             for (other in points) {
                 if (first != other) {
-                    val scalar: Double = 10000000 / first!!.getDistanceTo(other).pow(2.0)
-                    forces[i]!!.add(other!!.getDirectionTo(first).scale(scalar))
+                    val scalar: Double = 10000000 / first.getDistanceTo(other).pow(2.0)
+                    forces[i].add(other.getDirectionTo(first).scale(scalar))
                 }
             }
         }
