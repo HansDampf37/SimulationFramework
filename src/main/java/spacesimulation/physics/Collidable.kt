@@ -11,7 +11,7 @@ open class Collidable(
     z: Double,
     val radius: Double, mass: Double): Mass(mass, x, y, z) {
     fun testForCollision(other: Collidable): Boolean {
-        return this.getDistanceTo(other) < this.radius + other.radius;
+        return this.getDistanceTo(other) < this.radius + other.radius
     }
 
     override fun render(drawer: Graphics3d, g: Graphics) {
