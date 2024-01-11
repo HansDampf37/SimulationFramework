@@ -31,7 +31,7 @@ class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
     }
 
     private val input: Unit
-        private get() {
+        get() {
             if (keyManager.up) forces[0] = Vec(10.0, 0.0, 0.0)
             if (keyManager.down) forces[0] = Vec(-10.0, 0.0, 0.0)
             if (keyManager.left) forces[0] = Vec(0.0, 0.0, 10.0)
@@ -40,36 +40,36 @@ class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
 
     private fun airResist() {
         for (i in forces.indices) {
-            forces[i]!!.scale(airResist)
+            forces[i].scaleInPlace(airResist)
         }
     }
 
     private fun movePoints() {
-        points[0]!!.add(forces[0])
+        points[0].add(forces[0])
         for (i in 1 until points.size) {
-            points[i]!!.add(forces[i])
-            if (points[i - 1]!!.getConnectingVectorTo(points[i]).length > maxRopeSegmentLength) {
-                val posVec = points[i - 1]!!.getConnectingVectorTo(points[i])
+            points[i].add(forces[i])
+            if (points[i - 1].getConnectingVectorTo(points[i]).length > maxRopeSegmentLength) {
+                val posVec = points[i - 1].getConnectingVectorTo(points[i])
                 val scalar = maxRopeSegmentLength / posVec.length
-                posVec.scale(scalar)
-                points[i]!!.set(points[i - 1]!!.positionVector.add(posVec))
+                posVec.scaleInPlace(scalar)
+                points[i].set(points[i - 1].positionVector.addInPlace(posVec))
             }
         }
     }
 
     private fun calcForcesOnPoints() {
         for (i in 1 until points.size) {
-            if (points[i]!!.getDistanceTo(points[i - 1]) >= maxRopeSegmentLength) {
-                val ropeDir = points[i]!!.getDirectionTo(points[i - 1])
+            if (points[i].getDistanceTo(points[i - 1]) >= maxRopeSegmentLength) {
+                val ropeDir = points[i].getDirectionTo(points[i - 1])
                 if (i == 1) {
-                    val forceInRopeDir = Vec.linearProjection(forces[1], ropeDir)
-                    forceInRopeDir.scale(-2.0)
-                    forces[1]!!.add(forceInRopeDir)
-                    forces[1]!!.add(Vec.linearProjection(forces[0], forceInRopeDir))
+                    val forceInRopeDir = forces[1].projectOnto(ropeDir)
+                    forceInRopeDir.scaleInPlace(-2.0)
+                    forces[1].addInPlace(forceInRopeDir)
+                    forces[1].addInPlace(forces[0].projectOnto(forceInRopeDir))
                 } else {
                 }
             }
-            forces[i]!!.add(gravity)
+            forces[i].addInPlace(gravity)
         }
     }
 

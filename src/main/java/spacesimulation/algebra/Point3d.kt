@@ -39,8 +39,7 @@ open class Point3d {
 
     fun getDirectionTo(other: Point3d): Vec {
         val result = getConnectingVectorTo(other)
-        result.scale(1 / result.length)
-        return result
+        return result.normalize()
     }
 
     fun getDistanceTo(other: Point3d): Double {

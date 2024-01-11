@@ -60,7 +60,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
         for (i in points.indices) {
             if (points[i].positionVector.length > radius) {
                 val positionVector = points[i].positionVector
-                points[i].set(positionVector.scale(radius / positionVector.length))
+                points[i].set(positionVector.scaleInPlace(radius / positionVector.length))
             }
         }
     }
@@ -77,7 +77,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
             for (other in points) {
                 if (first != other) {
                     val scalar: Double = 10000000 / first.getDistanceTo(other).pow(2.0)
-                    forces[i].add(other.getDirectionTo(first).scale(scalar))
+                    forces[i].addInPlace(other.getDirectionTo(first).scaleInPlace(scalar))
                 }
             }
         }

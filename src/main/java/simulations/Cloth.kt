@@ -33,7 +33,7 @@ class Cloth(simulator: Simulator, private val size: Int): MassSimulation<Collida
                     val targetDistance = sphere.radius + it.radius
                     val overlap = targetDistance - sphere.getDistanceTo(it)
                     val massMovable = it.status == Mass.Status.Movable
-                    val overlap1 = if (massMovable) sphere.mass / (it.mass + sphere.mass) * overlap else 0
+                    val overlap1 = if (massMovable) sphere.mass / (it.mass + sphere.mass) * overlap else 0.0
                     val overlap2 = if (massMovable) it.mass / (it.mass + sphere.mass) * overlap else overlap
                     sphere.set(sphere + it.getDirectionTo(sphere) * overlap2)
                     it.set(it + sphere.getDirectionTo(it) * overlap1)

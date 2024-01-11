@@ -1,6 +1,5 @@
 package simulations
 
-import spacesimulation.KeyManager
 import spacesimulation.Simulation
 import spacesimulation.Simulator
 import spacesimulation.algebra.CartesianCoordinateSystem
@@ -40,14 +39,14 @@ class Net(sim: Simulator) : Simulation(sim) {
     private fun movePoints() {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
-                points[x][y]!!.add(forces[x][y])
-                points[x][y]!!.add(gravity)
+                points[x][y].add(forces[x][y])
+                points[x][y].add(gravity)
             }
         }
     }
 
     private val input: Unit
-        private get() {
+        get() {
             if (keyManager.f) {
                 moveEdge(Vec(0.0, 100.0, 0.0))
             }
@@ -65,7 +64,7 @@ class Net(sim: Simulator) : Simulation(sim) {
     private fun airResist() {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
-                forces[x][y]!!.scale(airResist)
+                forces[x][y].scaleInPlace(airResist)
             }
         }
     }
@@ -73,43 +72,43 @@ class Net(sim: Simulator) : Simulation(sim) {
     private fun calcNetForces() {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
-                forces[x][y]!!.add(
-                    if (points[x][y]!!
+                forces[x][y].addInPlace(
+                    if (points[x][y]
                             .getConnectingVectorTo(points[x][y + 1]).length > 60
-                    ) points[x][y]!!
-                        .getConnectingVectorTo(points[x][y + 1]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                    ) points[x][y]
+                        .getConnectingVectorTo(points[x][y + 1]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
                 )
-                forces[x][y]!!.add(
-                    if (points[x][y]!!
+                forces[x][y].addInPlace(
+                    if (points[x][y]
                             .getConnectingVectorTo(points[x + 1][y]).length > 60
-                    ) points[x][y]!!
-                        .getConnectingVectorTo(points[x + 1][y]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                    ) points[x][y]
+                        .getConnectingVectorTo(points[x + 1][y]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
                 )
-                forces[x][y]!!.add(
-                    if (points[x][y]!!
+                forces[x][y].addInPlace(
+                    if (points[x][y]
                             .getConnectingVectorTo(points[x][y - 1]).length > 60
-                    ) points[x][y]!!
-                        .getConnectingVectorTo(points[x][y - 1]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                    ) points[x][y]
+                        .getConnectingVectorTo(points[x][y - 1]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
                 )
-                forces[x][y]!!.add(
-                    if (points[x][y]!!
+                forces[x][y].addInPlace(
+                    if (points[x][y]
                             .getConnectingVectorTo(points[x - 1][y]).length > 60
-                    ) points[x][y]!!
-                        .getConnectingVectorTo(points[x - 1][y]).scale(0.1) else Vec(0.0, 0.0, 0.0)
+                    ) points[x][y]
+                        .getConnectingVectorTo(points[x - 1][y]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
                 )
-                forces[x][y]!!.scale(0.99)
+                forces[x][y].scaleInPlace(0.99)
             }
         }
     }
 
     private fun moveEdge(delta: Vec) {
         for (i in points.indices) {
-            points[0][i]!!.add(delta)
-            points[points.size - 1][i]!!.add(delta)
+            points[0][i].add(delta)
+            points[points.size - 1][i].add(delta)
         }
         for (i in 1 until points.size - 1) {
-            points[i][0]!!.add(delta)
-            points[i][points.size - 1]!!.add(delta)
+            points[i][0].add(delta)
+            points[i][points.size - 1].add(delta)
         }
     }
 

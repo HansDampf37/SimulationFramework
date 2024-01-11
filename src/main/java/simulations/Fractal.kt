@@ -11,7 +11,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
-    var cart = CartesianCoordinateSystem(false, 100, 10.0, Color.white)
     private lateinit var corners: Array<Point3d>
     private lateinit var points: MutableList<Point3d>
 
@@ -23,13 +22,8 @@ class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
         val speed = 5
         for (i in 0 until speed) {
             val corner = corners[(Math.random() * corners.size).toInt()]
-            points.add(
-                Point3d(
-                    points[points.size - 1].getConnectingVectorTo(corner).scale(0.5).add(
-                        points[points.size - 1].positionVector
-                    )
-                )
-            )
+            val newPoint = Point3d(points[points.size - 1].positionVector + points[points.size - 1].getConnectingVectorTo(corner) / 2)
+            points.add(newPoint)
         }
         drawer.setCameraAngleHorizontal(0.0)
         drawer.setCameraAngleVertical(0.0)

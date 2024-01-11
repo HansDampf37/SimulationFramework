@@ -24,7 +24,7 @@ abstract class MassSimulation<T : Mass>(
         for (mass in masses) {
             mass.tick(dt)
             if (affectedByGravity[mass]!!) mass.accelerate(gravity)
-            mass.velocity = mass.velocity.scale((1-frictionPerSecond * dt))
+            mass.velocity = mass.velocity.scaleInPlace((1-frictionPerSecond * dt))
         }
     }
 

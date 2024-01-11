@@ -2,7 +2,6 @@ package spacesimulation.physics
 
 import spacesimulation.Entity
 import spacesimulation.Graphics3d
-import spacesimulation.algebra.Vec
 import spacesimulation.physics.Collision.Companion.occur
 import java.awt.Color
 import java.awt.Graphics

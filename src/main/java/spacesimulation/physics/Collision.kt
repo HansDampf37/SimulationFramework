@@ -1,6 +1,5 @@
 package spacesimulation.physics
 
-import spacesimulation.algebra.Vec
 import kotlin.math.pow
 
 /**
@@ -19,8 +18,8 @@ class Collision {
         fun occur(mass1: Mass, mass2: Mass, k: Double = 1.0): Double {
             val dir = mass1.getDirectionTo(mass2)
             if (dir.length == 0.0) return 0.0
-            val v1 = Vec.linearProjection(mass1.velocity, dir)
-            val v2 = Vec.linearProjection(mass2.velocity, dir)
+            val v1 = mass1.velocity.projectOnto(dir)
+            val v2 = mass2.velocity.projectOnto(dir)
             val v1O = mass1.velocity - v1
             val v2O = mass2.velocity - v2
             if (listOf(mass1, mass2).all { it.status == Mass.Status.Movable }) {

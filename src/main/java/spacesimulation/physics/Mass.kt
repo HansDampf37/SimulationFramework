@@ -33,8 +33,8 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     }
 
     private fun accelerate(dt: Seconds) {
-        velocity.add(Vec.scale(acceleration, dt))
-        acceleration.scale(0.0)
+        velocity += acceleration * dt
+        acceleration.setToZero()
     }
 
     private fun move(dt: Seconds) {
@@ -42,19 +42,19 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     }
 
     fun applyForce(force: Vec) {
-        acceleration.add(force / mass)
+        acceleration.addInPlace(force / mass)
     }
 
     fun accelerate(acceleration: Vec) {
-        this.acceleration.add(acceleration)
+        this.acceleration.addInPlace(acceleration)
     }
 
     fun removeAccelerationInDirection(direction: Vec) {
-        acceleration.sub(acceleration.linearProjection(direction))
+        acceleration.subInPlace(acceleration.projectOnto(direction))
     }
 
     val impulse: Vec
-        get() = Vec.scale(velocity, mass)
+        get() = velocity * mass
 
 
     enum class Status {
