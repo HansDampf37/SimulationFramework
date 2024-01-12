@@ -1,7 +1,6 @@
 package simulations
 
 import framework.Simulation
-import framework.Simulator
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
@@ -9,7 +8,7 @@ import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
-class Net(sim: Simulator) : Simulation(sim) {
+class Net() : Simulation("Net") {
     private val airResist = 0.999
     private val gravity = Vec(0.0, -100.0, 0.0)
     private lateinit var points: Array<Array<Point3d>>

@@ -7,9 +7,9 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 abstract class MassSimulation<T : Mass>(
+    private val title: String,
     private var frictionPerSecond: Double = .2,
-    private var gravity: Vec = Vec(0.0, -9.81, 0.0),
-    simulator: Simulator) : Simulation(simulator) {
+    private var gravity: Vec = Vec(0.0, -9.81, 0.0)) : Simulation(title) {
 
     protected var masses: MutableList<T> = ArrayList()
     private var affectedByGravity = HashMap<T, Boolean>()

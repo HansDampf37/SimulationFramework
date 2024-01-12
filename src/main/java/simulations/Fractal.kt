@@ -1,7 +1,6 @@
 package simulations
 
 import framework.Simulation
-import framework.Simulator
 import algebra.Point3d
 import physics.Seconds
 import java.awt.Color
@@ -9,7 +8,7 @@ import java.awt.Graphics
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
+class Fractal(private val dim: Int) : Simulation("Fractal") {
     private lateinit var corners: Array<Point3d>
     private lateinit var points: MutableList<Point3d>
 

@@ -1,7 +1,6 @@
 package simulations
 
 import framework.MassSimulation
-import framework.Simulator
 import algebra.Point3d
 import algebra.Vec
 import physics.Connection
@@ -10,7 +9,7 @@ import physics.Mass
 import physics.Seconds
 import java.awt.Graphics
 
-class Pend(private val amountOfPoints: Int, sim: Simulator, length: Double) : MassSimulation<Mass>(simulator = sim) {
+class Pend(private val amountOfPoints: Int, length: Double) : MassSimulation<Mass>("String") {
     private val maxRopeSegmentLength: Double
     private val connections: MutableList<Connection> = ArrayList()
 

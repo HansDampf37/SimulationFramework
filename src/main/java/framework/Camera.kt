@@ -19,7 +19,9 @@ class Camera(
     x: Double, y: Double, z: Double,
     val yaw: Double, val pitch: Double, val roll: Double,
     var zoomX: Double, var zoomY: Double,
-    private var focalLength: Double, private val simulator: Simulator
+    private var focalLength: Double,
+    var widthPixels: Int,
+    var heightPixels: Int
 ) : Point3d(x, y, z) {
 
     val lookingDirection: Vec
@@ -44,8 +46,8 @@ class Camera(
 
     private val cameraToPixelCoords
         get() = Matrix3x4(
-            focalLength / zoomX, 0.0, simulator.width / 2.0, 0.0,
-            0.0, focalLength / zoomY, simulator.height / 2.0, 0.0,
+            focalLength / zoomX, 0.0, widthPixels / 2.0, 0.0,
+            0.0, focalLength / zoomY, heightPixels / 2.0, 0.0,
             0.0, 0.0, 1.0, 0.0
         )
 

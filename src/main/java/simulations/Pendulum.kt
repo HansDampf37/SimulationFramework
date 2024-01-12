@@ -1,7 +1,6 @@
 package simulations
 
 import framework.Simulation
-import framework.Simulator
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
@@ -9,7 +8,7 @@ import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
-class Pendulum(val amountOfPoints: Int, sim: Simulator) : Simulation(sim) {
+class Pendulum(val amountOfPoints: Int) : Simulation("Pendulum") {
     var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
     private val maxRopeSegmentLength = 10000
     private val gravity = Vec(0.0, -9.81, 0.0)

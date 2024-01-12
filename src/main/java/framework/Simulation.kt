@@ -8,29 +8,59 @@ import java.awt.RenderingHints
 import java.awt.image.BufferStrategy
 
 /**
- * Simulations are run in [Simulator]s. They implement a [tick] method that updates simulated objects and a [render]-method
- * that displays the objects.The [drawer] object can be used in the render method
+ * Simulations run by the [start] adn [stop] methods. They implement a [tick] method that updates simulated objects and
+ * a [render]-method that displays the objects.The [drawer] object can be used in the render method
  * to map the three-dimensional space into the drawing plane.
  */
-abstract class Simulation(protected var simulator: Simulator) {
+abstract class Simulation(
+    title: String,
+    private val renderingFrequency: Double = 25.0,
+    private val antiAliasing: Boolean = true
+) : ISimulation {
+
     protected var drawer: Graphics3d = Graphics3d()
     //protected var camera = Camera(0.0, 0.0, 30.0, Vec(0.0, 0.0, -1.0), 1.0, 1.0, 1.0, simulator)
-    private val antiAliasing = true
-    lateinit var keyManager: KeyManager
+    private var running = false
+    protected val keyManager: KeyManager = KeyManager()
+    protected val display: Display = Display(title).apply { jFrame.addKeyListener(keyManager) }
 
-    abstract fun tick(dt: Seconds)
-    fun parentTick(dt: Seconds) {
-        listenForInput(dt)
-        drawer.setWindowHeightAndWidth(simulator.width, simulator.height)
-        tick(dt)
+    /**
+     * triggers [Simulation.render] on every simulation at a given frequency.
+     * triggers [Simulation.tick] as often as possible
+     */
+    private val tickAndRender = Runnable {
+        var lastTime = System.currentTimeMillis()
+        val msPerTick = 1000.0 / renderingFrequency
+        var delta = 0.0
+        while (running) {
+            val now = System.currentTimeMillis()
+
+            // always tick
+            val dt: Seconds = (now - lastTime) / 1000.0
+            keyManager.tick()
+            listenForInput(dt)
+            drawer.setWindowHeightAndWidth(width, height)
+            tick(dt)
+            delta += (now - lastTime) / msPerTick
+
+            // render to reach fps goal
+            if (delta >= 1) {
+                initializeRendering()
+                delta--
+                lastTime = now
+            }
+        }
+        stop()
     }
+
+    private var threadTickingAndRendering: Thread = Thread(tickAndRender)
 
     private fun listenForInput(dt: Seconds) {
         if (keyManager.w) drawer.moveVerticalCamera(dt)
         if (keyManager.s) drawer.moveVerticalCamera(-dt)
         if (keyManager.d) drawer.moveHorizontalCamera(dt)
         if (keyManager.a) drawer.moveHorizontalCamera(-dt)
-        if (keyManager.y) drawer.zoom( 1 + dt)
+        if (keyManager.y) drawer.zoom(1 + dt)
         if (keyManager.out) drawer.zoom(1 - dt)
         if (keyManager.n) reset()
 
@@ -45,7 +75,17 @@ abstract class Simulation(protected var simulator: Simulator) {
          */
     }
 
-    fun parentRender(g: Graphics) {
+    /**
+     * Calls [Simulation.render] with a new [Graphics] object
+     */
+    private fun initializeRendering() {
+        val bs = display.canvas.bufferStrategy
+        if (bs == null) {
+            display.canvas.createBufferStrategy(3)
+            return
+        }
+        val g = bs.drawGraphics
+        g.clearRect(0, 0, display.canvas.width, display.canvas.height)
         g.color = Color.white
         g.drawString(drawer.cameraSettingsToString(), 10, 10)
         if (antiAliasing) (g as Graphics2D).setRenderingHint(
@@ -53,8 +93,30 @@ abstract class Simulation(protected var simulator: Simulator) {
             RenderingHints.VALUE_ANTIALIAS_ON
         )
         render(g)
+        bs.show()
+        g.dispose()
     }
 
-    abstract fun render(g: Graphics)
-    abstract fun reset()
+    @Synchronized
+    override fun start() {
+        if (running) return
+        running = true
+        threadTickingAndRendering.start()
+    }
+
+    @Synchronized
+    override fun stop() {
+        if (!running) return
+        running = false
+        try {
+            threadTickingAndRendering.join()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+    }
+
+    protected val height: Int
+        get() = display.canvas.height
+    protected val width: Int
+        get() = display.canvas.width
 }

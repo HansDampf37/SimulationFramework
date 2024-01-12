@@ -2,11 +2,10 @@ package simulations
 
 import physics.*
 import framework.MassSimulation
-import framework.Simulator
 import algebra.Vec
 import java.awt.Graphics
 
-class Cloth(simulator: Simulator, private val size: Int): MassSimulation<Collidable>(simulator = simulator) {
+class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
     private lateinit var connections: MutableList<Connection>
     private var sphere = Sphere(0.0, 0.0, 0.0, 10.0, 10.0)
     init {
