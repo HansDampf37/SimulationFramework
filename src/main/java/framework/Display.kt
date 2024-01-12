@@ -1,49 +1,35 @@
-package spacesimulation;
+package framework
 
-import javax.swing.JFrame;
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Canvas
+import java.awt.Color
+import java.awt.Dimension
+import javax.swing.JFrame
+import javax.swing.WindowConstants
 
-public class Display {
+class Display(val title: String, private var height: Int = 1000, private var width: Int = 1600) {
+    val jFrame: JFrame = JFrame("Title")
+    val canvas: Canvas
 
-    private JFrame frame;
-    private Canvas canvas;
-    private int height, width;
-
-    public Display() {
-        frame = new JFrame("Title");
-        height = 1000;
-        width = 1600;
-        frame.setPreferredSize(new Dimension(width, height));
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-        canvas = new Canvas();
-        canvas.setPreferredSize(new Dimension(width, height));
-        canvas.setMaximumSize(new Dimension(width, height));
-        canvas.setMinimumSize(new Dimension(width, height));
-        canvas.setBackground(new Color(42, 55, 71));
-        frame.add(canvas);
-        frame.pack();
+    init {
+        jFrame.setPreferredSize(Dimension(width, height))
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+        jFrame.pack()
+        jFrame.setLocationRelativeTo(null)
+        jFrame.isVisible = true
+        canvas = Canvas()
+        canvas.setPreferredSize(Dimension(width, height))
+        canvas.setMaximumSize(Dimension(width, height))
+        canvas.setMinimumSize(Dimension(width, height))
+        canvas.setBackground(Color(42, 55, 71))
+        jFrame.add(canvas)
+        jFrame.pack()
     }
 
-    public int getHeight() {
-        if (frame == null) return 1080; 
-        return frame.getHeight();
-    }
-    
-    public int getWidth() {
-        if (frame == null) return 1920; 
-        return frame.getWidth();
+    fun getHeight(): Int {
+        return jFrame.height ?: 1080
     }
 
-    public Canvas getCanvas() {
-        return canvas;
-    }
-
-    public JFrame getJFrame() {
-        return frame;
+    fun getWidth(): Int {
+        return jFrame.width ?: 1920
     }
 }

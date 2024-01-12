@@ -1,12 +1,12 @@
-package spacesimulation
+package framework
 
-import spacesimulation.physics.Seconds
+import physics.Seconds
 import java.awt.Graphics
 
 /**
  * An entity can be drawn and moved
  */
-interface Entity {
+interface Simulateable {
     fun tick(dt: Seconds)
     fun render(drawer: Graphics3d, g: Graphics)
 }

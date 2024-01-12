@@ -1,13 +1,14 @@
-package spacesimulation.physics
+package physics
 
-import spacesimulation.Entity
-import spacesimulation.Graphics3d
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
+import framework.Camera
+import framework.Simulateable
+import framework.Graphics3d
+import algebra.Point3d
+import algebra.Vec
 import java.awt.Color
 import java.awt.Graphics
 
-open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Entity {
+open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Simulateable {
     var velocity: Vec
     private val acceleration: Vec
     val mass: Double
@@ -30,6 +31,17 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
 
     override fun render(drawer: Graphics3d, g: Graphics) {
         drawer.drawDot(this, 0.25, Color.white, g)
+    }
+
+    open fun render(cam: Camera, g: Graphics) {
+        val coords = cam.project(this.positionVector)
+        g.color = Color.WHITE
+        val radius = 0.25
+        g.fillOval(
+            (coords.first - radius / cam.zoomX).toInt(),
+            (coords.second - radius / cam.zoomY).toInt(),
+            (2 * radius / cam.zoomX).toInt(),
+            (2 * radius / cam.zoomY).toInt())
     }
 
     private fun accelerate(dt: Seconds) {

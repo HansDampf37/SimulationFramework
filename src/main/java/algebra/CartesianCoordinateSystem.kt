@@ -1,6 +1,6 @@
-package spacesimulation.algebra
+package algebra
 
-import spacesimulation.Graphics3d
+import framework.Graphics3d
 import java.awt.Color
 import java.awt.Graphics
 

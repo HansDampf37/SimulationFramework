@@ -1,4 +1,4 @@
-package spacesimulation.algebra
+package algebra
 
 open class Point3d {
     var x: Double

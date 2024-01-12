@@ -1,7 +1,7 @@
-package spacesimulation
+package framework
 
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
+import algebra.Point3d
+import algebra.Vec
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos

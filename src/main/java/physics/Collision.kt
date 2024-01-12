@@ -1,4 +1,4 @@
-package spacesimulation.physics
+package physics
 
 import kotlin.math.pow
 

@@ -1,10 +1,9 @@
 package simulations
 
-import spacesimulation.Simulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.CartesianCoordinateSystem
-import spacesimulation.algebra.Point3d
-import spacesimulation.physics.Seconds
+import framework.Simulation
+import framework.Simulator
+import algebra.Point3d
+import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos
@@ -22,7 +21,8 @@ class Fractal(private val dim: Int, sim: Simulator) : Simulation(sim) {
         val speed = 5
         for (i in 0 until speed) {
             val corner = corners[(Math.random() * corners.size).toInt()]
-            val newPoint = Point3d(points[points.size - 1].positionVector + points[points.size - 1].getConnectingVectorTo(corner) / 2)
+            val newPoint =
+                Point3d(points[points.size - 1].positionVector + points[points.size - 1].getConnectingVectorTo(corner) / 2)
             points.add(newPoint)
         }
         drawer.setCameraAngleHorizontal(0.0)

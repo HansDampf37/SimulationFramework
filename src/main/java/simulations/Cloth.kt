@@ -1,9 +1,9 @@
 package simulations
 
-import spacesimulation.MassSimulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.*
+import physics.*
+import framework.MassSimulation
+import framework.Simulator
+import algebra.Vec
 import java.awt.Graphics
 
 class Cloth(simulator: Simulator, private val size: Int): MassSimulation<Collidable>(simulator = simulator) {

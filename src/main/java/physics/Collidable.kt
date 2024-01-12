@@ -1,7 +1,8 @@
-package spacesimulation.physics
+package physics
 
-import spacesimulation.Entity
-import spacesimulation.Graphics3d
+import framework.Camera
+import framework.Simulateable
+import framework.Graphics3d
 import java.awt.Color
 import java.awt.Graphics
 
@@ -23,8 +24,18 @@ class Sphere(
     x: Double,
     y: Double,
     z: Double,
-    radius: Double, mass: Double): Collidable(x, y, z, radius, mass), Entity {
+    radius: Double, mass: Double): Collidable(x, y, z, radius, mass), Simulateable {
     override fun render(drawer: Graphics3d, g: Graphics) {
         drawer.drawDot(this, radius = radius, Color.red, g)
+    }
+
+    override fun render(cam: Camera, g: Graphics) {
+        val coords = cam.project(this.positionVector)
+        g.color = Color.WHITE
+        g.fillOval(
+            (coords.first - radius / cam.zoomX).toInt(),
+            (coords.second - radius / cam.zoomY).toInt(),
+            (2 * radius / cam.zoomX).toInt(),
+            (2 * radius / cam.zoomY).toInt())
     }
 }

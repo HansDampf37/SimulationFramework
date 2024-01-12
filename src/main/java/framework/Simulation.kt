@@ -1,10 +1,11 @@
-package spacesimulation
+package framework
 
-import spacesimulation.physics.Seconds
+import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.image.BufferStrategy
 
 /**
  * Simulations are run in [Simulator]s. They implement a [tick] method that updates simulated objects and a [render]-method
@@ -13,6 +14,7 @@ import java.awt.RenderingHints
  */
 abstract class Simulation(protected var simulator: Simulator) {
     protected var drawer: Graphics3d = Graphics3d()
+    //protected var camera = Camera(0.0, 0.0, 30.0, Vec(0.0, 0.0, -1.0), 1.0, 1.0, 1.0, simulator)
     private val antiAliasing = true
     lateinit var keyManager: KeyManager
 
@@ -31,6 +33,16 @@ abstract class Simulation(protected var simulator: Simulator) {
         if (keyManager.y) drawer.zoom( 1 + dt)
         if (keyManager.out) drawer.zoom(1 - dt)
         if (keyManager.n) reset()
+
+        /*
+        if (keyManager.w) camera.add(camera.lookingDirection * dt)
+        if (keyManager.s) camera.add(-camera.lookingDirection * dt)
+        if (keyManager.d) camera.add(camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
+        if (keyManager.a) camera.add(-camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
+        if (keyManager.y) camera.zoom *= 1 + dt
+        if (keyManager.out) camera.zoom *= 1 - dt
+        if (keyManager.n) reset()
+         */
     }
 
     fun parentRender(g: Graphics) {

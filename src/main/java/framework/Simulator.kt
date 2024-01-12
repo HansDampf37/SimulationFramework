@@ -1,6 +1,6 @@
-package spacesimulation
+package framework
 
-import spacesimulation.physics.Seconds
+import physics.Seconds
 import java.awt.Graphics
 import java.awt.image.BufferStrategy
 
@@ -11,7 +11,7 @@ class Simulator {
     val keyManager = KeyManager()
     private var threadTickingAndRendering: Thread? = null
     private var running = false
-    private val display: Display = Display().apply{ jFrame.addKeyListener(keyManager) }
+    private val display: Display = Display().apply { jFrame.addKeyListener(keyManager) }
     private var bs: BufferStrategy? = null
     private var g: Graphics? = null
     private val simulations: ArrayList<Simulation> = ArrayList()

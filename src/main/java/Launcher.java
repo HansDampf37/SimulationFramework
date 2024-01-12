@@ -1,6 +1,5 @@
-package simulations;
-
-import spacesimulation.Simulator;
+import simulations.Cloth;
+import framework.Simulator;
 
 public class Launcher {
     public static void main(String[] args) {

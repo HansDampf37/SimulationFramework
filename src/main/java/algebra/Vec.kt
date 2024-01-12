@@ -1,4 +1,4 @@
-package spacesimulation.algebra
+package algebra
 
 import kotlin.math.sqrt
 
@@ -8,7 +8,7 @@ import kotlin.math.sqrt
  * @param y y value
  * @param z z value
  */
-class Vec(var x: Double, var y: Double, var z: Double) {
+open class Vec(var x: Double, var y: Double, var z: Double) {
 
     constructor(x: Number, y: Number, z: Number) : this(x.toDouble(), y.toDouble(), z.toDouble())
     /**
@@ -147,5 +147,9 @@ class Vec(var x: Double, var y: Double, var z: Double) {
         y -= vec.y
         z -= vec.z
         return this
+    }
+
+    fun crossProduct(vec: Vec): Vec {
+        return Vec(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x)
     }
 }

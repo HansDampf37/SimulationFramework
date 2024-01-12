@@ -1,11 +1,11 @@
 package simulations
 
-import spacesimulation.Simulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.CartesianCoordinateSystem
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.Seconds
+import framework.Simulation
+import framework.Simulator
+import algebra.CartesianCoordinateSystem
+import algebra.Point3d
+import algebra.Vec
+import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.pow
@@ -109,11 +109,13 @@ class PlatonSpace(private val amountOfPoint3ds: Int, simulator: Simulator?) : Si
     }
 
     override fun reset() {
-        points = Array(amountOfPoint3ds) { Point3d(
-            2 * radius * Math.random() - radius,
-            2 * radius * Math.random() - radius,
-            2 * radius * Math.random() - radius
-        )}
+        points = Array(amountOfPoint3ds) {
+            Point3d(
+                2 * radius * Math.random() - radius,
+                2 * radius * Math.random() - radius,
+                2 * radius * Math.random() - radius
+            )
+        }
         forces = Array(amountOfPoint3ds) { Vec(0.0, 0.0, 0.0) }
         for (i in points.indices) points[i] = Point3d(
             2 * radius * Math.random() - radius,

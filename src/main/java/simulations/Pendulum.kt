@@ -1,11 +1,11 @@
 package simulations
 
-import spacesimulation.Simulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.CartesianCoordinateSystem
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.Seconds
+import framework.Simulation
+import framework.Simulator
+import algebra.CartesianCoordinateSystem
+import algebra.Point3d
+import algebra.Vec
+import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 

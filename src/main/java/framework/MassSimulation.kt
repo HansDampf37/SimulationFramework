@@ -1,8 +1,8 @@
-package spacesimulation
+package framework
 
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.Mass
-import spacesimulation.physics.Seconds
+import algebra.Vec
+import physics.Mass
+import physics.Seconds
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 

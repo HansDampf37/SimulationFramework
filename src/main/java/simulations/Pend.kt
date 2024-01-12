@@ -1,13 +1,13 @@
 package simulations
 
-import spacesimulation.MassSimulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.Connection
-import spacesimulation.physics.ImpulseConnection
-import spacesimulation.physics.Mass
-import spacesimulation.physics.Seconds
+import framework.MassSimulation
+import framework.Simulator
+import algebra.Point3d
+import algebra.Vec
+import physics.Connection
+import physics.ImpulseConnection
+import physics.Mass
+import physics.Seconds
 import java.awt.Graphics
 
 class Pend(private val amountOfPoints: Int, sim: Simulator, length: Double) : MassSimulation<Mass>(simulator = sim) {

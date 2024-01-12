@@ -1,8 +1,9 @@
-package spacesimulation.physics
+package physics
 
-import spacesimulation.Entity
-import spacesimulation.Graphics3d
-import spacesimulation.physics.Collision.Companion.occur
+import framework.Camera
+import framework.Simulateable
+import framework.Graphics3d
+import physics.Collision.Companion.occur
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.pow
@@ -11,11 +12,18 @@ abstract class Connection(
     protected val m1: Mass,
     protected val m2: Mass,
     protected val maxEnergy: Double,
-    protected var broken: Boolean = false) : Entity {
+    protected var broken: Boolean = false) : Simulateable {
     abstract override fun tick(dt: Seconds)
 
     override fun render(drawer: Graphics3d, g: Graphics) {
         if (!broken) drawer.drawLine(m1, m2, g)
+    }
+
+    fun render(camera: Camera, g: Graphics) {
+        if (broken) return
+        val p1 = camera.project(m1.positionVector)
+        val p2 = camera.project(m2.positionVector)
+        g.drawLine(p1.first.toInt(), p1.second.toInt(), p2.first.toInt(), p2.second.toInt())
     }
 }
 

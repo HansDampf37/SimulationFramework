@@ -1,4 +1,4 @@
-package spacesimulation.physics
+package physics
 
 typealias Meters = Double
 typealias Seconds = Double

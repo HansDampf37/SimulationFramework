@@ -1,11 +1,11 @@
 package simulations
 
-import spacesimulation.Simulation
-import spacesimulation.Simulator
-import spacesimulation.algebra.CartesianCoordinateSystem
-import spacesimulation.algebra.Point3d
-import spacesimulation.algebra.Vec
-import spacesimulation.physics.Seconds
+import framework.Simulation
+import framework.Simulator
+import algebra.CartesianCoordinateSystem
+import algebra.Point3d
+import algebra.Vec
+import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
@@ -133,11 +133,13 @@ class Net(sim: Simulator) : Simulation(sim) {
     }
 
     override fun reset() {
-        points = Array(size) { x -> Array(size) { y -> Point3d(
-            distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2,
-            distBetweenPoints * (Math.random() - 0.5) - 50,
-            distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2
-        ) } }
+        points = Array(size) { x -> Array(size) { y ->
+            Point3d(
+                distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2,
+                distBetweenPoints * (Math.random() - 0.5) - 50,
+                distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2
+            )
+        } }
         forces = Array(size) { Array(size) { Vec(0.0, 0.0, 0.0) } }
     }
 
