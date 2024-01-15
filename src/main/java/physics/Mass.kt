@@ -34,12 +34,12 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     }
 
     open fun render(cam: Camera, g: Graphics) {
-        val coords = cam.project(this.positionVector)
+        val (coords, dist) = cam.project(this.positionVector)
         g.color = Color.WHITE
-        val radius = 0.25
+        val radius = 3 / dist
         g.fillOval(
-            (coords.first - radius / cam.zoomX).toInt(),
-            (coords.second - radius / cam.zoomY).toInt(),
+            (coords.x - radius / cam.zoomX).toInt(),
+            (coords.y - radius / cam.zoomY).toInt(),
             (2 * radius / cam.zoomX).toInt(),
             (2 * radius / cam.zoomY).toInt())
     }

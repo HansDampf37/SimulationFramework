@@ -7,16 +7,16 @@ import java.awt.Graphics
 
 class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    private var sphere = Sphere(0.0, 0.0, 0.0, 10.0, 10.0)
+    //private var sphere = Sphere(0.0, 0.0, 0.0, 10.0, 10.0)
     init {
         reset()
         drawer.setZoom(30.0)
         drawer.setCameraAngleHorizontal(0.2)
     }
     override fun render(g: Graphics) {
-        masses.forEach{it.render(drawer, g)}
-        connections.forEach{it.render(drawer, g)}
-        sphere.render(drawer, g)
+        masses.forEach{it.render(camera, g)}
+        connections.forEach{it.render(camera, g)}
+        //sphere.render(camera, g)
     }
 
     override fun calcForces(dt: Seconds) {
@@ -24,8 +24,8 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         masses.shuffle()
         connections.shuffle()
         connections.forEach { it.tick(dt) }
-        sphere.tick(dt)
-        masses.forEach {
+        //sphere.tick(dt)
+        /*masses.forEach {
             if (it != sphere) {
                 if (sphere.testForCollision(it)) {
                     Collision.occur(sphere, it, 1.0)
@@ -38,16 +38,16 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
                     it.set(it + sphere.getDirectionTo(it) * overlap1)
                 }
             }
-        }
+        }*/
     }
 
     private fun input() {
-        if (keyManager.up) sphere.accelerate(Vec(40.0, 0.0, 0.0))
+        /*if (keyManager.up) sphere.accelerate(Vec(40.0, 0.0, 0.0))
         if (keyManager.down) sphere.accelerate(Vec(-40.0, 0.0, 0.0))
         if (keyManager.left) sphere.accelerate(Vec(0.0, 0.0, 40.0))
         if (keyManager.right) sphere.accelerate(Vec(0.0, 0.0, -40.0))
         if (keyManager.shift) sphere.accelerate(Vec(0.0, 40.0, 0.0))
-        if (keyManager.space) sphere.accelerate(Vec(0.0, -40.0, 0.0))
+        if (keyManager.space) sphere.accelerate(Vec(0.0, -40.0, 0.0))*/
     }
 
     override fun reset() {
@@ -68,7 +68,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
             }
         }
 
-        sphere = Sphere(0.0, 10.0, 0.0, 2.0, 20.0)
-        addNewMass(sphere, true)
+        //sphere = Sphere(0.0, 10.0, 0.0, 2.0, 20.0)
+        //addNewMass(sphere, true)
     }
 }

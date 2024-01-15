@@ -12,6 +12,13 @@ class Matrix4X4(var a: Double, var b: Double, var c: Double, var d: Double,
             v.x * m + v.y * n + v.z * o + v.w * p
         )
     }
+
+    override fun toString(): String {
+        return  "| $a, $b, $c, $d |\n" +
+                "| $e, $f, $g, $h |\n" +
+                "| $i, $j, $k, $l |\n" +
+                "| $m, $n, $o, $p |"
+    }
 }
 
 class Matrix3x4(var a: Double, var b: Double, var c: Double, var d: Double,
@@ -23,5 +30,11 @@ class Matrix3x4(var a: Double, var b: Double, var c: Double, var d: Double,
             v.x * e + v.y * f + v.z * g + v.w * h,
             v.x * i + v.y * j + v.z * k + v.w * l
         )
+    }
+
+    override fun toString(): String {
+        return  "| $a, $b, $c, $d |\n" +
+                "| $e, $f, $g, $h |\n" +
+                "| $i, $j, $k, $l |"
     }
 }

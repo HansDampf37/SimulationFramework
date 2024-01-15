@@ -21,9 +21,9 @@ abstract class Connection(
 
     fun render(camera: Camera, g: Graphics) {
         if (broken) return
-        val p1 = camera.project(m1.positionVector)
-        val p2 = camera.project(m2.positionVector)
-        g.drawLine(p1.first.toInt(), p1.second.toInt(), p2.first.toInt(), p2.second.toInt())
+        val (p1, d1) = camera.project(m1.positionVector)
+        val (p2, d2) = camera.project(m2.positionVector)
+        if (d1 > 0 && d2 > 0) g.drawLine(p1.x.toInt(), p1.y.toInt(), p2.x.toInt(), p2.y.toInt())
     }
 }
 

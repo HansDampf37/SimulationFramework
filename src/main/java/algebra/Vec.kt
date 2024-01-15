@@ -95,7 +95,7 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
 
     override fun equals(other: Any?): Boolean {
         return if (other is Vec) {
-            x == other.x && y == other.y && z == other.z
+            (this - other).length < 0.0001
         } else false
     }
 
