@@ -9,7 +9,7 @@ import java.awt.RenderingHints
 
 /**
  * Simulations run by the [start] and [stop] methods. They implement a [tick] method that updates simulated objects and
- * a [render]-method that displays the objects.The [drawer] object can be used in the render method
+ * a [render]-method that displays the objects.The [drawer] and [camera] object can be used in the render method
  * to map the three-dimensional space into the drawing plane.
  */
 abstract class Simulation(
@@ -23,9 +23,9 @@ abstract class Simulation(
     protected val keyManager: KeyManager = KeyManager()
     protected val display: Display = Display(title).apply { jFrame.addKeyListener(keyManager) }
     protected var camera = Camera(
-        0.0, 0.0, 0.0,
-        0.0, 0.0, Math.PI,
-        1.0, 1.0, 1000.0,
+        0.0, 2.0, 0.0,
+        0.0, -Math.PI/2,
+        1.0, 1.0, 1.0,
         display.getWidth(), display.getHeight()
     )
     private var zPuffer: Array<Array<Float>> = Array(width) { Array(height) { Float.MAX_VALUE } }
@@ -75,17 +75,17 @@ abstract class Simulation(
 
         if (keyManager.w) camera.add(camera.lookingDirection * dt)
         if (keyManager.s) camera.add(-camera.lookingDirection * dt)
-        if (keyManager.d) camera.add(camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
-        if (keyManager.a) camera.add(-camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
+        if (keyManager.d) camera.add(-camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
+        if (keyManager.a) camera.add(camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt)
         if (keyManager.y) camera.zoom *= 1 + dt
         if (keyManager.out) camera.zoom *= 1 - dt
         if (keyManager.n) reset()
         if (keyManager.shift) camera.add(Vec(0.0, -1.0, 0.0) * dt)
         if (keyManager.space) camera.add(Vec(0.0, 1.0, 0.0) * dt)
-        if (keyManager.up) camera.pitch += dt
-        if (keyManager.down) camera.pitch -= dt
-        if (keyManager.left) camera.yaw += dt
-        if (keyManager.right) camera.yaw -= dt
+        if (keyManager.up) camera.nodAngle -= dt
+        if (keyManager.down) camera.nodAngle += dt
+        if (keyManager.left) camera.turnAngle += dt
+        if (keyManager.right) camera.turnAngle -= dt
     }
 
     /**
