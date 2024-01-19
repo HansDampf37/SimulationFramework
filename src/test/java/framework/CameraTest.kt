@@ -13,8 +13,7 @@ class CameraTest {
     fun setup() {
         camera = Camera(0.0, 0.0, 0.0,
             0.0, 0.0,
-            1.0, 1.0, 1.0,
-            100, 100)
+            1.0,100, 100)
     }
 
     @Test
@@ -129,45 +128,45 @@ class CameraTest {
 
     @Test
     fun `test default yaw pitch and roll`() {
-        assertEquals(0.0, camera.gamma)
-        assertEquals(0.0, camera.beta)
-        assertEquals(0.0, camera.alpha)
+        assertEquals(0.0, camera.yaw)
+        assertEquals(0.0, camera.pitch)
+        assertEquals(0.0, camera.roll)
     }
 
     @Test
     fun `test single yaw`() {
         camera.turnAngle = Math.PI
         camera.nodAngle = 0.0
-        assertEquals(Math.PI, camera.gamma)
-        assertEquals(0.0, camera.beta)
-        assertEquals(0.0, camera.alpha)
+        assertEquals(Math.PI, camera.yaw)
+        assertEquals(0.0, camera.pitch)
+        assertEquals(0.0, camera.roll)
     }
 
     @Test
     fun `test single pitch`() {
         camera.turnAngle = 0.0
         camera.nodAngle = Math.PI / 2
-        assertEquals(0.0, camera.gamma)
-        assertEquals(Math.PI / 2, camera.beta)
-        assertEquals(0.0, camera.alpha)
+        assertEquals(0.0, camera.yaw)
+        assertEquals(Math.PI / 2, camera.pitch)
+        assertEquals(0.0, camera.roll)
     }
 
     @Test
     fun `test that pitch and yaw become pitch and roll`() {
         camera.turnAngle = Math.PI / 2
         camera.nodAngle = Math.PI / 2
-        assertEquals(0.0, camera.gamma)
-        assertEquals(Math.PI / 2, camera.beta)
-        assertEquals(Math.PI / 2, camera.alpha)
+        assertEquals(0.0, camera.yaw)
+        assertEquals(Math.PI / 2, camera.pitch)
+        assertEquals(Math.PI / 2, camera.roll)
         camera.nodAngle -= Math.PI / 2
-        assertEquals(Math.PI / 2, camera.gamma)
-        assertEquals(0.0, camera.beta)
-        assertEquals(0.0, camera.alpha)
+        assertEquals(Math.PI / 2, camera.yaw)
+        assertEquals(0.0, camera.pitch)
+        assertEquals(0.0, camera.roll)
 
         camera.turnAngle = -Math.PI / 2
         camera.nodAngle = Math.PI / 2
-        assertEquals(-0.0, camera.gamma)
-        assertEquals(Math.PI / 2, camera.beta)
-        assertEquals(-Math.PI / 2, camera.alpha)
+        assertEquals(-0.0, camera.yaw)
+        assertEquals(Math.PI / 2, camera.pitch)
+        assertEquals(-Math.PI / 2, camera.roll)
     }
 }

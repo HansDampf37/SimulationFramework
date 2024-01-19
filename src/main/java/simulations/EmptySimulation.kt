@@ -6,12 +6,10 @@ import framework.Simulation
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
-import kotlin.math.PI
 
 class EmptySimulation: Simulation("Test") {
-    val coordSystem = CartesianCoordinateSystem(false, 100, 10.0, Color.WHITE)
-    val amountSquares = 50
-    val sizeSquares = 2.0
+    private val amountSquares = 50
+    private val sizeSquares = 2.0
 
     init {
         reset()
@@ -58,8 +56,6 @@ class EmptySimulation: Simulation("Test") {
         camera.x = 50.0
         camera.y = 50.0
         camera.z = 50.0
-        camera.turnAngle = PI
-        camera.nodAngle = 0.0
         camera.focalLength = 1.0
         camera.zoom = 0.003
     }
@@ -67,8 +63,8 @@ class EmptySimulation: Simulation("Test") {
     private fun drawLookingDirection(g: Graphics) {
         val p1 = camera.positionVector - camera.up + camera.lookingDirection * 0.1
         val p2 = camera.positionVector - camera.up + camera.lookingDirection * 10
-        val (pr1, d1) = camera.project(p1)
-        val (pr2, d2) = camera.project(p2)
+        val (pr1, _) = camera.project(p1)
+        val (pr2, _) = camera.project(p2)
         g.color = Color.black
         g.drawLine(pr1.x.toInt(), pr1.y.toInt(), pr2.x.toInt(), pr2.y.toInt())
     }

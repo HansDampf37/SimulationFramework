@@ -36,7 +36,7 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     open fun render(cam: Camera, g: Graphics) {
         val (coords, dist) = cam.project(this.positionVector)
         g.color = Color.WHITE
-        val radius = 3 / dist
+        val radius = 1 / dist
         g.fillOval(
             (coords.x - radius / cam.zoomX).toInt(),
             (coords.y - radius / cam.zoomY).toInt(),

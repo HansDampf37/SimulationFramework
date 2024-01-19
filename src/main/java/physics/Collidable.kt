@@ -18,24 +18,16 @@ open class Collidable(
     override fun render(drawer: Graphics3d, g: Graphics) {
         drawer.drawDot(this, radius = radius, Color.white, g)
     }
-}
-
-class Sphere(
-    x: Double,
-    y: Double,
-    z: Double,
-    radius: Double, mass: Double): Collidable(x, y, z, radius, mass), Simulateable {
-    override fun render(drawer: Graphics3d, g: Graphics) {
-        drawer.drawDot(this, radius = radius, Color.red, g)
-    }
 
     override fun render(cam: Camera, g: Graphics) {
         val (coords, distance) = cam.project(this.positionVector)
+        if (distance < 0) return
         g.color = Color.WHITE
+        val drawingRadius = radius * cam.focalLength / (distance * cam.zoom)
         g.fillOval(
-            (coords.x - radius / cam.zoomX).toInt(),
-            (coords.y - radius / cam.zoomY).toInt(),
-            (2 * radius / cam.zoomX).toInt(),
-            (2 * radius / cam.zoomY).toInt())
+            (coords.x - drawingRadius).toInt(),
+            (coords.y - drawingRadius).toInt(),
+            (2 * drawingRadius).toInt(),
+            (2 * drawingRadius).toInt())
     }
 }

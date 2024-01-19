@@ -7,23 +7,22 @@ import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    //private var sphere = Sphere(0.0, 0.0, 0.0, 10.0, 10.0)
+    private var sphere = Collidable(0.0, 0.0, 0.0, 10.0, 10.0)
     init {
         reset()
         drawer.setZoom(30.0)
         drawer.setCameraAngleHorizontal(0.2)
         camera.focalLength = 10.0
-        camera.z = 100.0
-        camera.x = 0.0
-        camera.y = 0.0
-        camera.nodAngle = 0.0
-        camera.turnAngle = PI
-        camera.zoom = 1.0
+        camera.z = -20.0
+        camera.y = 20.0
+        camera.pitch = 5 * PI / 4
+        camera.yaw = PI
+        camera.focalLength = 10.0
+        camera.zoom = 0.03
     }
     override fun render(g: Graphics) {
         masses.forEach{it.render(camera, g)}
         connections.forEach{it.render(camera, g)}
-        //sphere.render(camera, g)
     }
 
     override fun calcForces(dt: Seconds) {
@@ -31,8 +30,8 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         masses.shuffle()
         connections.shuffle()
         connections.forEach { it.tick(dt) }
-        //sphere.tick(dt)
-        /*masses.forEach {
+        sphere.tick(dt)
+        masses.forEach {
             if (it != sphere) {
                 if (sphere.testForCollision(it)) {
                     Collision.occur(sphere, it, 1.0)
@@ -45,7 +44,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
                     it.set(it + sphere.getDirectionTo(it) * overlap1)
                 }
             }
-        }*/
+        }
     }
 
     private fun input() {
@@ -75,7 +74,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
             }
         }
 
-        //sphere = Sphere(0.0, 10.0, 0.0, 2.0, 20.0)
-        //addNewMass(sphere, true)
+        sphere = Collidable(0.0, 10.0, 0.0, 3.0, 20.0)
+        addNewMass(sphere, true)
     }
 }

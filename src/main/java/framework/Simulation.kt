@@ -23,7 +23,6 @@ abstract class Simulation(
     protected val display: Display = Display(title).apply { jFrame.addKeyListener(keyManager) }
     protected var camera = Camera(
         0.0, 2.0, 0.0,
-        0.0, -Math.PI/2,
         1.0, 1.0, 1.0,
         display.getWidth(), display.getHeight()
     )
@@ -81,10 +80,10 @@ abstract class Simulation(
         if (keyManager.y) camera.zoom *= 1 + dt
         if (keyManager.out) camera.zoom *= 1 - dt
         if (keyManager.n) reset()
-        if (keyManager.up) camera.beta -= dt
-        if (keyManager.down) camera.beta += dt
-        if (keyManager.left) camera.gamma -= dt
-        if (keyManager.right) camera.gamma += dt
+        if (keyManager.up) camera.pitch -= dt
+        if (keyManager.down) camera.pitch += dt
+        if (keyManager.left) camera.yaw -= dt
+        if (keyManager.right) camera.yaw += dt
         if (keyManager.f) camera.focalLength *= 1 + dt
         if (keyManager.g) camera.focalLength *= 1 - dt
     }
