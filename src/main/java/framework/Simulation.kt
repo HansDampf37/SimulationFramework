@@ -1,6 +1,5 @@
 package framework
 
-import algebra.Vec
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -47,8 +46,8 @@ abstract class Simulation(
             keyManager.tick()
             listenForInput(dt)
             drawer.setWindowHeightAndWidth(width, height)
-            camera.widthPixels = width
-            camera.heightPixels = height
+            camera.screenWidth = width
+            camera.screenHeight = height
             tick(dt)
             delta += (now - lastTime) / msPerTick
 
@@ -75,17 +74,19 @@ abstract class Simulation(
 
         if (keyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
         if (keyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
-        if (keyManager.d) camera.add(camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt * 5.0)
-        if (keyManager.a) camera.add(-camera.lookingDirection.crossProduct(Vec(0.0, 1.0, 0.0)).normalize() * dt * 5.0)
+        if (keyManager.d) camera.add(-camera.left * dt * 5.0)
+        if (keyManager.a) camera.add(camera.left * dt * 5.0)
+        if (keyManager.shift) camera.add(-camera.up * dt * 5.0)
+        if (keyManager.space) camera.add(camera.up * dt * 5.0)
         if (keyManager.y) camera.zoom *= 1 + dt
         if (keyManager.out) camera.zoom *= 1 - dt
         if (keyManager.n) reset()
-        if (keyManager.shift) camera.add(Vec(0.0, -1.0, 0.0) * dt * 5.0)
-        if (keyManager.space) camera.add(Vec(0.0, 1.0, 0.0) * dt * 5.0)
-        if (keyManager.up) camera.pitch -= dt
-        if (keyManager.down) camera.pitch += dt
-        if (keyManager.left) camera.yaw += dt
-        if (keyManager.right) camera.yaw -= dt
+        if (keyManager.up) camera.beta -= dt
+        if (keyManager.down) camera.beta += dt
+        if (keyManager.left) camera.gamma -= dt
+        if (keyManager.right) camera.gamma += dt
+        if (keyManager.f) camera.focalLength *= 1 + dt
+        if (keyManager.g) camera.focalLength *= 1 - dt
     }
 
     /**

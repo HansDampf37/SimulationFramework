@@ -1,9 +1,9 @@
 package algebra
 
 open class Point3d {
-    var x: Double
-    var y: Double
-    var z: Double
+    open var x: Double
+    open var y: Double
+    open var z: Double
 
     constructor(x: Double, y: Double, z: Double) {
         this.x = x

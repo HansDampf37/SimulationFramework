@@ -27,28 +27,31 @@ class EmptySimulation: Simulation("Test") {
         val X = dx * 50
         for (x in 0 until amountSquares) {
             for (y in 0 until amountSquares) {
-                val color = if ((y + x) % 2 == 0) Color.RED else Color.WHITE
+                var color = if ((y + x) % 2 == 0) Color.RED else Color.WHITE
                 drawRect(dx * x + dy * y, dx * x + dx + dy * y, dx * x + dx + dy * y + dy, dy * y + dy + dx * x, color, g)
-                //drawRect(dx * x + dy * y + Z, dx * x + dx + dy * y + Z, dx * x + dx + dy * y + dy + Z, dy * y + dy + dx * x + Z, color, g)
+                color = if ((y + x) % 2 == 0) Color.PINK else Color.WHITE
+                drawRect(dx * x + dy * y + Z, dx * x + dx + dy * y + Z, dx * x + dx + dy * y + dy + Z, dy * y + dy + dx * x + Z, color, g)
             }
         }
 
         for (x in 0 until amountSquares) {
             for (z in 0 until amountSquares) {
-                val color = if ((z + x) % 2 == 0) Color.BLUE else Color.WHITE
+                var color = if ((z + x) % 2 == 0) Color.BLUE else Color.WHITE
                 drawRect(dx * x + dz * z, dx * x + dx + dz * z, dx * x + dx + dz * z + dz, dz * z + dz + dx * x, color, g)
-                // drawRect(dx * x + dz * z + Y, dx * x + dx + dz * z + Y, dx * x + dx + dz * z + dz + Y, dz * z + dz + dx * x + Y, color, g)
+                color = if ((z + x) % 2 == 0) Color.CYAN else Color.WHITE
+                drawRect(dx * x + dz * z + Y, dx * x + dx + dz * z + Y, dx * x + dx + dz * z + dz + Y, dz * z + dz + dx * x + Y, color, g)
             }
         }
 
         for (y in 0 until amountSquares) {
             for (z in 0 until amountSquares) {
-                val color = if ((y + z) % 2 == 0) Color.GREEN else Color.WHITE
+                var color = if ((y + z) % 2 == 0) Color.GREEN else Color.WHITE
                 drawRect(dy * y + dz * z, dy * y + dy + dz * z, dy * y + dy + dz * z + dz, dz * z + dz + dy * y, color, g)
-                //drawRect(dy * y + dz * z + Y, dy * y + dx + dz * z + X, dy * y + dy + dz * z + dz + X, dz * z + dz + dy * y + X, color, g)
+                color = if ((y + z) % 2 == 0) Color.MAGENTA else Color.WHITE
+                drawRect(dy * y + dz * z + X, dy * y + dz * z + dz + X, dy * y + dy + dz * z + dz + X, dz * z + dy * y + dy + X, color, g)
             }
         }
-        drawLookingDirection(g)
+        // drawLookingDirection(g)
     }
 
     override fun reset() {
@@ -66,7 +69,6 @@ class EmptySimulation: Simulation("Test") {
         val p2 = camera.positionVector - camera.up + camera.lookingDirection * 10
         val (pr1, d1) = camera.project(p1)
         val (pr2, d2) = camera.project(p2)
-        if (d1 < 0 || d2 < 0) throw IllegalStateException("Das iste nix gut")
         g.color = Color.black
         g.drawLine(pr1.x.toInt(), pr1.y.toInt(), pr2.x.toInt(), pr2.y.toInt())
     }
@@ -78,10 +80,10 @@ class EmptySimulation: Simulation("Test") {
         val (p4, d4) = camera.project(pos3)
         val w = display.getWidth()
         val h = display.getHeight()
-        if (p1.x < 0.0 || p2.x < 0.0 || p3.x < 0.0 || p4.x < 0.0) return
-        if (p1.y < 0.0 || p2.y < 0.0 || p3.y < 0.0 || p4.y < 0.0) return
-        if (p1.x > w || p2.x > w || p3.x > w || p4.x > w) return
-        if (p1.y > h || p2.y > h || p3.y > h || p4.y > h) return
+        if (p1.x < 0.0 && p2.x < 0.0 && p3.x < 0.0 && p4.x < 0.0) return
+        if (p1.y < 0.0 && p2.y < 0.0 && p3.y < 0.0 && p4.y < 0.0) return
+        if (p1.x > w && p2.x > w && p3.x > w && p4.x > w) return
+        if (p1.y > h && p2.y > h && p3.y > h && p4.y > h) return
         if (d1 < 0 || d2 < 0 || d3 < 0 || d4 < 0) return
         val xPoints = intArrayOf(p1.x.toInt(), p2.x.toInt(), p3.x.toInt(), p4.x.toInt())
         val yPoints = intArrayOf(p1.y.toInt(), p2.y.toInt(), p3.y.toInt(), p4.y.toInt())

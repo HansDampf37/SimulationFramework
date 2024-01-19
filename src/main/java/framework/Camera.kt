@@ -17,36 +17,98 @@ import kotlin.math.*
  * @param turnAngle
  * @param nodAngle
  * @param focalLength distance from pinhole to projection plane
- * @param widthPixels resolution of projection plane
- * @param heightPixels resolution of projection plane
+ * @param screenWidth resolution of projection plane
+ * @param screenHeight resolution of projection plane
  */
 class Camera(
     x: Double, y: Double, z: Double,
     turnAngle: Double, nodAngle: Double,
-    var zoomX: Double, var zoomY: Double,
-    var focalLength: Double,
-    var widthPixels: Int,
-    var heightPixels: Int,
+    zoomX: Double, zoomY: Double,
+    focalLength: Double,
+    screenWidth: Int,
+    screenHeight: Int,
 ) : Point3d(x, y, z) {
-    var yaw: Double = 0.0
-    var pitch: Double = 0.0
-    var roll: Double = 0.0
-
-    var turnAngle: Double = 0.0
+    var gamma: Double = 0.0
         set(value) {
-            yaw = (-abs(nodAngle) / (PI / 2) + 1) * value
-            roll = abs(nodAngle) / (PI / 2) * value
+            projectionMatrixIsValid = false
+            field = value
+        }
+    var beta: Double = 0.0
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+    var alpha: Double = 0.0
+        set(value) {
+            projectionMatrixIsValid = false
             field = value
         }
 
-    var nodAngle: Double
-        get() = pitch
+    override var x: Double = x
         set(value) {
-            pitch = if (value > PI / 2) PI / 2
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    override var y: Double = y
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    override var z: Double = z
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var zoomX: Double = zoomX
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var zoomY: Double = zoomY
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var focalLength: Double = focalLength
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var screenWidth: Int = screenWidth
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var screenHeight: Int = screenHeight
+        set(value) {
+            projectionMatrixIsValid = false
+            field = value
+        }
+
+    var turnAngle: Double = 0.0
+        set(value) {
+            gamma = (-abs(nodAngle) / (PI / 2) + 1) * value
+            alpha = abs(nodAngle) / (PI / 2) * value
+            field = value
+            projectionMatrixIsValid = false
+        }
+
+    var nodAngle: Double
+        get() = beta
+        set(value) {
+            beta = if (value > PI / 2) PI / 2
             else if (value < -PI / 2) -PI / 2
             else value
-            yaw = (-abs(nodAngle) / (PI / 2) + 1) * turnAngle
-            roll = abs(nodAngle) / (PI / 2) * turnAngle
+            gamma = (-abs(turnAngle) / (PI / 2) + 1) * turnAngle
+            alpha = abs(turnAngle) / (PI / 2) * turnAngle
+            projectionMatrixIsValid = false
         }
 
     init {
@@ -66,11 +128,18 @@ class Camera(
             return Vec(v.x, v.y, v.z).normalize()
         }
 
+    val left: Vec
+        get() {
+            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(1.0, 0.0, 0.0, 1.0)))
+            return Vec(v.x, v.y, v.z).normalize()
+        }
+
     var zoom: Double
         get() = zoomX
         set(value) {
             zoomX = value
             zoomY = value
+            projectionMatrixIsValid = false
         }
     private val translationMatrix4x4
         get() = Matrix4X4(
@@ -80,89 +149,79 @@ class Camera(
             0.0, 0.0, 0.0, 1.0
         )
 
-    private val rotationMatrix4x4
-        get() = Matrix4X4(
-            cos(yaw) * cos(pitch),
-            cos(yaw) * sin(pitch) * sin(roll + PI) - sin(yaw) * cos(roll + PI),
-            cos(yaw) * sin(pitch) * cos(roll + PI) + sin(yaw) * sin(roll + PI),
-            0.0,
-            sin(yaw) * cos(pitch),
-            sin(yaw) * sin(pitch) * sin(roll + PI) + cos(yaw) * cos(roll + PI),
-            sin(yaw) * sin(pitch) * cos(roll + PI) - cos(yaw) * sin(roll + PI),
-            0.0,
-            -sin(pitch),
-            cos(pitch) * sin(roll + PI),
-            cos(pitch) * cos(roll + PI),
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0
-        )
-
     private val matrixPitch
         get() = Matrix4X4(
             1.0, 0.0, 0.0, 0.0,
-            0.0, cos(pitch), -sin(pitch), 0.0,
-            0.0, sin(pitch), cos(pitch), 0.0,
+            0.0, cos(beta), -sin(beta), 0.0,
+            0.0, sin(beta), cos(beta), 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val matrixPitchInv
         get() = Matrix4X4(
             1.0, 0.0, 0.0, 0.0,
-            0.0, cos(-pitch), -sin(-pitch), 0.0,
-            0.0, sin(-pitch), cos(-pitch), 0.0,
+            0.0, cos(-beta), -sin(-beta), 0.0,
+            0.0, sin(-beta), cos(-beta), 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val matrixYaw
         get() = Matrix4X4(
-            cos(yaw), 0.0, sin(yaw), 0.0,
+            cos(gamma), 0.0, sin(gamma), 0.0,
             0.0, 1.0, 0.0, 0.0,
-            -sin(yaw), 0.0, cos(yaw), 0.0,
+            -sin(gamma), 0.0, cos(gamma), 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val matrixYawInv
         get() = Matrix4X4(
-            cos(-yaw), 0.0, sin(-yaw), 0.0,
+            cos(-gamma), 0.0, sin(-gamma), 0.0,
             0.0, 1.0, 0.0, 0.0,
-            -sin(-yaw), 0.0, cos(-yaw), 0.0,
+            -sin(-gamma), 0.0, cos(-gamma), 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val matrixRoll
         get() = Matrix4X4(
-            cos(roll + PI), -sin(roll + PI), 0.0, 0.0,
-            sin(roll + PI), cos(roll + PI), 0.0, 0.0,
+            cos(alpha + PI), -sin(alpha + PI), 0.0, 0.0,
+            sin(alpha + PI), cos(alpha + PI), 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val matrixRollInv
         get() = Matrix4X4(
-            cos(-roll + PI), -sin(-roll + PI), 0.0, 0.0,
-            sin(-roll + PI), cos(-roll + PI), 0.0, 0.0,
+            cos(-alpha + PI), -sin(-alpha + PI), 0.0, 0.0,
+            sin(-alpha + PI), cos(-alpha + PI), 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val cameraToPixelCoords
         get() = Matrix3x4(
-            focalLength, 0.0, 0.0, 0.0,
-            0.0, focalLength, 0.0, 0.0,
+            -focalLength / zoomX, 0.0, screenWidth / 2.0, 0.0,
+            0.0, -focalLength / zoomY, screenHeight / 2.0, 0.0,
             0.0, 0.0, 1.0, 0.0
         )
+
+    private var projectionMatrix: Matrix3x4 = Matrix3x4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    private var projectionMatrixIsValid = false
 
     fun project(v: Vec): Pair<Vec2, Meters> {
         if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
-            val cameraCoordinate = matrixYaw * (matrixPitch * (matrixRoll * (translationMatrix4x4 * vHom)))
-            val filmCoords = cameraToPixelCoords * cameraCoordinate
+            if (!projectionMatrixIsValid) {
+                projectionMatrix = cameraToPixelCoords * matrixYaw * matrixPitch * matrixRoll * translationMatrix4x4
+                projectionMatrixIsValid = true
+            }
+            val filmCoords = projectionMatrix * vHom
+            // translate and rotate world coordinate system in camera coordinate system
+            // val cameraCoordinate = matrixYaw * (matrixPitch * (matrixRoll * (translationMatrix4x4 * vHom)))
+            // project camera coordinates into film coordinates
+            // val filmCoords = cameraToPixelCoords * cameraCoordinate
             val filmX = if (filmCoords.z != 0.0) filmCoords.x / filmCoords.z else filmCoords.x
             val filmY = if (filmCoords.z != 0.0) filmCoords.y / filmCoords.z else filmCoords.y
-            return Pair(Vec2(filmX/zoomX + widthPixels / 2, filmY/zoomY + heightPixels / 2), (this - v).length)
+            return Pair(Vec2(filmX, filmY), (this - v).length)
         }
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
