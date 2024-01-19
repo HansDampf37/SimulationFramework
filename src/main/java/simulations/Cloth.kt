@@ -1,9 +1,9 @@
 package simulations
 
-import physics.*
 import framework.MassSimulation
-import algebra.Vec
+import physics.*
 import java.awt.Graphics
+import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
     private lateinit var connections: MutableList<Connection>
@@ -12,6 +12,13 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         reset()
         drawer.setZoom(30.0)
         drawer.setCameraAngleHorizontal(0.2)
+        camera.focalLength = 10.0
+        camera.z = 100.0
+        camera.x = 0.0
+        camera.y = 0.0
+        camera.nodAngle = 0.0
+        camera.turnAngle = PI
+        camera.zoom = 1.0
     }
     override fun render(g: Graphics) {
         masses.forEach{it.render(camera, g)}

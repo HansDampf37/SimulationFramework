@@ -2,7 +2,6 @@ package framework
 
 import algebra.Vec
 import algebra.Vec2
-import org.junit.Before
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -11,7 +10,6 @@ class CameraTest {
     private lateinit var camera: Camera
 
     @BeforeEach
-    @Before
     fun setup() {
         camera = Camera(0.0, 0.0, 0.0,
             0.0, 0.0,
@@ -161,6 +159,10 @@ class CameraTest {
         assertEquals(0.0, camera.yaw)
         assertEquals(Math.PI / 2, camera.pitch)
         assertEquals(Math.PI / 2, camera.roll)
+        camera.nodAngle -= Math.PI / 2
+        assertEquals(Math.PI / 2, camera.yaw)
+        assertEquals(0.0, camera.pitch)
+        assertEquals(0.0, camera.roll)
 
         camera.turnAngle = -Math.PI / 2
         camera.nodAngle = Math.PI / 2

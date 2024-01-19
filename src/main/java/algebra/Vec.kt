@@ -1,5 +1,6 @@
 package algebra
 
+import kotlin.math.acos
 import kotlin.math.sqrt
 
 /**
@@ -151,5 +152,13 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
 
     fun crossProduct(vec: Vec): Vec {
         return Vec(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x)
+    }
+
+    operator fun times(x: Int): Vec {
+        return times(x.toDouble())
+    }
+
+    fun angleWith(vec: Vec): Double {
+        return acos(vec * this / (vec.length * this.length))
     }
 }

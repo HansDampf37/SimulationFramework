@@ -47,3 +47,31 @@ class Matrix3x4(var a: Double, var b: Double, var c: Double, var d: Double,
                 "| $i, $j, $k, $l |"
     }
 }
+
+class Matrix3x3(
+    var a: Double, var b: Double, var c: Double,
+    var d: Double, var e: Double, var f: Double,
+    var g: Double, var h: Double, var i: Double) {
+
+    operator fun times(v: Vec) : Vec {
+        return Vec(
+            v.x * a + v.y * b + v.z * c,
+            v.x * d + v.y * e + v.z * f,
+            v.x * g + v.y * h + v.z * i
+        )
+    }
+
+    operator fun times(m: Matrix3x4): Matrix3x4 {
+        return Matrix3x4(
+            m.a * a + m.e * b + m.i * c, m.b * a + m.f * b + m.j * c, m.c * a + m.g * b + m.k * c, m.d * a + m.h * b + m.l * c,
+            m.a * d + m.e * e + m.i * f, m.b * d + m.f * e + m.j * f, m.c * d + m.g * e + m.k * f, m.d * d + m.h * e + m.l * f,
+            m.a * g + m.e * h + m.i * i, m.b * g + m.f *h + m.j *i, m.c * g + m.g * h + m.k * i, m.d * g + m.h * h + m.l * i,
+        )
+    }
+
+    override fun toString(): String {
+        return  "| $a, $b, $c |\n" +
+                "| $d, $e, $f |\n" +
+                "| $g, $h, $i |"
+    }
+}

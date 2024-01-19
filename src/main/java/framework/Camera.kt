@@ -24,7 +24,7 @@ class Camera(
     x: Double, y: Double, z: Double,
     turnAngle: Double, nodAngle: Double,
     var zoomX: Double, var zoomY: Double,
-    private var focalLength: Double,
+    var focalLength: Double,
     var widthPixels: Int,
     var heightPixels: Int,
 ) : Point3d(x, y, z) {
@@ -56,8 +56,14 @@ class Camera(
 
     val lookingDirection: Vec
         get() {
-            val v: Vec4 = matrixYawInv * (matrixPitchInv * (matrixRollInv * Vec4(0.0, 0.0, 1.0, 1.0)))
-            return Vec(v.x, v.y, v.z)
+            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 0.0, 1.0, 1.0)))
+            return Vec(v.x, v.y, v.z).normalize()
+        }
+
+    val up: Vec
+        get() {
+            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 1.0, 0.0, 1.0)))
+            return Vec(v.x, v.y, v.z).normalize()
         }
 
     var zoom: Double
@@ -136,27 +142,27 @@ class Camera(
 
     private val matrixRollInv
         get() = Matrix4X4(
-            cos(-roll - PI), -sin(-roll - PI), 0.0, 0.0,
-            sin(-roll - PI), cos(-roll - PI), 0.0, 0.0,
+            cos(-roll + PI), -sin(-roll + PI), 0.0, 0.0,
+            sin(-roll + PI), cos(-roll + PI), 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
     private val cameraToPixelCoords
         get() = Matrix3x4(
-            focalLength / zoomX, 0.0, widthPixels / 2.0, 0.0,
-            0.0, focalLength / zoomY, heightPixels / 2.0, 0.0,
+            focalLength, 0.0, 0.0, 0.0,
+            0.0, focalLength, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0
         )
 
     fun project(v: Vec): Pair<Vec2, Meters> {
-        if ((v - this.positionVector).hasSharpAngleTo(lookingDirection)) {
+        if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
             val cameraCoordinate = matrixYaw * (matrixPitch * (matrixRoll * (translationMatrix4x4 * vHom)))
             val filmCoords = cameraToPixelCoords * cameraCoordinate
             val filmX = if (filmCoords.z != 0.0) filmCoords.x / filmCoords.z else filmCoords.x
             val filmY = if (filmCoords.z != 0.0) filmCoords.y / filmCoords.z else filmCoords.y
-            return Pair(Vec2(filmX, filmY), (this - v).length)
+            return Pair(Vec2(filmX/zoomX + widthPixels / 2, filmY/zoomY + heightPixels / 2), (this - v).length)
         }
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
