@@ -105,7 +105,9 @@ abstract class Simulation(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON
         )
-        render(g)
+        camera.prepareForNewFrame()
+        render()
+        g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null);
         bs.show()
         g.dispose()
     }

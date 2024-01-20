@@ -34,13 +34,13 @@ class RasterizerTest {
         val v6 = Vertex(position = Vec(10.0, 10.0, 1.0), color = c6, normal = zero)
         val triangle2 = Triangle(arrayOf(v4, v5, v6))
         val line = Line(arrayOf(v1, v4))
-        rasterizer.drawPrimitive(triangle1)
-        rasterizer.drawPrimitive(triangle2)
-        val image = rasterizer.drawPrimitive(line)
+        rasterizer.renderPrimitive(triangle1)
+        rasterizer.renderPrimitive(triangle2)
+        rasterizer.renderPrimitive(line)
 
         val frame = JFrame()
         frame.contentPane.setLayout(FlowLayout())
-        frame.contentPane.add(JLabel(ImageIcon(image)))
+        frame.contentPane.add(JLabel(ImageIcon(rasterizer.image)))
         frame.pack()
         frame.isVisible = true
         sleep(20000)

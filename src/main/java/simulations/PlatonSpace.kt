@@ -31,10 +31,14 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
         keepPointsInOrb()
     }
 
-    override fun render(g: Graphics) {
+    fun render(g: Graphics) {
         coordSys.render(drawer, g)
         drawPoints(g)
         if (keyManager.f) drawForces(g)
+    }
+
+    override fun render() {
+        TODO("Not yet implemented")
     }
 
     private fun drawForces(g: Graphics) {
