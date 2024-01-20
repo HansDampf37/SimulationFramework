@@ -115,19 +115,19 @@ class Camera(
 
     val lookingDirection: Vec
         get() {
-            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 0.0, 1.0, 1.0)))
+            val v: Vec4 = swpAxisInv * (matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 0.0, 1.0, 1.0))))
             return Vec(v.x, v.y, v.z).normalize()
         }
 
     val up: Vec
         get() {
-            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 1.0, 0.0, 1.0)))
+            val v: Vec4 = swpAxisInv * (matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(0.0, 1.0, 0.0, 1.0))))
             return Vec(v.x, v.y, v.z).normalize()
         }
 
     val left: Vec
         get() {
-            val v: Vec4 = matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(1.0, 0.0, 0.0, 1.0)))
+            val v: Vec4 = swpAxisInv * (matrixRollInv * (matrixPitchInv * (matrixYawInv * Vec4(1.0, 0.0, 0.0, 1.0))))
             return Vec(v.x, v.y, v.z).normalize()
         }
 
@@ -166,6 +166,22 @@ class Camera(
             cos(yaw), 0.0, sin(yaw), 0.0,
             0.0, 1.0, 0.0, 0.0,
             -sin(yaw), 0.0, cos(yaw), 0.0,
+            0.0, 0.0, 0.0, 1.0
+        )
+
+    private val swpAxis
+        get() = Matrix4X4(
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        )
+
+    private val swpAxisInv
+        get() = Matrix4X4(
+            0.0, 0.0, 1.0, 0.0,
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
@@ -209,7 +225,7 @@ class Camera(
             if (!projectionMatrixIsValid) {
                 // translate and rotate world coordinate system in camera coordinate system
                 // project camera coordinates into film coordinates
-                projectionMatrix = cameraToPixelCoords * matrixYaw * matrixPitch * matrixRoll * translationMatrix4x4
+                projectionMatrix = cameraToPixelCoords * matrixYaw * matrixPitch * matrixRoll * swpAxis * translationMatrix4x4
                 projectionMatrixIsValid = true
             }
             val filmCoords = projectionMatrix * vHom
@@ -218,6 +234,13 @@ class Camera(
             return Pair(Vec2(filmX, filmY), (this - v).length)
         }
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
+    }
+
+    fun cameraSettingsToString(): String {
+        fun round(value: Double) = (value * 100).toInt().toDouble() / 100
+        return "x: ${round(x)}, y: ${round(y)}, z: ${round(z)}, \n" +
+                "yaw: ${round(yaw / PI)}π, pitch: ${round(pitch / PI)}π, roll: ${round(roll / PI)}π, \n" +
+                "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
     }
 
     /*fun rasterize(triangle: Triangle): BufferedImage {

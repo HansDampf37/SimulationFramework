@@ -80,10 +80,10 @@ abstract class Simulation(
         if (keyManager.y) camera.zoom *= 1 + dt
         if (keyManager.out) camera.zoom *= 1 - dt
         if (keyManager.n) reset()
-        if (keyManager.up) camera.theta -= dt
-        if (keyManager.down) camera.theta += dt
-        if (keyManager.left) camera.phi -= dt
-        if (keyManager.right) camera.phi += dt
+        if (keyManager.up) camera.pitch += dt
+        if (keyManager.down) camera.pitch -= dt
+        if (keyManager.left) camera.yaw -= dt
+        if (keyManager.right) camera.yaw += dt
         if (keyManager.f) camera.focalLength *= 1 + dt
         if (keyManager.g) camera.focalLength *= 1 - dt
     }
@@ -100,7 +100,7 @@ abstract class Simulation(
         val g = bs.drawGraphics
         g.clearRect(0, 0, display.canvas.width, display.canvas.height)
         g.color = Color.white
-        g.drawString(drawer.cameraSettingsToString(), 10, 10)
+        g.drawString(camera.cameraSettingsToString(), 10, 10)
         if (antiAliasing) (g as Graphics2D).setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON

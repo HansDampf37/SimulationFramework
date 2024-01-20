@@ -7,16 +7,19 @@ import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    private var sphere = Collidable(0.0, 0.0, 0.0, 10.0, 10.0)
+    private var sphere = Collidable(0.0, 0.0, 10.0, 3.0, 20.0)
+
     init {
         reset()
         drawer.setZoom(30.0)
         drawer.setCameraAngleHorizontal(0.2)
         camera.focalLength = 10.0
-        camera.z = -20.0
-        camera.y = 20.0
+        camera.x = -10.0
+        camera.y = 0.0
+        camera.z = 8.0
         camera.pitch = 5 * PI / 4
         camera.yaw = PI
+        camera.roll = 0.0
         camera.focalLength = 10.0
         camera.zoom = 0.03
     }
@@ -61,7 +64,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         for (x in 0 until size) {
             for (z in 0 until size) {
                 val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
-                val c = Collidable(x.toDouble() - size / 2.0 + 0.5, 0.0, z.toDouble() - size / 2.0 + 0.5, .25, 1.0)
+                val c = Collidable(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0,.25, 1.0)
                 addNewMass(c, !isOnEdge)
                 masses.last().status = if (isOnEdge) Mass.Status.Immovable else Mass.Status.Movable
             }
@@ -74,7 +77,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
             }
         }
 
-        sphere = Collidable(0.0, 10.0, 0.0, 3.0, 20.0)
+        sphere = Collidable(0.0, 0.0, 10.0, 3.0, 20.0)
         addNewMass(sphere, true)
     }
 }
