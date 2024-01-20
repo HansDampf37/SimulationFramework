@@ -2,6 +2,7 @@ package framework
 
 import algebra.*
 import physics.Meters
+import java.lang.IllegalArgumentException
 import java.lang.Math.PI
 import kotlin.math.*
 
@@ -25,6 +26,10 @@ class Camera(
     screenWidth: Int,
     screenHeight: Int,
 ) : Point3d(x, y, z) {
+
+    init {
+        if (zoomX <= 0.0 || zoomY <= 0.0 || focalLength == 0.0) throw IllegalArgumentException("Zoom must be > 0; focal length must be != 0")
+    }
 
     var turnAngle: Double = 0.0
     var nodAngle: Double = 0.0

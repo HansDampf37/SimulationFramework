@@ -12,15 +12,15 @@ class CameraTest {
     @BeforeEach
     fun setup() {
         camera = Camera(0.0, 0.0, 0.0,
-            0.0, 0.0,
+            1.0, 1.0,
             1.0,100, 100)
     }
 
     @Test
     fun project() {
         camera = Camera(0.0, 0.0, 0.0,
-            0.0, 0.0,
-            1.0, 1.0, 1.0,
+            1.0, 1.0,
+            1.0,
             100, 100)
         assertEquals(Vec(0.0,0.0,1.0), camera.lookingDirection)
 

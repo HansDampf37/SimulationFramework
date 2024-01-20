@@ -47,4 +47,16 @@ class Vec2(var x: Double, var y: Double) {
         result = 31 * result + y.hashCode()
         return result
     }
+
+    fun normalize(): Vec2 {
+        return this * (1 / length())
+    }
+
+    operator fun times(d: Double): Vec2 {
+        return Vec2(x * d, y * d)
+    }
+
+    operator fun times(v: Vec2): Double {
+        return this.x * v.x + this.y * v.y
+    }
 }
