@@ -10,6 +10,6 @@ public class Launcher {
         new Cloth(20).start();
         // new Pend(4, simulator);
         // new Fractal(5, simulator);
-        //new EmptySimulation().start();
+        // new EmptySimulation().start();
     }
 }

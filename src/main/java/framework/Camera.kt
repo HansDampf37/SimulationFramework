@@ -2,6 +2,7 @@ package framework
 
 import algebra.*
 import physics.Meters
+import java.lang.IllegalArgumentException
 import java.lang.Math.PI
 import kotlin.math.*
 
@@ -26,8 +27,27 @@ class Camera(
     screenHeight: Int,
 ) : Point3d(x, y, z) {
 
-    var turnAngle: Double = 0.0
-    var nodAngle: Double = 0.0
+    //var zPuffer = BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_)
+
+    init {
+        if (zoomX <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
+        if (zoomY <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
+        if (focalLength <= 0.0) throw IllegalArgumentException("Focal length must be > 0")
+    }
+
+    var phi: Double
+        get() = yaw
+        set(value) {
+            yaw = value
+            pitch = cos(phi) * theta
+            roll = sin(phi) * theta
+        }
+    var theta: Double = 0.0
+        set(value) {
+            field = min(PI / 2, max(-PI / 2, value))
+            pitch = cos(phi) * theta
+            roll = sin(phi) * theta
+        }
 
     var yaw: Double = 0.0
         set(value) {
@@ -199,4 +219,13 @@ class Camera(
         }
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
+
+    /*fun rasterize(triangle: Triangle): BufferedImage {
+        val (p1, d1) = project(triangle.p1)
+        val (p2, d2) = project(triangle.p2)
+        val (p3, d3) = project(triangle.p3)
+        val image = BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB)
+        val g = image.graphics
+        //g.fillP
+    }*/
 }
