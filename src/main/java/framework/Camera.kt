@@ -27,8 +27,6 @@ class Camera(
     screenHeight: Int,
 ) : Point3d(x, y, z) {
 
-    //var zPuffer = BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_)
-
     init {
         if (zoomX <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
         if (zoomY <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
@@ -242,13 +240,4 @@ class Camera(
                 "yaw: ${round(yaw / PI)}π, pitch: ${round(pitch / PI)}π, roll: ${round(roll / PI)}π, \n" +
                 "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
     }
-
-    /*fun rasterize(triangle: Triangle): BufferedImage {
-        val (p1, d1) = project(triangle.p1)
-        val (p2, d2) = project(triangle.p2)
-        val (p3, d3) = project(triangle.p3)
-        val image = BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB)
-        val g = image.graphics
-        //g.fillP
-    }*/
 }
