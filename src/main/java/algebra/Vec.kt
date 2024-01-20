@@ -161,4 +161,9 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
     fun angleWith(vec: Vec): Double {
         return acos(vec * this / (vec.length * this.length))
     }
+
+    companion object{
+        val ones = Vec(1.0, 1.0, 1.0)
+        val zero = Vec(0.0,0.0,0.0)
+    }
 }

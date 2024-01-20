@@ -1,21 +1,8 @@
 package algebra
 
-open class Point3d {
-    open var x: Double
-    open var y: Double
-    open var z: Double
+open class Point3d(open var x: Double, open var y: Double, open var z: Double) {
 
-    constructor(x: Double, y: Double, z: Double) {
-        this.x = x
-        this.y = y
-        this.z = z
-    }
-
-    constructor(positionVector: Vec) {
-        x = positionVector.x
-        y = positionVector.y
-        z = positionVector.z
-    }
+    constructor(positionVector: Vec): this(positionVector.x, positionVector.y, positionVector.z)
 
     fun add(delta: Vec) {
         x += delta.x

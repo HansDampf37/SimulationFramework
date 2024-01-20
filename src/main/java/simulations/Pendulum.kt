@@ -29,6 +29,10 @@ class Pendulum(val amountOfPoints: Int) : Simulation("Pendulum") {
         movePoints()
     }
 
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+
     private val input: Unit
         get() {
             if (keyManager.up) forces[0] = Vec(10.0, 0.0, 0.0)
@@ -72,7 +76,7 @@ class Pendulum(val amountOfPoints: Int) : Simulation("Pendulum") {
         }
     }
 
-    override fun render(g: Graphics) {
+    fun render(g: Graphics) {
         cart.render(drawer, g)
         for (i in 0 until points.size - 1) {
             drawer.drawDot(points[i], 0.25, Color.lightGray, g)

@@ -2,16 +2,18 @@ package framework
 
 import algebra.Vec
 import algebra.Vec2
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class Primitive(val vertices: Array<Vertex>) {
-    abstract fun boundingBox(): BoundingBox
+interface Primitive {
+    fun boundingBox(): BoundingBox
 
-    abstract fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult
+    fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult
+    fun getVertices(): Array<Vertex>
 }
 
 class BoundingBox(var minX: Int, var minY: Int, var maxX: Int, var maxY: Int)
@@ -30,9 +32,8 @@ class Vertex(
     var screenPosition: Vec2? = null,
     var depth: Float = -1f,
 )
-class Triangle(
-    vertices: Array<Vertex>
-) : Primitive(vertices) {
+class Triangle(private val vertices: Array<Vertex>): Primitive {
+
     override fun boundingBox(): BoundingBox {
         // Find bounding box of the triangle in screen space
         val pixel1 = vertices[0].screenPosition!!
@@ -67,11 +68,13 @@ class Triangle(
             InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
         }
     }
+
+    override fun getVertices(): Array<Vertex> {
+        return vertices
+    }
 }
 
-class Line(
-    vertices: Array<Vertex>
-) : Primitive(vertices) {
+class Line(private val vertices: Array<Vertex>): Primitive {
     override fun boundingBox(): BoundingBox {
         // Find bounding box of the triangle in screen space
         val pixel1 = vertices[0].screenPosition!!
@@ -87,7 +90,7 @@ class Line(
         val v0: Vec2 = vertices[0].screenPosition!!
         val v1: Vec2 = vertices[1].screenPosition!!
         // Check if the point is on the line
-        return if ((v1 - v0).normalize() * (pixel - v0).normalize() > 0.999999) {
+        return if ((v1 - v0).normalize() * (pixel - v0).normalize() > 0.99) {
             // point is inside -> Interpolate depth normal and color
             val alpha = (pixel - v0).length() / (v1 - v0).length()
             val beta = 1 - alpha
@@ -101,24 +104,30 @@ class Line(
             InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
         }
     }
+
+    override fun getVertices(): Array<Vertex> {
+        return vertices
+    }
 }
 
 class Rasterizer(
     val camera: Camera
 ) {
-    private var image: BufferedImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
+    var image: BufferedImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
     private var zBuffer: FloatArray = FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
 
     init {
-        Arrays.fill(zBuffer, Float.MAX_VALUE) // Initialize z-buffer with maximum depth
+        prepareForNewFrame()
     }
 
-    fun drawPrimitive(primitive: Primitive): BufferedImage {
+    fun renderPrimitive(primitive: Primitive) {
         // Convert 3D coordinates to 2D screen space
-        for (i in 0 until primitive.vertices.size) {
-            val (p, d) = camera.project(primitive.vertices[i].position)
-            primitive.vertices[i].screenPosition = p
-            primitive.vertices[i].depth = d.toFloat()
+        for (i in 0 until primitive.getVertices().size) {
+            val vertex = primitive.getVertices()[i]
+            val (p, d) = camera.project(vertex.position)
+            vertex.screenPosition = p
+            vertex.depth = d.toFloat()
+            if (d < 0) return
         }
 
         val bb = primitive.boundingBox()
@@ -127,7 +136,7 @@ class Rasterizer(
         bb.minX = max(0, bb.minX)
         bb.minY = max(0, bb.minY)
         bb.maxX = min((image.width - 1), bb.maxX)
-        bb.maxY = min((image.width - 1), bb.maxY)
+        bb.maxY = min((image.height - 1), bb.maxY)
 
         // Iterate over pixels in the bounding box
         for (y in bb.minY..bb.maxY) {
@@ -139,7 +148,7 @@ class Rasterizer(
                     val depth = interpolation.depth
 
                     // Check against z-buffer
-                    val index = y * image.width + x
+                    val index = y * camera.screenWidth + x
                     if (depth < zBuffer[index]) {
                         // Update z-buffer
                         zBuffer[index] = depth
@@ -153,7 +162,19 @@ class Rasterizer(
                 }
             }
         }
-        return image
+    }
+
+    fun prepareForNewFrame() {
+        val graphics = image.graphics
+        graphics.color = Color.BLACK
+        graphics.drawRect(0,0, image.width, image.height)
+        Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
+    }
+
+    fun updateWidthHeightFromCamera() {
+        image = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
+        zBuffer = FloatArray(camera.screenWidth * camera.screenHeight)
+        prepareForNewFrame()
     }
 }
 

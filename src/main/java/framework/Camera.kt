@@ -102,12 +102,14 @@ class Camera(
     var screenWidth: Int = screenWidth
         set(value) {
             projectionMatrixIsValid = false
+            rasterizer.updateWidthHeightFromCamera()
             field = value
         }
 
     var screenHeight: Int = screenHeight
         set(value) {
             projectionMatrixIsValid = false
+            rasterizer.updateWidthHeightFromCamera()
             field = value
         }
 
@@ -217,6 +219,11 @@ class Camera(
     private var projectionMatrix: Matrix3x4 = Matrix3x4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
     private var projectionMatrixIsValid = false
 
+    private val rasterizer = Rasterizer(this)
+    val image
+        get() = rasterizer.image
+    fun prepareForNewFrame() = rasterizer.prepareForNewFrame()
+
     fun project(v: Vec): Pair<Vec2, Meters> {
         if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
@@ -233,6 +240,9 @@ class Camera(
         }
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
+
+    fun renderLine(v1: Vertex, v2: Vertex) = rasterizer.renderPrimitive(Line(arrayOf(v1, v2)))
+    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex) = rasterizer.renderPrimitive(Triangle(arrayOf(v1, v2, v3)))
 
     fun cameraSettingsToString(): String {
         fun round(value: Double) = (value * 100).toInt().toDouble() / 100

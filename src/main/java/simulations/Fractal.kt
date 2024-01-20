@@ -28,7 +28,11 @@ class Fractal(private val dim: Int) : Simulation("Fractal") {
         drawer.setCameraAngleVertical(0.0)
     }
 
-    override fun render(g: Graphics) {
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+
+    fun render(g: Graphics) {
         // cart.render(drawer, g);
         for (point in corners) drawer.drawDot(point, 4.0, Color.green, g)
         for (point in points) drawer.drawDot(point, 1.0, Color.white, g)

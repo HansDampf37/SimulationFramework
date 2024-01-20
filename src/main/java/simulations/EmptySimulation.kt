@@ -16,7 +16,7 @@ class EmptySimulation: Simulation("Test") {
     }
     override fun tick(dt: Seconds) = Unit
 
-    override fun render(g: Graphics) {
+    fun render(g: Graphics) {
         val dx = Vec(sizeSquares, 0.0, 0.0)
         val dy = Vec(0.0, sizeSquares, 0.0)
         val dz = Vec(0.0, 0.0, sizeSquares)
@@ -50,6 +50,10 @@ class EmptySimulation: Simulation("Test") {
             }
         }
         // drawLookingDirection(g)
+    }
+
+    override fun render() {
+        TODO("Not yet implemented")
     }
 
     override fun reset() {

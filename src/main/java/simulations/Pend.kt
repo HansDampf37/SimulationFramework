@@ -25,6 +25,10 @@ class Pend(private val amountOfPoints: Int, length: Double) : MassSimulation<Mas
         connections.forEach { it.tick(dt) }
     }
 
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+
     private fun input() {
             if (keyManager.f) masses[0].accelerate(Vec(40.0, 0.0, 0.0))
             if (keyManager.g) masses[0].accelerate(Vec(-40.0, 0.0, 0.0))
@@ -33,7 +37,7 @@ class Pend(private val amountOfPoints: Int, length: Double) : MassSimulation<Mas
             if (keyManager.up) masses[1].applyForce(Vec(10.0, 0.0, 0.0))
         }
 
-    override fun render(g: Graphics) {
+    fun render(g: Graphics) {
         for (m in masses) m.render(drawer, g)
         for (c in connections) c.render(drawer, g)
         for (i in masses.indices) {

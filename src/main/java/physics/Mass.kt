@@ -8,7 +8,7 @@ import algebra.Vec
 import java.awt.Color
 import java.awt.Graphics
 
-open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Simulateable {
+open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Simulateable{
     var velocity: Vec
     private val acceleration: Vec
     val mass: Double

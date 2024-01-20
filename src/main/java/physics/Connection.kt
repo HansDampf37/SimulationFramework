@@ -1,8 +1,7 @@
 package physics
 
-import framework.Camera
-import framework.Simulateable
-import framework.Graphics3d
+import algebra.Vec
+import framework.*
 import physics.Collision.Companion.occur
 import java.awt.Color
 import java.awt.Graphics
@@ -12,22 +11,29 @@ abstract class Connection(
     protected val m1: Mass,
     protected val m2: Mass,
     protected val maxEnergy: Double,
-    protected var broken: Boolean = false) : Simulateable {
+    var broken: Boolean = false
+) : Simulateable {
+
     abstract override fun tick(dt: Seconds)
 
     override fun render(drawer: Graphics3d, g: Graphics) {
         if (!broken) drawer.drawLine(m1, m2, g)
     }
 
-    fun render(camera: Camera, g: Graphics) {
-        if (broken) return
-        val (p1, d1) = camera.project(m1.positionVector)
-        val (p2, d2) = camera.project(m2.positionVector)
-        if (d1 > 0 && d2 > 0) g.drawLine(p1.x.toInt(), p1.y.toInt(), p2.x.toInt(), p2.y.toInt())
+    fun render(camera: Camera) {
+        val v1 = Vertex(m1.positionVector, 255 * Vec.ones, Vec.zero)
+        val v2 = Vertex(m2.positionVector, 255 * Vec.ones, Vec.zero)
+        camera.renderLine(v1, v2)
     }
 }
 
-class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, maxEnergy: Double, private val springConstant: Double = 300.0) : Connection(m1, m2, maxEnergy) {
+class ImpulseConnection(
+    m1: Mass,
+    m2: Mass,
+    private val maxDistance: Double,
+    maxEnergy: Double,
+    private val springConstant: Double = 300.0
+) : Connection(m1, m2, maxEnergy) {
     override fun tick(dt: Seconds) {
         if (broken) return
         val dist = m1.getDistanceTo(m2)
@@ -51,8 +57,7 @@ class ImpulseConnection(m1: Mass, m2: Mass, private val maxDistance: Double, max
             } else if (m2.status == Mass.Status.Movable) {
                 m2.applyForce(-force)
                 //m2.set(m1 + ropeDir * maxDistance)
-            }
-            else if (m1.status == Mass.Status.Movable) {
+            } else if (m1.status == Mass.Status.Movable) {
                 m1.applyForce(force)
                 //m1.set(m2 - ropeDir * maxDistance)
             }

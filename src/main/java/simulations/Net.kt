@@ -35,6 +35,10 @@ class Net() : Simulation("Net") {
         movePoints()
     }
 
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+
     private fun movePoints() {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
@@ -111,7 +115,7 @@ class Net() : Simulation("Net") {
         }
     }
 
-    override fun render(g: Graphics) {
+    fun render(g: Graphics) {
         cart.render(drawer, g)
         // ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (x in points.indices) {

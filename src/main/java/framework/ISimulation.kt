@@ -17,10 +17,9 @@ interface ISimulation {
     fun tick(dt: Seconds)
 
     /**
-     * Renders the internal state on the
-     * @param g Graphics Object
+     * Render all the primitives by calling [Camera.render] on all relevant primitives
      */
-    fun render(g: Graphics)
+    fun render()
 
     /**
      * Resets the Simulation to a starting state

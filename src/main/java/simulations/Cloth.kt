@@ -2,13 +2,11 @@ package simulations
 
 import framework.MassSimulation
 import physics.*
-import java.awt.Graphics
 import kotlin.math.PI
 
-class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
+class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    private var sphere = Collidable(0.0, 0.0, 10.0, 3.0, 20.0)
-
+    private var sphere = Sphere(0.0, 0.0, 10.0, 3.0, 20.0)
     init {
         reset()
         drawer.setZoom(30.0)
@@ -23,9 +21,9 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         camera.focalLength = 10.0
         camera.zoom = 0.03
     }
-    override fun render(g: Graphics) {
-        masses.forEach{it.render(camera, g)}
-        connections.forEach{it.render(camera, g)}
+    override fun render() {
+        //masses.forEach{camera.render(it)}
+        connections.filter { !it.broken }.forEach{ it.render(camera) }
     }
 
     override fun calcForces(dt: Seconds) {
@@ -64,7 +62,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
         for (x in 0 until size) {
             for (z in 0 until size) {
                 val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
-                val c = Collidable(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0,.25, 1.0)
+                val c = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0,.25, 1.0)
                 addNewMass(c, !isOnEdge)
                 masses.last().status = if (isOnEdge) Mass.Status.Immovable else Mass.Status.Movable
             }
@@ -77,7 +75,7 @@ class Cloth(private val size: Int): MassSimulation<Collidable>("Cloth") {
             }
         }
 
-        sphere = Collidable(0.0, 0.0, 10.0, 3.0, 20.0)
+        sphere = Sphere(0.0, 0.0, 10.0, 3.0, 20.0)
         addNewMass(sphere, true)
     }
 }
