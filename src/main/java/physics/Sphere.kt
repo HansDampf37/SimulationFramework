@@ -1,8 +1,7 @@
 package physics
 
-import algebra.Vec
-import algebra.Vec2
-import framework.*
+import framework.Camera
+import framework.Graphics3d
 import java.awt.Color
 import java.awt.Graphics
 
@@ -10,7 +9,7 @@ open class Sphere(
     x: Double,
     y: Double,
     z: Double,
-    val radius: Double, mass: Double): Mass(mass, x, y, z), Primitive {
+    val radius: Double, mass: Double): Mass(mass, x, y, z) {
     fun testForCollision(other: Sphere): Boolean {
         return this.getDistanceTo(other) < this.radius + other.radius
     }
@@ -29,17 +28,5 @@ open class Sphere(
             (coords.y - drawingRadius).toInt(),
             (2 * drawingRadius).toInt(),
             (2 * drawingRadius).toInt())
-    }
-
-    override fun getVertices(): Array<Vertex> {
-        return arrayOf(Vertex(positionVector, Vec.ones * 255, Vec.zero))
-    }
-
-    override fun boundingBox(): BoundingBox {
-        TODO("Not yet implemented")
-    }
-
-    override fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult {
-        TODO("Not yet implemented")
     }
 }

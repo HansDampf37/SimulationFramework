@@ -13,6 +13,7 @@ abstract class Connection(
     protected val maxEnergy: Double,
     var broken: Boolean = false
 ) : Simulateable {
+    val color = 255 * Vec(Math.random(), Math.random(), Math.random())
 
     abstract override fun tick(dt: Seconds)
 
@@ -21,8 +22,8 @@ abstract class Connection(
     }
 
     fun render(camera: Camera) {
-        val v1 = Vertex(m1.positionVector, 255 * Vec.ones, Vec.zero)
-        val v2 = Vertex(m2.positionVector, 255 * Vec.ones, Vec.zero)
+        val v1 = Vertex(m1.positionVector, color, Vec.zero)
+        val v2 = Vertex(m2.positionVector, color, Vec.zero)
         camera.renderLine(v1, v2)
     }
 }
