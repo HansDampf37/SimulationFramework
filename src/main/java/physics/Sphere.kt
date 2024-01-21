@@ -1,7 +1,9 @@
 package physics
 
+import algebra.Vec
 import framework.Camera
 import framework.Graphics3d
+import framework.Vertex
 import java.awt.Color
 import java.awt.Graphics
 
@@ -10,6 +12,9 @@ open class Sphere(
     y: Double,
     z: Double,
     val radius: Double, mass: Double): Mass(mass, x, y, z) {
+
+    val color: Vec = Vec.random * 255
+
     fun testForCollision(other: Sphere): Boolean {
         return this.getDistanceTo(other) < this.radius + other.radius
     }
@@ -18,15 +23,7 @@ open class Sphere(
         drawer.drawDot(this, radius = radius, Color.white, g)
     }
 
-    override fun render(cam: Camera, g: Graphics) {
-        val (coords, distance) = cam.project(this.positionVector)
-        if (distance < 0) return
-        g.color = Color.WHITE
-        val drawingRadius = radius * cam.focalLength / (distance * cam.zoom)
-        g.fillOval(
-            (coords.x - drawingRadius).toInt(),
-            (coords.y - drawingRadius).toInt(),
-            (2 * drawingRadius).toInt(),
-            (2 * drawingRadius).toInt())
+    fun render(cam: Camera) {
+        cam.renderCircle(Vertex(this.positionVector, color, Vec.zero), radius.toFloat())
     }
 }

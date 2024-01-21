@@ -22,7 +22,7 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
         camera.zoom = 0.03
     }
     override fun render() {
-        //masses.forEach{camera.render(it)}
+        masses.forEach{it.render(camera)}
         connections.filter { !it.broken }.forEach{ it.render(camera) }
     }
 

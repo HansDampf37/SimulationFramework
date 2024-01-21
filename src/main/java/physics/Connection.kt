@@ -13,7 +13,7 @@ abstract class Connection(
     protected val maxEnergy: Double,
     var broken: Boolean = false
 ) : Simulateable {
-    val color = 255 * Vec(Math.random(), Math.random(), Math.random())
+    val color = 255 * Vec.random
 
     abstract override fun tick(dt: Seconds)
 

@@ -26,12 +26,16 @@ class Vertex(
     var screenPosition: Vec2? = null,
     var depth: Float = -1f,
 )
+
 class Triangle(val v1: Vertex, val v2: Vertex, val v3: Vertex)
 class Line(val v1: Vertex, val v2: Vertex)
+class Circle(val v1: Vertex, val radius: Float)
 
 class Rasterizer(val camera: Camera) {
-    var image: BufferedImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
-    private var zBuffer: FloatArray = FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
+    var image: BufferedImage =
+        BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
+    private var zBuffer: FloatArray =
+        FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
 
     init {
         prepareForNewFrame()
@@ -118,6 +122,7 @@ class Rasterizer(val camera: Camera) {
                 InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
             }
         }
+
         fun boundingBox(v1: Vertex, v2: Vertex, v3: Vertex): BoundingBox {
             val pixel1 = v1.screenPosition!!
             val pixel2 = v2.screenPosition!!
@@ -137,7 +142,7 @@ class Rasterizer(val camera: Camera) {
             if (d < 0) return
         }
 
-        val bb = boundingBox(triangle.v1,triangle.v2,triangle.v3)
+        val bb = boundingBox(triangle.v1, triangle.v2, triangle.v3)
 
         // Clip bounding box to image bounds
         bb.minX = max(0, bb.minX)
@@ -163,7 +168,55 @@ class Rasterizer(val camera: Camera) {
                         zBuffer[index] = depth
 
                         // Interpolate color
-                        val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt().shl(8) or interpolation.color.y.toInt().shl(16)
+                        val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt()
+                            .shl(8) or interpolation.color.y.toInt().shl(16)
+
+                        // Set pixel color in the image buffer
+                        image.setRGB(x, y, pixelColor)
+                    }
+                }
+            }
+        }
+    }
+
+    fun rasterizeCircle(circle: Circle) {
+        // Convert 3D coordinates to 2D screen space
+        val (p, d) = camera.project(circle.v1.position)
+        circle.v1.screenPosition = p
+        circle.v1.depth = d.toFloat()
+        if (d < 0) return
+
+        val radius = circle.radius * camera.focalLength / (d * camera.zoom)
+        val bb = BoundingBox(
+            (circle.v1.screenPosition!!.x - radius).toInt(),
+            (circle.v1.screenPosition!!.y - radius).toInt(),
+            (circle.v1.screenPosition!!.x + radius).toInt(),
+            (circle.v1.screenPosition!!.y + radius).toInt()
+        )
+
+        // Clip bounding box to image bounds
+        bb.minX = max(0, bb.minX)
+        bb.minY = max(0, bb.minY)
+        bb.maxX = min((image.width - 1), bb.maxX)
+        bb.maxY = min((image.height - 1), bb.maxY)
+
+        // Iterate over pixels in the bounding box
+        for (y in bb.minY..bb.maxY) {
+            for (x in bb.minX..bb.maxX) {
+                val dx = x - circle.v1.screenPosition!!.x
+                val dy = y - circle.v1.screenPosition!!.y
+                // Check if the current pixel is inside the triangle
+                if (dx * dx + dy * dy <= radius * radius) {
+                    // pixel is inside
+                    // Check against z-buffer
+                    val index = y * camera.screenWidth + x
+                    if (circle.v1.depth < zBuffer[index]) {
+                        // Update z-buffer
+                        zBuffer[index] = circle.v1.depth
+                        // Todo shading interpolieren oder normale interpolieren
+                        val pixelColor =
+                            circle.v1.color.x.toInt() or circle.v1.color.y.toInt().shl(8) or circle.v1.color.y.toInt()
+                                .shl(16)
 
                         // Set pixel color in the image buffer
                         image.setRGB(x, y, pixelColor)
@@ -176,7 +229,7 @@ class Rasterizer(val camera: Camera) {
     fun prepareForNewFrame() {
         val graphics = image.graphics
         graphics.color = Color.BLACK
-        graphics.drawRect(0,0, image.width, image.height)
+        graphics.drawRect(0, 0, image.width, image.height)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
     }
 

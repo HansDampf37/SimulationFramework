@@ -165,5 +165,6 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
     companion object{
         val ones = Vec(1.0, 1.0, 1.0)
         val zero = Vec(0.0,0.0,0.0)
+        val random get() = Vec(Math.random(), Math.random(), Math.random())
     }
 }
