@@ -5,16 +5,10 @@ import algebra.Vec2
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-
-interface Primitive {
-    fun boundingBox(): BoundingBox
-
-    fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult
-    fun getVertices(): Array<Vertex>
-}
 
 class BoundingBox(var minX: Int, var minY: Int, var maxX: Int, var maxY: Int)
 
@@ -32,87 +26,10 @@ class Vertex(
     var screenPosition: Vec2? = null,
     var depth: Float = -1f,
 )
-class Triangle(private val vertices: Array<Vertex>): Primitive {
+class Triangle(val v1: Vertex, val v2: Vertex, val v3: Vertex)
+class Line(val v1: Vertex, val v2: Vertex)
 
-    override fun boundingBox(): BoundingBox {
-        // Find bounding box of the triangle in screen space
-        val pixel1 = vertices[0].screenPosition!!
-        val pixel2 = vertices[1].screenPosition!!
-        val pixel3 = vertices[2].screenPosition!!
-        val minX = min(pixel1.x, min(pixel2.x, pixel3.x)).toInt()
-        val minY = min(pixel1.y, min(pixel2.y, pixel3.y)).toInt()
-        val maxX = max(pixel1.x, max(pixel2.x, pixel3.x)).toInt()
-        val maxY = max(pixel1.y, max(pixel2.y, pixel3.y)).toInt()
-        return BoundingBox(minX, minY, maxX, maxY)
-    }
-
-    override fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult {
-        val v0: Vec2 = vertices[0].screenPosition!!
-        val v1: Vec2 = vertices[1].screenPosition!!
-        val v2: Vec2 = vertices[2].screenPosition!!
-        // Compute barycentric coordinates
-        val denominator: Double = (v1.y - v2.y) * (v0.x - v2.x) + (v2.x - v1.x) * (v0.y - v2.y)
-        val alpha: Double = ((v1.y - v2.y) * (pixel.x - v2.x) + (v2.x - v1.x) * (pixel.y - v2.y)) / denominator
-        val beta: Double = ((v2.y - v0.y) * (pixel.x - v2.x) + (v0.x - v2.x) * (pixel.y - v2.y)) / denominator
-        val gamma = 1 - alpha - beta
-        // Check if the point is inside the triangle
-        return if (alpha >= 0 && beta >= 0 && gamma >= 0 && alpha <= 1 && beta <= 1 && gamma <= 1) {
-            // point is inside -> Interpolate depth using barycentric coordinates
-            InterpolationResult(
-                true,
-                (alpha * vertices[0].depth + beta * vertices[1].depth + gamma * vertices[2].depth).toFloat(),
-                (alpha * vertices[0].color + beta * vertices[1].color + gamma * vertices[2].color),
-                (alpha * vertices[0].normal + beta * vertices[1].normal + gamma * vertices[2].normal)
-            )
-        } else {
-            InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
-        }
-    }
-
-    override fun getVertices(): Array<Vertex> {
-        return vertices
-    }
-}
-
-class Line(private val vertices: Array<Vertex>): Primitive {
-    override fun boundingBox(): BoundingBox {
-        // Find bounding box of the triangle in screen space
-        val pixel1 = vertices[0].screenPosition!!
-        val pixel2 = vertices[1].screenPosition!!
-        val minX = min(pixel1.x, pixel2.x).toInt()
-        val minY = min(pixel1.y, pixel2.y).toInt()
-        val maxX = max(pixel1.x, pixel2.x).toInt()
-        val maxY = max(pixel1.y, pixel2.y).toInt()
-        return BoundingBox(minX, minY, maxX, maxY)
-    }
-
-    override fun interpolateDepthColorNormal(pixel: Vec2): InterpolationResult {
-        val v0: Vec2 = vertices[0].screenPosition!!
-        val v1: Vec2 = vertices[1].screenPosition!!
-        // Check if the point is on the line
-        return if ((v1 - v0).normalize() * (pixel - v0).normalize() > 0.99) {
-            // point is inside -> Interpolate depth normal and color
-            val alpha = (pixel - v0).length() / (v1 - v0).length()
-            val beta = 1 - alpha
-            InterpolationResult(
-                true,
-                (alpha * vertices[0].depth + beta * vertices[1].depth).toFloat(),
-                (alpha * vertices[0].color + beta * vertices[1].color),
-                (alpha * vertices[0].normal + beta * vertices[1].normal)
-            )
-        } else {
-            InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
-        }
-    }
-
-    override fun getVertices(): Array<Vertex> {
-        return vertices
-    }
-}
-
-class Rasterizer(
-    val camera: Camera
-) {
+class Rasterizer(val camera: Camera) {
     var image: BufferedImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
     private var zBuffer: FloatArray = FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
 
@@ -120,17 +37,107 @@ class Rasterizer(
         prepareForNewFrame()
     }
 
-    fun renderPrimitive(primitive: Primitive) {
+    fun rasterizeLine(line: Line) {
         // Convert 3D coordinates to 2D screen space
-        for (i in 0 until primitive.getVertices().size) {
-            val vertex = primitive.getVertices()[i]
-            val (p, d) = camera.project(vertex.position)
-            vertex.screenPosition = p
-            vertex.depth = d.toFloat()
+        for (v in arrayOf(line.v1, line.v2)) {
+            val (p, d) = camera.project(v.position)
+            v.screenPosition = p
+            v.depth = d.toFloat()
             if (d < 0) return
         }
 
-        val bb = primitive.boundingBox()
+        var x0 = line.v1.screenPosition!!.x.toInt()
+        var y0 = line.v1.screenPosition!!.y.toInt()
+        val x1 = line.v2.screenPosition!!.x.toInt()
+        val y1 = line.v2.screenPosition!!.y.toInt()
+
+        val dx = abs(x1 - x0)
+        val dy = -abs(y1 - y0)
+        val sx = if (x0 < x1) 1 else -1
+        val sy = if (y0 < y1) 1 else -1
+
+        var err = dx + dy
+
+        while (true) {
+            // Draw the pixel at (x0, y0)
+            // Check if the pixel is within the screen bounds
+            if (x0 >= 0 && x0 < camera.screenWidth && y0 >= 0 && y0 < camera.screenHeight) {
+                // Interpolate depth
+                val t: Float = if (dx == 0) 0f else (x0 - line.v1.screenPosition!!.x).toFloat() / dx.toFloat()
+                val depth = (1 - t) * line.v1.depth + t * line.v2.depth
+                // Check against z-buffer
+                val index = y0 * camera.screenWidth + x0
+                if (depth < zBuffer[index]) {
+                    // Update z-buffer
+                    zBuffer[index] = depth
+                    // interpolate color
+                    val color = (1 - t) * line.v1.color + t * line.v2.color
+                    val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.y.toInt().shl(16)
+                    // Set pixel color in the image buffer (using line color or other criteria)
+                    image.setRGB(x0, y0, pixelColor)
+                }
+            }
+
+            if (x0 == x1 && y0 == y1) {
+                break
+            }
+
+            val e2 = 2 * err
+            if (e2 >= dy) {
+                err += dy
+                x0 += sx
+            }
+            if (e2 <= dx) {
+                err += dx
+                y0 += sy
+            }
+        }
+    }
+
+
+    fun rasterizeTriangle(triangle: Triangle) {
+        fun interpolateDepthColorNormal(v1: Vertex, v2: Vertex, v3: Vertex, pixel: Vec2): InterpolationResult {
+            val p0: Vec2 = v1.screenPosition!!
+            val p1: Vec2 = v2.screenPosition!!
+            val p2: Vec2 = v3.screenPosition!!
+            // Compute barycentric coordinates
+            val denominator: Double = (p1.y - p2.y) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.y - p2.y)
+            val alpha: Double = ((p1.y - p2.y) * (pixel.x - p2.x) + (p2.x - p1.x) * (pixel.y - p2.y)) / denominator
+            val beta: Double = ((p2.y - p0.y) * (pixel.x - p2.x) + (p0.x - p2.x) * (pixel.y - p2.y)) / denominator
+            val gamma = 1 - alpha - beta
+            // Check if the point is inside the triangle
+            return if (alpha >= 0 && beta >= 0 && gamma >= 0 && alpha <= 1 && beta <= 1 && gamma <= 1) {
+                // point is inside -> Interpolate depth using barycentric coordinates
+                InterpolationResult(
+                    true,
+                    (alpha * v1.depth + beta * v2.depth + gamma * v3.depth).toFloat(),
+                    (alpha * v1.color + beta * v2.color + gamma * v3.color),
+                    (alpha * v1.normal + beta * v2.normal + gamma * v3.normal)
+                )
+            } else {
+                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
+            }
+        }
+        fun boundingBox(v1: Vertex, v2: Vertex, v3: Vertex): BoundingBox {
+            val pixel1 = v1.screenPosition!!
+            val pixel2 = v2.screenPosition!!
+            val pixel3 = v3.screenPosition!!
+            val minX = min(pixel1.x, min(pixel2.x, pixel3.x)).toInt()
+            val minY = min(pixel1.y, min(pixel2.y, pixel3.y)).toInt()
+            val maxX = max(pixel1.x, max(pixel2.x, pixel3.x)).toInt()
+            val maxY = max(pixel1.y, max(pixel2.y, pixel3.y)).toInt()
+            val bb = BoundingBox(minX, minY, maxX, maxY)
+            return bb
+        }
+        // Convert 3D coordinates to 2D screen space
+        for (v in arrayOf(triangle.v1, triangle.v2, triangle.v3)) {
+            val (p, d) = camera.project(v.position)
+            v.screenPosition = p
+            v.depth = d.toFloat()
+            if (d < 0) return
+        }
+
+        val bb = boundingBox(triangle.v1,triangle.v2,triangle.v3)
 
         // Clip bounding box to image bounds
         bb.minX = max(0, bb.minX)
@@ -142,7 +149,9 @@ class Rasterizer(
         for (y in bb.minY..bb.maxY) {
             for (x in bb.minX..bb.maxX) {
                 // Check if the current pixel is inside the triangle
-                val interpolation = primitive.interpolateDepthColorNormal(Vec2(x.toDouble(), y.toDouble()))
+                val interpolation = interpolateDepthColorNormal(
+                    triangle.v1, triangle.v2, triangle.v3, Vec2(x.toDouble(), y.toDouble())
+                )
                 if (interpolation.inPrimitive) {
                     // Interpolate depth value
                     val depth = interpolation.depth

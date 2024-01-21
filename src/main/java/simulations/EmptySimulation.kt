@@ -1,6 +1,5 @@
 package simulations
 
-import algebra.CartesianCoordinateSystem
 import algebra.Vec
 import framework.Simulation
 import physics.Seconds

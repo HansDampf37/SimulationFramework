@@ -107,7 +107,7 @@ abstract class Simulation(
         )
         camera.prepareForNewFrame()
         render()
-        g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null);
+        g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
         bs.show()
         g.dispose()
     }

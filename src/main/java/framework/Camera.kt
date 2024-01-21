@@ -212,6 +212,6 @@ get() = rasterizer.image
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
 
-    fun renderLine(v1: Vertex, v2: Vertex) = rasterizer.renderPrimitive(Line(arrayOf(v1, v2)))
-    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex) = rasterizer.renderPrimitive(Triangle(arrayOf(v1, v2, v3)))
+    fun renderLine(v1: Vertex, v2: Vertex) = rasterizer.rasterizeLine(Line(v1, v2))
+    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3))
 }
