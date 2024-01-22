@@ -47,7 +47,7 @@ abstract class Simulation(
             drawer.setWindowHeightAndWidth(width, height)
             camera.screenWidth = width
             camera.screenHeight = height
-            tick(dt)
+            tick(dt/10)
             delta += (now - lastTime) / msPerTick
 
             // render to reach fps goal

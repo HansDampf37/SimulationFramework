@@ -182,13 +182,42 @@ class Rasterizer(val camera: Camera) {
     }
 
     fun rasterizeCircle(circle: Circle) {
-        // Convert 3D coordinates to 2D screen space
-        val (p, d) = camera.project(circle.v1.position)
-        circle.v1.screenPosition = p
-        circle.v1.depth = d.toFloat()
-        if (d < 0) return
+        fun interpolateDepthColorNormal(v1: Vertex, pixel: Vec2, radius: Float): InterpolationResult {
+            // Check if the point is inside the sphere
+            val dx = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
+            val dy = pixel.y.toFloat() - v1.screenPosition!!.y.toFloat()
+            val distanceFromCenterSquared = dx * dx + dy * dy
+            val radiusSquared = radius * radius
 
-        val radius = circle.radius * camera.focalLength / (d * camera.zoom)
+            return if (distanceFromCenterSquared <= radiusSquared) {
+                // Point is inside the sphere
+                // Calculate the depth adjustment based on the distance from the sphere's center
+                val depthAdjustment = sqrt(radiusSquared - distanceFromCenterSquared)
+
+                // Calculate the normal vector by normalizing the vector pointing from the sphere's center to the surface point
+                val sphereCenterToSurface = Vec(dx, dy, sqrt(radiusSquared - distanceFromCenterSquared))
+                val normal = sphereCenterToSurface.normalize()
+
+                // Simple shading: Use dot product with light direction
+                val shadingFactor = maxOf(0.0, normal * Vec(0.0, 0.0, 1.0))
+
+                InterpolationResult(
+                    inPrimitive = true,
+                    depth = v1.depth - 0.1f * depthAdjustment,
+                    color = v1.color * shadingFactor,
+                    normal = normal
+                )
+            } else {
+                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
+            }
+        }
+        // Convert 3D coordinates to 2D screen space
+        val (pixelCoordinate, distance) = camera.project(circle.v1.position)
+        circle.v1.screenPosition = pixelCoordinate
+        circle.v1.depth = distance.toFloat()
+        if (distance < 0) return
+
+        val radius = circle.radius * camera.focalLength / (distance * camera.zoom)
         val bb = BoundingBox(
             (circle.v1.screenPosition!!.x - radius).toInt(),
             (circle.v1.screenPosition!!.y - radius).toInt(),
@@ -205,20 +234,17 @@ class Rasterizer(val camera: Camera) {
         // Iterate over pixels in the bounding box
         for (y in bb.minY..bb.maxY) {
             for (x in bb.minX..bb.maxX) {
-                val dx = x - circle.v1.screenPosition!!.x
-                val dy = y - circle.v1.screenPosition!!.y
+                val interpolation = interpolateDepthColorNormal(circle.v1, Vec2(x.toDouble(), y.toDouble()), radius.toFloat())
                 // Check if the current pixel is inside the triangle
-                if (dx * dx + dy * dy <= radius * radius) {
+                if (interpolation.inPrimitive) {
                     // pixel is inside
                     // Check against z-buffer
                     val index = y * camera.screenWidth + x
-                    if (circle.v1.depth < zBuffer[index]) {
+                    if (interpolation.depth < zBuffer[index]) {
                         // Update z-buffer
-                        zBuffer[index] = circle.v1.depth
-                        // Todo shading interpolieren oder normale interpolieren
-                        val pixelColor =
-                            circle.v1.color.x.toInt() or circle.v1.color.y.toInt().shl(8) or circle.v1.color.y.toInt()
-                                .shl(16)
+                        zBuffer[index] = interpolation.depth
+                        val color = interpolation.color
+                        val pixelColor = color.x.toInt().shl(16) or color.y.toInt().shl(8) or color.z.toInt()
 
                         // Set pixel color in the image buffer
                         image.setRGB(x, y, pixelColor)
