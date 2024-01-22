@@ -8,6 +8,7 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 
 class BoundingBox(var minX: Int, var minY: Int, var maxX: Int, var maxY: Int)
@@ -30,6 +31,7 @@ class Vertex(
 class Triangle(val v1: Vertex, val v2: Vertex, val v3: Vertex)
 class Line(val v1: Vertex, val v2: Vertex)
 class Circle(val v1: Vertex, val radius: Float)
+class TriangleStrip(val vertices: List<Vertex> = ArrayList())
 
 class Rasterizer(val camera: Camera) {
     var image: BufferedImage =
@@ -223,6 +225,17 @@ class Rasterizer(val camera: Camera) {
                     }
                 }
             }
+        }
+    }
+
+    fun rasterizeTriangleStrip(triangleStrip: TriangleStrip) {
+        // Iterate through the vertices, creating triangles on the fly
+        for (i in 0 until triangleStrip.vertices.size - 2) {
+            val v1 = triangleStrip.vertices[i]
+            val v2 = triangleStrip.vertices[i + 1]
+            val v3 = triangleStrip.vertices[i + 2]
+
+            rasterizeTriangle(Triangle(v1, v2, v3))
         }
     }
 

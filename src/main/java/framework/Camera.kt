@@ -251,4 +251,5 @@ class Camera(
     fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3))
 
     fun renderCircle(v1: Vertex, radius: Float) = rasterizer.rasterizeCircle(Circle(v1, radius))
+    fun renderStrip(vertices: List<Vertex>) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices))
 }
