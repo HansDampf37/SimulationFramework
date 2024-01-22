@@ -1,12 +1,20 @@
 package simulations
 
 import framework.MassSimulation
+import framework.Vertex
+import framework.Watch
 import physics.*
 import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    private var sphere = Sphere(0.0, 0.0, 10.0, 3.0, 20.0)
+    @Watch("Sphere Size", 2.0, 10.0)
+    private var sphereRadius: Double = 5.0
+        set(value) {
+            sphere.radius = value
+            field = value
+        }
+    private var sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
     init {
         reset()
         drawer.setZoom(30.0)
@@ -77,7 +85,7 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
             }
         }
 
-        sphere = Sphere(0.0, 0.0, 10.0, 3.0, 20.0)
+        sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
         addNewMass(sphere, true)
     }
 }

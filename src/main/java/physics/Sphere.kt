@@ -14,7 +14,7 @@ open class Sphere(
     x: Double,
     y: Double,
     z: Double,
-    val radius: Double, mass: Double): Mass(mass, x, y, z) {
+    var radius: Double, mass: Double): Mass(mass, x, y, z) {
 
     val color: Vec = Vec.random * 255
 

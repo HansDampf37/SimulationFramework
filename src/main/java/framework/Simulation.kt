@@ -1,10 +1,11 @@
 package framework
 
 import physics.Seconds
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.RenderingHints
+import java.awt.*
+import java.lang.IllegalStateException
+import java.lang.reflect.Field
+import kotlin.reflect.KClass
+import kotlin.reflect.full.superclasses
 
 /**
  * Simulations run by the [start] and [stop] methods. They implement a [tick] method that updates simulated objects and
@@ -16,24 +17,29 @@ abstract class Simulation(
     private val renderingFrequency: Double = 25.0,
     private val antiAliasing: Boolean = true
 ) : ISimulation {
-
+    @Watch("Speed",0.5, 2.0)
+    private var speed = 1.0
     protected var drawer: Graphics3d = Graphics3d()
     private var running = false
     protected val keyManager: KeyManager = KeyManager()
-    protected val display: Display = Display(title).apply { jFrame.addKeyListener(keyManager) }
+    protected val display: Display = Display(title)
     protected var camera = Camera(
         0.0, 2.0, 0.0,
         1.0, 1.0, 1.0,
         display.getWidth(), display.getHeight()
     )
-    private var zPuffer: Array<Array<Float>> = Array(width) { Array(height) { Float.MAX_VALUE } }
-    private var colorPuffer: Array<Array<Color>> = Array(width) { Array(height) { Color.black } }
+
+    init {
+        display.window.addKeyListener(keyManager)
+        display.controls.addKeyListener(keyManager)
+    }
 
     /**
      * triggers [Simulation.render] on every simulation at a given frequency.
      * triggers [Simulation.tick] as often as possible
      */
     private val tickAndRender = Runnable {
+        display.setupSlidersPanel(collectAdjustableFields(listOf(this, camera)))
         var lastTime = System.currentTimeMillis()
         val msPerTick = 1000.0 / renderingFrequency
         var delta = 0.0
@@ -47,7 +53,7 @@ abstract class Simulation(
             drawer.setWindowHeightAndWidth(width, height)
             camera.screenWidth = width
             camera.screenHeight = height
-            tick(dt/10)
+            tick(dt * speed)
             delta += (now - lastTime) / msPerTick
 
             // render to reach fps goal
@@ -130,8 +136,34 @@ abstract class Simulation(
         }
     }
 
-    protected val height: Int
+    private val height: Int
         get() = display.canvas.height
-    protected val width: Int
+    private val width: Int
         get() = display.canvas.width
+
+    private fun collectAdjustableFields(objects: Collection<Any>): Map<Any, Map<Field, Number>> {
+        fun getAllFields(c: KClass<*>): Set<Field> {
+            val fields = c.java.declaredFields.toMutableSet()
+            for (superclass in c.superclasses) {
+                fields.addAll(getAllFields(superclass))
+            }
+            return fields
+        }
+        val watchedFieldsForObjects = mutableMapOf<Any, MutableMap<Field, Number>>()
+        objects.forEach { obj ->
+            val watchedFields = mutableMapOf<Field, Number>()
+            for (field in getAllFields(obj::class)) {
+                field.setAccessible(true)
+                if (field.isAnnotationPresent(Watch::class.java)) {
+                    try {
+                        watchedFields[field] = field.get(obj) as Number
+                    } catch (e: ClassCastException) {
+                        throw IllegalStateException("Only Numbers can be adjusted")
+                    }
+                }
+            }
+            watchedFieldsForObjects[obj] = watchedFields
+        }
+        return watchedFieldsForObjects
+    }
 }
