@@ -47,40 +47,47 @@ class Camera(
             roll = sin(phi) * theta
         }
 
+    @Watch("Yaw", 0.0, PI * 2)
     var yaw: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
+    @Watch("Pitch", 0.0, PI * 2)
     var pitch: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
+    @Watch("Roll", 0.0, PI * 2)
     var roll: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
+    @Watch("X", -100.0, 100.0)
     override var x: Double = x
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
+    @Watch("Y", -100.0, 100.0)
     override var y: Double = y
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
+    @Watch("Z", -100.0, 100.0)
     override var z: Double = z
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
+    @Watch("Zoom", 0.01, 10.0)
     var zoomX: Double = zoomX
         set(value) {
             projectionMatrixIsValid = false
@@ -93,6 +100,7 @@ class Camera(
             field = value
         }
 
+    @Watch("Focal-Length", 0.01, 100.0)
     var focalLength: Double = focalLength
         set(value) {
             projectionMatrixIsValid = false

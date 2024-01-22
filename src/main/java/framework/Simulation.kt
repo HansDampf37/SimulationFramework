@@ -31,7 +31,6 @@ abstract class Simulation(
 
     init {
         display.window.addKeyListener(keyManager)
-        display.controls.addKeyListener(keyManager)
     }
 
     /**
