@@ -24,6 +24,8 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     override fun render() {
         masses.forEach{it.render(camera)}
         connections.filter { !it.broken }.forEach{ it.render(camera) }
+        //masses.filter{it != sphere}.forEach{it.render(camera)}
+        //sphere.renderStrip(camera)
     }
 
     override fun calcForces(dt: Seconds) {
