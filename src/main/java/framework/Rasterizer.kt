@@ -76,7 +76,7 @@ class Rasterizer(val camera: Camera) {
                     zBuffer[index] = depth
                     // interpolate color
                     val color = (1 - t) * line.v1.color + t * line.v2.color
-                    val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.y.toInt().shl(16)
+                    val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.z.toInt().shl(16)
                     // Set pixel color in the image buffer (using line color or other criteria)
                     image.setRGB(x0, y0, pixelColor)
                 }
@@ -169,7 +169,7 @@ class Rasterizer(val camera: Camera) {
 
                         // Interpolate color
                         val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt()
-                            .shl(8) or interpolation.color.y.toInt().shl(16)
+                            .shl(8) or interpolation.color.z.toInt().shl(16)
 
                         // Set pixel color in the image buffer
                         image.setRGB(x, y, pixelColor)
