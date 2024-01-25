@@ -1,4 +1,3 @@
-import simulations.EmptySimulation;
 import simulations.Cloth;
 
 public class Launcher {

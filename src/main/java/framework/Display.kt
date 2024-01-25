@@ -41,6 +41,10 @@ class Display(
         controls.add(Box.createGlue())
     }
 
+    fun tick() {
+        controls.tick()
+    }
+
     fun getHeight(): Int {
         return window.height
     }
@@ -82,10 +86,24 @@ class Display(
             revalidate();
             repaint();
         }
+
+        fun tick() {
+            for (panel in controls) {
+                (panel as WatchedFieldsPanel).tick()
+            }
+        }
     }
 
-    private class WatchedFieldsPanel(color: Color = Color(230, 255, 255)) : JPanel(GridBagLayout()) {
-        val entries = ArrayList<FieldData>()
+    private class WatchedFieldsPanel(val color: Color = Color(230, 255, 255)) : JPanel(GridBagLayout()) {
+        val entries = ArrayList<Pair<FieldData, JSlider>>()
+
+        fun tick() {
+            for (entry in entries) {
+                val current: Double = entry.first.field.get(entry.first.obj) as Double
+                val slider: JSlider = entry.second
+                slider.value = (current * 100).toInt()
+            }
+        }
 
         val c: GridBagConstraints = GridBagConstraints()
 
@@ -110,7 +128,6 @@ class Display(
         }
 
         fun addField(fieldData: FieldData) {
-            entries.add(fieldData)
             val minInt = (fieldData.min * 100).toInt()
             val maxInt = (fieldData.max * 100).toInt()
             val slider = JSlider(JSlider.HORIZONTAL, minInt, maxInt, (fieldData.current * 100).toInt())
@@ -120,6 +137,7 @@ class Display(
             slider.majorTickSpacing = (maxInt - minInt) / 100
             slider.paintTicks = false
             slider.paintLabels = false
+            slider.background = color
             val currentValuePanel = JLabel(round(slider.value / 100.0))
             slider.addChangeListener {
                 val newValue = slider.value / 100.0
@@ -144,6 +162,7 @@ class Display(
             this.add(JLabel(round(fieldData.max)), c)
             revalidate()
             repaint()
+            entries.add(Pair(fieldData, slider))
         }
 
         private fun setAdjustableFieldValue(field: Field, obj: Any, newValue: Double) {
