@@ -4,6 +4,7 @@ import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
+import framework.display.KeyManager
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -50,16 +51,16 @@ class Net() : Simulation("Net") {
 
     private val input: Unit
         get() {
-            if (keyManager.f) {
+            if (KeyManager.f) {
                 moveEdge(Vec(0.0, 100.0, 0.0))
             }
-            if (keyManager.g) {
+            if (KeyManager.g) {
                 moveEdge(Vec(0.0, -100.0, 0.0))
             }
-            if (keyManager.v) {
+            if (KeyManager.v) {
                 moveEdge(Vec(100.0, 0.0, 0.0))
             }
-            if (keyManager.b) {
+            if (KeyManager.b) {
                 moveEdge(Vec(-100.0, 0.0, 0.0))
             }
         }

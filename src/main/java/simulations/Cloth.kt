@@ -7,6 +7,7 @@ import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     private lateinit var connections: MutableList<Connection>
+    @Suppress("SameParameterValue")
     @WatchDouble("Sphere Size", 2.0, 10.0)
     private var sphereRadius: Double = 5.0
         set(value) {

@@ -1,6 +1,7 @@
 package framework
 
 import framework.display.Display
+import framework.display.KeyManager
 import java.awt.Dimension
 import java.lang.reflect.Field
 import javax.swing.*
@@ -28,10 +29,6 @@ annotation class WatchString(val displayName: String)
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)
 annotation class WatchBoolean(val displayName: String)
-
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FIELD)
-annotation class WatchAttributeObject(val displayName: String)
 
 abstract class WatchedField<T, S : JComponent>(val displayName: String, val field: Field, val obj: Any) {
 
@@ -75,6 +72,8 @@ abstract class WatchedNumber<T : Number>(displayName: String, field: Field, obj:
             set(newValue as T)
             displayComponent.text = "$newValue"
         }
+        keyListeners.forEach { removeKeyListener(it) }
+        addKeyListener(KeyManager)
     }
     override var displayComponent: JLabel = JLabel(Display.round(controlComponent.value / 100.0))
 

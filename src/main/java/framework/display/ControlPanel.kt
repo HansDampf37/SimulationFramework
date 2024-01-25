@@ -1,9 +1,8 @@
 package framework.display
 
 import framework.WatchedField
-import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
-import java.awt.LayoutManager
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -16,8 +15,13 @@ class ControlPanel(width: Int, height: Int, padding: Int = 10) : JPanel() {
         maximumSize = Dimension(width, height)
         minimumSize = Dimension(width, height)
         border = EmptyBorder(padding, padding, padding, padding)
+
+        // Set top alignment for each component added to the BoxLayout
+        watchedFieldsPanel.setAlignmentY(Component.TOP_ALIGNMENT)
+
         add(watchedFieldsPanel)
     }
+
 
     fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *>>>) {
         watchedFieldsPanel.setWatchedFields(watchedFields)

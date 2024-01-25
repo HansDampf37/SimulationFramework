@@ -3,7 +3,7 @@ package framework.display
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
-class KeyManager : KeyListener {
+object KeyManager : KeyListener {
     private val pressed = BooleanArray(1000)
     var w = false
     var s = false

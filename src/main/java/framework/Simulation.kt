@@ -19,7 +19,6 @@ abstract class Simulation(
     private var speed = 1.0
     protected var drawer: Graphics3d = Graphics3d()
     private var running = false
-    protected val keyManager: KeyManager = KeyManager()
     protected val display: Display = Display(title)
     protected var camera = Camera(
         0.0, 2.0, 0.0,
@@ -28,7 +27,7 @@ abstract class Simulation(
     )
 
     init {
-        display.window.addKeyListener(keyManager)
+        display.window.addKeyListener(KeyManager)
     }
 
     /**
@@ -46,7 +45,7 @@ abstract class Simulation(
 
             // always tick
             val dt: Seconds = (now - lastTime) / 1000.0
-            keyManager.tick()
+            KeyManager.tick()
             listenForInput(dt)
             drawer.setWindowHeightAndWidth(width, height)
             camera.screenWidth = width
@@ -67,29 +66,29 @@ abstract class Simulation(
     private var threadTickingAndRendering: Thread = Thread(tickAndRender)
 
     private fun listenForInput(dt: Seconds) {
-        if (keyManager.w) drawer.moveVerticalCamera(dt)
-        if (keyManager.s) drawer.moveVerticalCamera(-dt)
-        if (keyManager.d) drawer.moveHorizontalCamera(dt)
-        if (keyManager.a) drawer.moveHorizontalCamera(-dt)
-        if (keyManager.y) drawer.zoom(1 + dt)
-        if (keyManager.out) drawer.zoom(1 - dt)
-        if (keyManager.n) reset()
+        if (KeyManager.w) drawer.moveVerticalCamera(dt)
+        if (KeyManager.s) drawer.moveVerticalCamera(-dt)
+        if (KeyManager.d) drawer.moveHorizontalCamera(dt)
+        if (KeyManager.a) drawer.moveHorizontalCamera(-dt)
+        if (KeyManager.y) drawer.zoom(1 + dt)
+        if (KeyManager.out) drawer.zoom(1 - dt)
+        if (KeyManager.n) reset()
 
-        if (keyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
-        if (keyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
-        if (keyManager.d) camera.add(-camera.left * dt * 5.0)
-        if (keyManager.a) camera.add(camera.left * dt * 5.0)
-        if (keyManager.shift) camera.add(-camera.up * dt * 5.0)
-        if (keyManager.space) camera.add(camera.up * dt * 5.0)
-        if (keyManager.y) camera.zoom *= 1 + dt
-        if (keyManager.out) camera.zoom *= 1 - dt
-        if (keyManager.n) reset()
-        if (keyManager.up) camera.theta += dt
-        if (keyManager.down) camera.theta -= dt
-        if (keyManager.left) camera.phi -= dt
-        if (keyManager.right) camera.phi += dt
-        if (keyManager.f) camera.focalLength *= 1 + dt
-        if (keyManager.g) camera.focalLength *= 1 - dt
+        if (KeyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
+        if (KeyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
+        if (KeyManager.d) camera.add(-camera.left * dt * 5.0)
+        if (KeyManager.a) camera.add(camera.left * dt * 5.0)
+        if (KeyManager.shift) camera.add(-camera.up * dt * 5.0)
+        if (KeyManager.space) camera.add(camera.up * dt * 5.0)
+        if (KeyManager.y) camera.zoom *= 1 + dt
+        if (KeyManager.out) camera.zoom *= 1 - dt
+        if (KeyManager.n) reset()
+        if (KeyManager.up) camera.theta += dt
+        if (KeyManager.down) camera.theta -= dt
+        if (KeyManager.left) camera.phi -= dt
+        if (KeyManager.right) camera.phi += dt
+        if (KeyManager.f) camera.focalLength *= 1 + dt
+        if (KeyManager.g) camera.focalLength *= 1 - dt
     }
 
     /**

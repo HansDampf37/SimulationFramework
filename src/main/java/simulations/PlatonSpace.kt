@@ -4,6 +4,7 @@ import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
+import framework.display.KeyManager
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -34,7 +35,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
     fun render(g: Graphics) {
         coordSys.render(drawer, g)
         drawPoints(g)
-        if (keyManager.f) drawForces(g)
+        if (KeyManager.f) drawForces(g)
     }
 
     override fun render() {

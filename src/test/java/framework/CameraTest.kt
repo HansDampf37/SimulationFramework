@@ -173,6 +173,14 @@ class CameraTest {
     }
 
     private fun assertAlmostEquals(a: Double, b: Double, eps: Double) {
-        assertTrue(abs(a - b) < eps)
+        assertTrue(abs(a - b) < eps, "Expected $a does not equal actual $b")
+    }
+
+    @Test
+    fun testLookingDirection() {
+        camera.yaw = 0.0
+        camera.pitch = 0.0
+        camera.roll = 0.0
+        assertEquals(Vec(1.0, 0.0, 0.0), camera.lookingDirection)
     }
 }

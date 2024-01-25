@@ -9,16 +9,16 @@ import javax.swing.*
 
 class Display(
     title: String,
-    private val height: Int = 1000,
-    private val width: Int = 1600,
-    private val controlWidth: Int = 500,
+    height: Int = 1000,
+    width: Int = 1600,
+    controlWidth: Int = 500,
 ) {
     val window: JFrame = JFrame(title)
     val canvas: Canvas
     private val controls: ControlPanel
 
     init {
-        FlatDarculaLaf.setup();
+        FlatDarculaLaf.setup()
 
         window.layout = BorderLayout()
         window.setPreferredSize(Dimension(width, height))

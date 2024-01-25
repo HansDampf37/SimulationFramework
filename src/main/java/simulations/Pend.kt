@@ -3,6 +3,7 @@ package simulations
 import framework.MassSimulation
 import algebra.Point3d
 import algebra.Vec
+import framework.display.KeyManager
 import physics.Connection
 import physics.ImpulseConnection
 import physics.Mass
@@ -30,11 +31,11 @@ class Pend(private val amountOfPoints: Int, length: Double) : MassSimulation<Mas
     }
 
     private fun input() {
-            if (keyManager.f) masses[0].accelerate(Vec(40.0, 0.0, 0.0))
-            if (keyManager.g) masses[0].accelerate(Vec(-40.0, 0.0, 0.0))
-            if (keyManager.v) masses[0].accelerate(Vec(0.0, 0.0, 20.0))
-            if (keyManager.b) masses[0].accelerate(Vec(0.0, 0.0, -20.0))
-            if (keyManager.up) masses[1].applyForce(Vec(10.0, 0.0, 0.0))
+            if (KeyManager.f) masses[0].accelerate(Vec(40.0, 0.0, 0.0))
+            if (KeyManager.g) masses[0].accelerate(Vec(-40.0, 0.0, 0.0))
+            if (KeyManager.v) masses[0].accelerate(Vec(0.0, 0.0, 20.0))
+            if (KeyManager.b) masses[0].accelerate(Vec(0.0, 0.0, -20.0))
+            if (KeyManager.up) masses[1].applyForce(Vec(10.0, 0.0, 0.0))
         }
 
     fun render(g: Graphics) {

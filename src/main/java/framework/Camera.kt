@@ -33,61 +33,69 @@ class Camera(
         if (focalLength <= 0.0) throw IllegalArgumentException("Focal length must be > 0")
     }
 
-    var phi: Double
-        get() = yaw
+    var phi: Double = 0.0
         set(value) {
-            yaw = value
-            pitch = cos(phi) * theta
-            roll = sin(phi) * theta
+            field = value
+            val dx = cos(phi) * sin(theta)
+            val dy = sin(phi) * sin(theta)
+            val dz = cos(theta)
+            roll = if (dz >= 0) acos(dy/sqrt(dz*dz+dy*dy)) else 2*PI - acos(dy/sqrt(dz*dz+dy*dy))
+            pitch = if (dx >= 0) acos(dz/sqrt(dz*dz+dx*dx)) else 2*PI - acos(dz/sqrt(dz*dz+dx*dx))
+            yaw = if (dy >= 0) acos(dx/sqrt(dx*dx+dy*dy)) else 2*PI - acos(dx/sqrt(dx*dx+dy*dy))
         }
     var theta: Double = 0.0
         set(value) {
-            field = min(PI / 2, max(-PI / 2, value))
-            pitch = cos(phi) * theta
-            roll = sin(phi) * theta
+            field = value
+            field = max(0.0, min(PI, field))
+            val dx = cos(phi) * sin(theta)
+            val dy = sin(phi) * sin(theta)
+            val dz = cos(theta)
+            roll = if (dz >= 0) acos(dy/sqrt(dz*dz+dy*dy)) else 2*PI - acos(dy/sqrt(dz*dz+dy*dy))
+            pitch = if (dx >= 0) acos(dz/sqrt(dz*dz+dx*dx)) else 2*PI - acos(dz/sqrt(dz*dz+dx*dx))
+            yaw = if (dy >= 0) acos(dx/sqrt(dx*dx+dy*dy)) else 2*PI - acos(dx/sqrt(dx*dx+dy*dy))
         }
 
-    @Watch("Yaw", 0.0, PI * 2)
+    @WatchDouble("Yaw", 0.0, PI * 2)
     var yaw: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
-    @Watch("Pitch", 0.0, PI * 2)
+    @WatchDouble("Pitch", 0.0, PI * 2)
     var pitch: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
-    @Watch("Roll", 0.0, PI * 2)
+    @WatchDouble("Roll", 0.0, PI * 2)
     var roll: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @Watch("X", -100.0, 100.0)
+    @WatchDouble("X", -100.0, 100.0)
     override var x: Double = x
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @Watch("Y", -100.0, 100.0)
+    @WatchDouble("Y", -100.0, 100.0)
     override var y: Double = y
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @Watch("Z", -100.0, 100.0)
+    @WatchDouble("Z", -100.0, 100.0)
     override var z: Double = z
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @Watch("Zoom", 0.01, 10.0)
+    @WatchDouble("Zoom", 0.01, 10.0)
     var zoomX: Double = zoomX
         set(value) {
             projectionMatrixIsValid = false
@@ -100,7 +108,7 @@ class Camera(
             field = value
         }
 
-    @Watch("Focal-Length", 0.01, 100.0)
+    @WatchDouble("Focal-Length", 0.01, 100.0)
     var focalLength: Double = focalLength
         set(value) {
             projectionMatrixIsValid = false

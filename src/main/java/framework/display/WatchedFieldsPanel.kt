@@ -10,9 +10,8 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 import javax.swing.border.EmptyBorder
-import javax.swing.border.MatteBorder
 
-class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 10) : JPanel(GridBagLayout()) {
+class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(GridBagLayout()) {
     private val entries = ArrayList<WatchedField<*,*>>()
 
     init {
@@ -56,13 +55,13 @@ class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 10) : JPanel(Gr
             for (field in fields) {
                 c.gridy = y++
                 c.gridx = 0
-                c.weightx = 0.5
+                c.weightx = 1.0
                 this.add(JLabel(field.displayName).apply { font = Display.entryFont }, c)
-                c.weightx = 0.5
                 c.gridx = 1
+                c.weightx = 1.0
                 this.add(field.displayComponent.apply { font = Display.entryFont }, c)
                 c.gridx = 2
-                c.weightx = 0.0
+                c.weightx = 1.0
                 this.add(field.controlComponent, c)
                 entries.add(field)
             }
