@@ -5,7 +5,6 @@ import java.lang.reflect.Field
 import java.text.NumberFormat
 import javax.swing.*
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.jvm.isAccessible
 
 
 class Display(
@@ -170,7 +169,6 @@ class Display(
             field.set(obj, newValue)
             val memberProperty = obj::class.members.find { it.name == field.name }
             if (memberProperty is KMutableProperty<*>) {
-                memberProperty.isAccessible = true
                 memberProperty.setter.call(obj, newValue)
             }
         }
