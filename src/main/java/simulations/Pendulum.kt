@@ -9,6 +9,7 @@ import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
+@SuppressWarnings("unused")
 class Pendulum(val amountOfPoints: Int) : Simulation("Pendulum") {
     var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
     private val maxRopeSegmentLength = 10000

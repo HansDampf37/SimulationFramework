@@ -1,8 +1,8 @@
 package framework.display
 
 import framework.WatchedField
-import java.awt.Component
 import java.awt.Dimension
+import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -16,10 +16,8 @@ class ControlPanel(width: Int, height: Int, padding: Int = 10) : JPanel() {
         minimumSize = Dimension(width, height)
         border = EmptyBorder(padding, padding, padding, padding)
 
-        // Set top alignment for each component added to the BoxLayout
-        watchedFieldsPanel.setAlignmentY(Component.TOP_ALIGNMENT)
-
         add(watchedFieldsPanel)
+        add(Box.createVerticalGlue())
     }
 
 

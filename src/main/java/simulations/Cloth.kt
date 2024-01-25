@@ -5,6 +5,13 @@ import framework.WatchDouble
 import physics.*
 import kotlin.math.PI
 
+/**
+ * Simulates a grid of [masses][Mass] connected by [connections][ImpulseConnection] that transmit impulses.
+ * The cloth collides with a [Sphere]. Use W,A,S,D to control the camera position and up,down,left,right to control
+ * the camera orientation
+ * @param size the amount masses in one dimension of the cloth
+ */
+@SuppressWarnings("unused")
 class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     private lateinit var connections: MutableList<Connection>
     @Suppress("SameParameterValue")
