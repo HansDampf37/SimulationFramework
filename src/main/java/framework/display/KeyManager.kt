@@ -1,4 +1,4 @@
-package framework
+package framework.display
 
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener

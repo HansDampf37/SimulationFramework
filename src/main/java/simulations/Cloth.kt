@@ -1,14 +1,13 @@
 package simulations
 
 import framework.MassSimulation
-import framework.Vertex
-import framework.Watch
+import framework.WatchDouble
 import physics.*
 import kotlin.math.PI
 
 class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     private lateinit var connections: MutableList<Connection>
-    @Watch("Sphere Size", 2.0, 10.0)
+    @WatchDouble("Sphere Size", 2.0, 10.0)
     private var sphereRadius: Double = 5.0
         set(value) {
             sphere.radius = value

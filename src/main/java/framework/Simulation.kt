@@ -1,11 +1,9 @@
 package framework
 
+import framework.display.Display
+import framework.display.KeyManager
 import physics.Seconds
 import java.awt.*
-import java.lang.IllegalStateException
-import java.lang.reflect.Field
-import kotlin.reflect.KClass
-import kotlin.reflect.full.superclasses
 
 /**
  * Simulations run by the [start] and [stop] methods. They implement a [tick] method that updates simulated objects and
@@ -17,7 +15,7 @@ abstract class Simulation(
     private val renderingFrequency: Double = 25.0,
     private val antiAliasing: Boolean = true
 ) : ISimulation {
-    @Watch("Speed",0.5, 2.0)
+    @WatchDouble("Speed",0.5, 2.0)
     private var speed = 1.0
     protected var drawer: Graphics3d = Graphics3d()
     private var running = false
@@ -38,7 +36,8 @@ abstract class Simulation(
      * triggers [Simulation.tick] as often as possible
      */
     private val tickAndRender = Runnable {
-        display.setupSlidersPanel(collectAdjustableFields(listOf(this, camera)))
+        val watchedFields = collectWatchedFields(listOf(this, camera))
+        display.setWatchedFields(watchedFields)
         var lastTime = System.currentTimeMillis()
         val msPerTick = 1000.0 / renderingFrequency
         var delta = 0.0
@@ -60,7 +59,6 @@ abstract class Simulation(
                 initializeRendering()
                 delta--
                 lastTime = now
-                display.tick()
             }
         }
         stop()
@@ -141,29 +139,4 @@ abstract class Simulation(
     private val width: Int
         get() = display.canvas.width
 
-    private fun collectAdjustableFields(objects: Collection<Any>): Map<Any, Map<Field, Number>> {
-        fun getAllFields(c: KClass<*>): Set<Field> {
-            val fields = c.java.declaredFields.toMutableSet()
-            for (superclass in c.superclasses) {
-                fields.addAll(getAllFields(superclass))
-            }
-            return fields
-        }
-        val watchedFieldsForObjects = mutableMapOf<Any, MutableMap<Field, Number>>()
-        objects.forEach { obj ->
-            val watchedFields = mutableMapOf<Field, Number>()
-            for (field in getAllFields(obj::class)) {
-                field.setAccessible(true)
-                if (field.isAnnotationPresent(Watch::class.java)) {
-                    try {
-                        watchedFields[field] = field.get(obj) as Number
-                    } catch (e: ClassCastException) {
-                        throw IllegalStateException("Only Numbers can be adjusted")
-                    }
-                }
-            }
-            watchedFieldsForObjects[obj] = watchedFields
-        }
-        return watchedFieldsForObjects
-    }
 }
