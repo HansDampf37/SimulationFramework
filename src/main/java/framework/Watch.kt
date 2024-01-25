@@ -2,7 +2,6 @@ package framework
 
 import framework.display.Display
 import java.awt.Dimension
-import java.lang.IllegalStateException
 import java.lang.reflect.Field
 import javax.swing.*
 import kotlin.reflect.KClass
