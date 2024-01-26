@@ -1,7 +1,6 @@
 package framework
 
 import framework.display.Display
-import framework.display.KeyManager
 import java.awt.Dimension
 import java.lang.reflect.Field
 import javax.swing.*
@@ -32,6 +31,8 @@ annotation class WatchBoolean(val displayName: String)
 
 abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: String, val field: Field, val obj: Any) {
 
+    class WatchFieldTypeNotMatching(field: Field) : Exception("Field $field is annotated with the wrong Watch annotation. Types dont match.")
+
     abstract var controlComponent: C
     abstract var displayComponent: D
 
@@ -46,7 +47,13 @@ abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: S
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun get(): T = field.get(obj) as T
+    fun get(): T {
+        try {
+            return field.get(obj) as T
+        } catch (e: ClassCastException) {
+            throw WatchFieldTypeNotMatching(field)
+        }
+    }
 
     abstract fun updateControlComponent()
 }

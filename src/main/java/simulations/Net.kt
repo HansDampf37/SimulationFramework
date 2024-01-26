@@ -4,12 +4,14 @@ import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
+import framework.Vertex
 import framework.display.KeyManager
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
-class Net() : Simulation("Net") {
+@Suppress("unused")
+class Net : Simulation("Net") {
     private val airResist = 0.999
     private val gravity = Vec(0.0, -100.0, 0.0)
     private lateinit var points: Array<Array<Point3d>>
@@ -37,7 +39,13 @@ class Net() : Simulation("Net") {
     }
 
     override fun render() {
-        TODO("Not yet implemented")
+        points.forEach { it.forEach { point ->
+            camera.renderSphere(
+                Vertex(point.positionVector, Vec.ones * 255, Vec.zero),
+                0.25f,
+                null)
+            }
+        }
     }
 
     private fun movePoints() {

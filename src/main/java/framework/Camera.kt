@@ -263,9 +263,9 @@ class Camera(
                 "yaw: ${round(yaw / PI)}π, pitch: ${round(pitch / PI)}π, roll: ${round(roll / PI)}π, \n" +
                 "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
     }
-    fun renderLine(v1: Vertex, v2: Vertex, entity: Entity) = rasterizer.rasterizeLine(Line(v1, v2), entity)
-    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex, entity: Entity) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3), entity)
+    fun renderLine(v1: Vertex, v2: Vertex, entity: Entity? = null) = rasterizer.rasterizeLine(Line(v1, v2), entity)
+    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex, entity: Entity? = null) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3), entity)
 
-    fun renderSphere(v1: Vertex, radius: Float, entity: Entity) = rasterizer.rasterizeCircle(Circle(v1, radius), entity)
-    fun renderStrip(vertices: List<Vertex>, entity: Entity) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
+    fun renderSphere(v1: Vertex, radius: Float, entity: Entity? = null) = rasterizer.rasterizeCircle(Circle(v1, radius), entity)
+    fun renderStrip(vertices: List<Vertex>, entity: Entity? = null) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
 }

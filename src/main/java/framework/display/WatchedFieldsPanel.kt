@@ -6,12 +6,10 @@ import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.lang.Thread.sleep
-import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 import javax.swing.border.EmptyBorder
-import kotlin.concurrent.withLock
 
 class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(GridBagLayout()) {
     private val entries = ArrayList<WatchedField<*, *, *>>()

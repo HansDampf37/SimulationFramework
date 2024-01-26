@@ -10,6 +10,7 @@ import physics.Mass
 import physics.Seconds
 import java.awt.Graphics
 
+@Suppress("unused")
 class Pend(private val amountOfPoints: Int, length: Double) : MassSimulation<Mass>("String") {
     private val maxRopeSegmentLength: Double
     private val connections: MutableList<Connection> = ArrayList()

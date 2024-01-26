@@ -10,8 +10,8 @@ import java.awt.Color
 import java.awt.Graphics
 
 @SuppressWarnings("unused")
-class Pendulum(val amountOfPoints: Int) : Simulation("Pendulum") {
-    var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
+class Pendulum(private val amountOfPoints: Int) : Simulation("Pendulum") {
+    private var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
     private val maxRopeSegmentLength = 10000
     private val gravity = Vec(0.0, -9.81, 0.0)
     private lateinit var points: Array<Point3d>

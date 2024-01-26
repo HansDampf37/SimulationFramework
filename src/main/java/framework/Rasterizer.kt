@@ -5,10 +5,7 @@ import algebra.Vec2
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
+import kotlin.math.*
 
 
 class BoundingBox(var minX: Int, var minY: Int, var maxX: Int, var maxY: Int)
@@ -45,7 +42,7 @@ class Rasterizer(val camera: Camera) {
         prepareForNewFrame()
     }
 
-    fun rasterizeLine(line: Line, entity: Entity) {
+    fun rasterizeLine(line: Line, entity: Entity?) {
         // Convert 3D coordinates to 2D screen space
         for (v in arrayOf(line.v1, line.v2)) {
             val (p, d) = camera.project(v.position)
@@ -104,7 +101,7 @@ class Rasterizer(val camera: Camera) {
     }
 
 
-    fun rasterizeTriangle(triangle: Triangle, entity: Entity) {
+    fun rasterizeTriangle(triangle: Triangle, entity: Entity?) {
         fun interpolateDepthColorNormal(v1: Vertex, v2: Vertex, v3: Vertex, pixel: Vec2): InterpolationResult {
             val p0: Vec2 = v1.screenPosition!!
             val p1: Vec2 = v2.screenPosition!!
@@ -177,7 +174,7 @@ class Rasterizer(val camera: Camera) {
                         val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt()
                             .shl(8) or interpolation.color.z.toInt().shl(16)
 
-                        if (entity.outlineRasterization && interpolation.inOutline) {
+                        if (entity?.outlineRasterization == true && interpolation.inOutline) {
                             image.setRGB(x, y, 0b111111111111111111111111)
                         } else {
                             // Set pixel color in the image buffer
@@ -189,7 +186,7 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
-    fun rasterizeCircle(circle: Circle, entity: Entity) {
+    fun rasterizeCircle(circle: Circle, entity: Entity?) {
         fun interpolateDepthColorNormal(v1: Vertex, pixel: Vec2, radius: Float): InterpolationResult {
             // Check if the point is inside the sphere
             val dx = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
@@ -211,10 +208,11 @@ class Rasterizer(val camera: Camera) {
 
                 InterpolationResult(
                     inPrimitive = true,
-                    depth = v1.depth - 0.1f * depthAdjustment,
+                    depth = v1.depth - depthAdjustment,
                     color = v1.color * shadingFactor,
                     normal = normal,
-                    abs(distanceFromCenterSquared - radiusSquared) == 1f                )
+                    radius - sqrt(distanceFromCenterSquared) <= 2
+                )
             } else {
                 InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
             }
@@ -255,7 +253,7 @@ class Rasterizer(val camera: Camera) {
                         val color = interpolation.color
                         val pixelColor = color.x.toInt().shl(16) or color.y.toInt().shl(8) or color.z.toInt()
 
-                        if (entity.outlineRasterization && interpolation.inOutline) {
+                        if (entity?.outlineRasterization == true && interpolation.inOutline) {
                             image.setRGB(x, y, 0b111111111111111111111111)
                         } else {
                             // Set pixel color in the image buffer
@@ -267,7 +265,7 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
-    fun rasterizeTriangleStrip(triangleStrip: TriangleStrip, entity: Entity) {
+    fun rasterizeTriangleStrip(triangleStrip: TriangleStrip, entity: Entity?) {
         // Iterate through the vertices, creating triangles on the fly
         for (i in 0 until triangleStrip.vertices.size - 2) {
             val v1 = triangleStrip.vertices[i]
