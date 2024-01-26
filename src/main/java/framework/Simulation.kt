@@ -45,16 +45,13 @@ abstract class Simulation(
 
             // always tick
             val dt: Seconds = (now - lastTime) / 1000.0
-            KeyManager.tick()
-            listenForInput(dt)
-            drawer.setWindowHeightAndWidth(width, height)
-            camera.screenWidth = width
-            camera.screenHeight = height
             tick(dt * speed)
             delta += (now - lastTime) / msPerTick
 
             // render to reach fps goal
             if (delta >= 1) {
+                KeyManager.tick()
+                listenForInput(dt)
                 initializeRendering()
                 delta--
                 lastTime = now
@@ -108,9 +105,14 @@ abstract class Simulation(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON
         )
-        camera.prepareForNewFrame()
-        render()
-        g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+        drawer.setWindowHeightAndWidth(width, height)
+        val canvasWidth = width
+        val canvasHeight = height
+        if (canvasWidth > 0 && canvasHeight > 0) {
+            camera.prepareForNewFrame()
+            render()
+            g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+        }
         bs.show()
         g.dispose()
     }

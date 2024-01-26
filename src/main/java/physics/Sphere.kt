@@ -15,6 +15,7 @@ open class Sphere(
     y: Double,
     z: Double,
     var radius: Double, mass: Double): Mass(mass, x, y, z) {
+    override var outlineRasterization: Boolean = false
 
     val color: Vec = Vec.random * 255
 
@@ -26,12 +27,12 @@ open class Sphere(
         drawer.drawDot(this, radius = radius, Color.white, g)
     }
 
-    fun render(cam: Camera) {
-        cam.renderCircle(Vertex(this.positionVector, color, Vec.zero), radius.toFloat())
+    override fun render(camera: Camera) {
+        camera.renderSphere(Vertex(this.positionVector, color, Vec.zero), radius.toFloat(), this)
     }
 
     fun renderStrip(cam: Camera) {
-        cam.renderStrip(triangleStrip(cam))
+        cam.renderStrip(triangleStrip(cam), this)
     }
 
     private fun triangleStrip(camera: Camera): List<Vertex> {

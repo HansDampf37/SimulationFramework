@@ -21,7 +21,7 @@ class ControlPanel(width: Int, height: Int, padding: Int = 10) : JPanel() {
     }
 
 
-    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *>>>) {
+    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *, *>>>) {
         watchedFieldsPanel.setWatchedFields(watchedFields)
         watchedFieldsPanel.revalidate()
         watchedFieldsPanel.repaint()

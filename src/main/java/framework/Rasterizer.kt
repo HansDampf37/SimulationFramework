@@ -17,7 +17,8 @@ class InterpolationResult(
     val inPrimitive: Boolean,
     val depth: Float,
     val color: Vec,
-    val normal: Vec
+    val normal: Vec,
+    val inOutline: Boolean
 )
 
 class Vertex(
@@ -38,12 +39,13 @@ class Rasterizer(val camera: Camera) {
         BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
     private var zBuffer: FloatArray =
         FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
+    private var entityPuffer: Array<Entity?> = Array(camera.screenWidth * camera.screenHeight) { null }
 
     init {
         prepareForNewFrame()
     }
 
-    fun rasterizeLine(line: Line) {
+    fun rasterizeLine(line: Line, entity: Entity) {
         // Convert 3D coordinates to 2D screen space
         for (v in arrayOf(line.v1, line.v2)) {
             val (p, d) = camera.project(v.position)
@@ -76,6 +78,7 @@ class Rasterizer(val camera: Camera) {
                 if (depth < zBuffer[index]) {
                     // Update z-buffer
                     zBuffer[index] = depth
+                    entityPuffer[index] = entity
                     // interpolate color
                     val color = (1 - t) * line.v1.color + t * line.v2.color
                     val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.z.toInt().shl(16)
@@ -101,7 +104,7 @@ class Rasterizer(val camera: Camera) {
     }
 
 
-    fun rasterizeTriangle(triangle: Triangle) {
+    fun rasterizeTriangle(triangle: Triangle, entity: Entity) {
         fun interpolateDepthColorNormal(v1: Vertex, v2: Vertex, v3: Vertex, pixel: Vec2): InterpolationResult {
             val p0: Vec2 = v1.screenPosition!!
             val p1: Vec2 = v2.screenPosition!!
@@ -118,10 +121,11 @@ class Rasterizer(val camera: Camera) {
                     true,
                     (alpha * v1.depth + beta * v2.depth + gamma * v3.depth).toFloat(),
                     (alpha * v1.color + beta * v2.color + gamma * v3.color),
-                    (alpha * v1.normal + beta * v2.normal + gamma * v3.normal)
+                    (alpha * v1.normal + beta * v2.normal + gamma * v3.normal),
+                    (alpha == 0.0 || alpha == 1.0) && (beta == 0.0 || beta == 1.0) || (gamma == 0.0 || gamma == 1.0)
                 )
             } else {
-                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
+                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
             }
         }
 
@@ -133,8 +137,7 @@ class Rasterizer(val camera: Camera) {
             val minY = min(pixel1.y, min(pixel2.y, pixel3.y)).toInt()
             val maxX = max(pixel1.x, max(pixel2.x, pixel3.x)).toInt()
             val maxY = max(pixel1.y, max(pixel2.y, pixel3.y)).toInt()
-            val bb = BoundingBox(minX, minY, maxX, maxY)
-            return bb
+            return BoundingBox(minX, minY, maxX, maxY)
         }
         // Convert 3D coordinates to 2D screen space
         for (v in arrayOf(triangle.v1, triangle.v2, triangle.v3)) {
@@ -168,20 +171,25 @@ class Rasterizer(val camera: Camera) {
                     if (depth < zBuffer[index]) {
                         // Update z-buffer
                         zBuffer[index] = depth
+                        entityPuffer[index] = entity
 
                         // Interpolate color
                         val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt()
                             .shl(8) or interpolation.color.z.toInt().shl(16)
 
-                        // Set pixel color in the image buffer
-                        image.setRGB(x, y, pixelColor)
+                        if (entity.outlineRasterization && interpolation.inOutline) {
+                            image.setRGB(x, y, 0b111111111111111111111111)
+                        } else {
+                            // Set pixel color in the image buffer
+                            image.setRGB(x, y, pixelColor)
+                        }
                     }
                 }
             }
         }
     }
 
-    fun rasterizeCircle(circle: Circle) {
+    fun rasterizeCircle(circle: Circle, entity: Entity) {
         fun interpolateDepthColorNormal(v1: Vertex, pixel: Vec2, radius: Float): InterpolationResult {
             // Check if the point is inside the sphere
             val dx = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
@@ -205,10 +213,10 @@ class Rasterizer(val camera: Camera) {
                     inPrimitive = true,
                     depth = v1.depth - 0.1f * depthAdjustment,
                     color = v1.color * shadingFactor,
-                    normal = normal
-                )
+                    normal = normal,
+                    abs(distanceFromCenterSquared - radiusSquared) == 1f                )
             } else {
-                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0))
+                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
             }
         }
         // Convert 3D coordinates to 2D screen space
@@ -243,33 +251,39 @@ class Rasterizer(val camera: Camera) {
                     if (interpolation.depth < zBuffer[index]) {
                         // Update z-buffer
                         zBuffer[index] = interpolation.depth
+                        entityPuffer[index] = entity
                         val color = interpolation.color
                         val pixelColor = color.x.toInt().shl(16) or color.y.toInt().shl(8) or color.z.toInt()
 
-                        // Set pixel color in the image buffer
-                        image.setRGB(x, y, pixelColor)
+                        if (entity.outlineRasterization && interpolation.inOutline) {
+                            image.setRGB(x, y, 0b111111111111111111111111)
+                        } else {
+                            // Set pixel color in the image buffer
+                            image.setRGB(x, y, pixelColor)
+                        }
                     }
                 }
             }
         }
     }
 
-    fun rasterizeTriangleStrip(triangleStrip: TriangleStrip) {
+    fun rasterizeTriangleStrip(triangleStrip: TriangleStrip, entity: Entity) {
         // Iterate through the vertices, creating triangles on the fly
         for (i in 0 until triangleStrip.vertices.size - 2) {
             val v1 = triangleStrip.vertices[i]
             val v2 = triangleStrip.vertices[i + 1]
             val v3 = triangleStrip.vertices[i + 2]
 
-            rasterizeTriangle(Triangle(v1, v2, v3))
+            rasterizeTriangle(Triangle(v1, v2, v3), entity)
         }
     }
 
     fun prepareForNewFrame() {
         val graphics = image.graphics
         graphics.color = Color.BLACK
-        graphics.drawRect(0, 0, image.width, image.height)
+        graphics.fillRect(0, 0, image.width, image.height)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
+        Arrays.fill(entityPuffer, null)
     }
 
     fun updateWidthHeightFromCamera() {

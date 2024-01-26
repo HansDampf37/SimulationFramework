@@ -12,19 +12,19 @@ abstract class Connection(
     protected val m2: Mass,
     protected val maxEnergy: Double,
     var broken: Boolean = false
-) : Simulateable {
+) : Entity {
     val color = 255 * Vec.random
 
     abstract override fun tick(dt: Seconds)
 
-    override fun render(drawer: Graphics3d, g: Graphics) {
+    open fun render(drawer: Graphics3d, g: Graphics) {
         if (!broken) drawer.drawLine(m1, m2, g)
     }
 
-    fun render(camera: Camera) {
+    override fun render(camera: Camera) {
         val v1 = Vertex(m1.positionVector, color, Vec.zero)
         val v2 = Vertex(m2.positionVector, color, Vec.zero)
-        camera.renderLine(v1, v2)
+        camera.renderLine(v1, v2, this)
     }
 }
 
@@ -35,6 +35,8 @@ class ImpulseConnection(
     maxEnergy: Double,
     private val springConstant: Double = 300.0
 ) : Connection(m1, m2, maxEnergy) {
+    override val outlineRasterization: Boolean = false
+
     override fun tick(dt: Seconds) {
         if (broken) return
         val dist = m1.getDistanceTo(m2)

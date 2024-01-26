@@ -6,21 +6,25 @@ import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.lang.Thread.sleep
+import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 import javax.swing.border.EmptyBorder
+import kotlin.concurrent.withLock
 
 class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(GridBagLayout()) {
-    private val entries = ArrayList<WatchedField<*,*>>()
+    private val entries = ArrayList<WatchedField<*, *, *>>()
 
     init {
         Thread {
             while (true) {
-                for (entry in entries) {
-                    entry.updateControlComponent()
+                synchronized(entries) {
+                    for (entry in entries) {
+                        entry.updateControlComponent()
+                    }
+                    sleep(60)
                 }
-                sleep(60)
             }
         }.start()
         preferredSize = Dimension(width, height)
@@ -29,7 +33,7 @@ class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(Gr
         border = EmptyBorder(padding, padding, padding, padding)
     }
 
-    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *>>>) {
+    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *, *>>>) {
         val c = GridBagConstraints()
         c.anchor = GridBagConstraints.WEST
         var y = 0
@@ -52,6 +56,7 @@ class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(Gr
             c.gridwidth = 3
             add(JLabel(obj::class.simpleName + " " + obj.toString(), SwingConstants.LEFT).apply { font = Display.subsectionFont; background = Color.MAGENTA; horizontalAlignment = SwingConstants.LEFT }, c)
             c.gridwidth = 1
+            entries.addAll(fields)
             for (field in fields) {
                 c.gridy = y++
                 c.gridx = 0
@@ -63,7 +68,6 @@ class WatchedFieldsPanel(width: Int, height: Int, padding: Int = 30) : JPanel(Gr
                 c.gridx = 2
                 c.weightx = 1.0
                 this.add(field.controlComponent, c)
-                entries.add(field)
             }
         }
     }

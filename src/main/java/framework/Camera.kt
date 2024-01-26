@@ -36,24 +36,24 @@ class Camera(
     var phi: Double = 0.0
         set(value) {
             field = value
-            val dx = cos(phi) * sin(theta)
-            val dy = sin(phi) * sin(theta)
-            val dz = cos(theta)
-            roll = if (dz >= 0) acos(dy/sqrt(dz*dz+dy*dy)) else 2*PI - acos(dy/sqrt(dz*dz+dy*dy))
-            pitch = if (dx >= 0) acos(dz/sqrt(dz*dz+dx*dx)) else 2*PI - acos(dz/sqrt(dz*dz+dx*dx))
-            yaw = if (dy >= 0) acos(dx/sqrt(dx*dx+dy*dy)) else 2*PI - acos(dx/sqrt(dx*dx+dy*dy))
+            updateYawPitchRoll()
         }
     var theta: Double = 0.0
         set(value) {
             field = value
             field = max(0.0, min(PI, field))
-            val dx = cos(phi) * sin(theta)
-            val dy = sin(phi) * sin(theta)
-            val dz = cos(theta)
-            roll = if (dz >= 0) acos(dy/sqrt(dz*dz+dy*dy)) else 2*PI - acos(dy/sqrt(dz*dz+dy*dy))
-            pitch = if (dx >= 0) acos(dz/sqrt(dz*dz+dx*dx)) else 2*PI - acos(dz/sqrt(dz*dz+dx*dx))
-            yaw = if (dy >= 0) acos(dx/sqrt(dx*dx+dy*dy)) else 2*PI - acos(dx/sqrt(dx*dx+dy*dy))
+            updateYawPitchRoll()
         }
+
+    // TODO TODO TODO
+    private fun updateYawPitchRoll() {
+        val dx = cos(phi) * sin(theta)
+        val dy = sin(phi) * sin(theta)
+        val dz = cos(theta)
+        roll = if (dz >= 0) acos(dy / sqrt(dz * dz + dy * dy)) else 2 * PI - acos(dy / sqrt(dz * dz + dy * dy))
+        pitch = if (dx >= 0) acos(dz / sqrt(dz * dz + dx * dx)) else 2 * PI - acos(dz / sqrt(dz * dz + dx * dx))
+        yaw = if (dy >= 0) acos(dx / sqrt(dx * dx + dy * dy)) else 2 * PI - acos(dx / sqrt(dx * dx + dy * dy))
+    }
 
     @WatchDouble("Yaw", 0.0, PI * 2)
     var yaw: Double = 0.0
@@ -263,9 +263,9 @@ class Camera(
                 "yaw: ${round(yaw / PI)}π, pitch: ${round(pitch / PI)}π, roll: ${round(roll / PI)}π, \n" +
                 "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
     }
-    fun renderLine(v1: Vertex, v2: Vertex) = rasterizer.rasterizeLine(Line(v1, v2))
-    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3))
+    fun renderLine(v1: Vertex, v2: Vertex, entity: Entity) = rasterizer.rasterizeLine(Line(v1, v2), entity)
+    fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex, entity: Entity) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3), entity)
 
-    fun renderCircle(v1: Vertex, radius: Float) = rasterizer.rasterizeCircle(Circle(v1, radius))
-    fun renderStrip(vertices: List<Vertex>) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices))
+    fun renderSphere(v1: Vertex, radius: Float, entity: Entity) = rasterizer.rasterizeCircle(Circle(v1, radius), entity)
+    fun renderStrip(vertices: List<Vertex>, entity: Entity) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
 }

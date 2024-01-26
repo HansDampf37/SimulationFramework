@@ -30,10 +30,10 @@ annotation class WatchString(val displayName: String)
 @Target(AnnotationTarget.FIELD)
 annotation class WatchBoolean(val displayName: String)
 
-abstract class WatchedField<T, S : JComponent>(val displayName: String, val field: Field, val obj: Any) {
+abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: String, val field: Field, val obj: Any) {
 
-    abstract var controlComponent: S
-    abstract var displayComponent: JLabel
+    abstract var controlComponent: C
+    abstract var displayComponent: D
 
     fun set(value: T) {
         field.isAccessible = true
@@ -53,7 +53,7 @@ abstract class WatchedField<T, S : JComponent>(val displayName: String, val fiel
 
 @Suppress("LeakingThis", "UNCHECKED_CAST")
 abstract class WatchedNumber<T : Number>(displayName: String, field: Field, obj: Any, min: Number, max: Number) :
-    WatchedField<T, JSlider>(displayName, field, obj) {
+    WatchedField<T, JSlider, JLabel>(displayName, field, obj) {
 
     override var controlComponent: JSlider = JSlider(
         JSlider.HORIZONTAL,
@@ -72,8 +72,6 @@ abstract class WatchedNumber<T : Number>(displayName: String, field: Field, obj:
             set(newValue as T)
             displayComponent.text = "$newValue"
         }
-        keyListeners.forEach { removeKeyListener(it) }
-        addKeyListener(KeyManager)
     }
     override var displayComponent: JLabel = JLabel(Display.round(controlComponent.value / 100.0))
 
@@ -92,23 +90,24 @@ class WatchedInt(displayName: String, field: Field, obj: Any, min: Int, max: Int
     WatchedNumber<Int>(displayName, field, obj, min, max)
 
 class WatchedString(displayName: String, field: Field, obj: Any) :
-    WatchedField<String, JTextField>(displayName, field, obj) {
-    override var controlComponent: JTextField = JTextField(get()).apply {
+    WatchedField<String, JLabel, JTextField>(displayName, field, obj) {
+    override var displayComponent: JTextField = JTextField(get()).apply {
         preferredSize = Dimension(100, 25)
         maximumSize = Dimension(100, 25)
         minimumSize = Dimension(100, 25)
+        addActionListener {
+            set(text)
+        }
         // todo update value in model and view when changed
     }
-    override var displayComponent: JLabel = JLabel()
+    override var controlComponent = JLabel()
 
-    override fun updateControlComponent() {
-        controlComponent.text = get()
-    }
+    override fun updateControlComponent() = Unit
 }
 
 class WatchedBoolean(displayName: String, field: Field, obj: Any) :
-    WatchedField<Boolean, JCheckBox>(displayName, field, obj) {
-    override var controlComponent: JCheckBox = JCheckBox().apply {
+    WatchedField<Boolean, JLabel, JCheckBox>(displayName, field, obj) {
+    override var displayComponent: JCheckBox = JCheckBox().apply {
         preferredSize = Dimension(100, 25)
         maximumSize = Dimension(100, 25)
         minimumSize = Dimension(100, 25)
@@ -116,18 +115,17 @@ class WatchedBoolean(displayName: String, field: Field, obj: Any) :
         addChangeListener {
             val newValue = isSelected
             set(newValue)
-            displayComponent.text = isSelected.toString()
         }
         // todo update value in model and view when changed
     }
-    override var displayComponent: JLabel = JLabel()
+    override var controlComponent: JLabel = JLabel()
 
     override fun updateControlComponent() {
-        controlComponent.isSelected = get()
+        displayComponent.isSelected = get()
     }
 }
 
-fun collectWatchedFields(objects: Collection<Any>): Map<Any, List<WatchedField<*, *>>> {
+fun collectWatchedFields(objects: Collection<Any>): Map<Any, List<WatchedField<*, *, *>>> {
     fun getAllFields(c: KClass<*>): Set<Field> {
         val fields = c.java.declaredFields.toMutableSet()
         for (superclass in c.superclasses) {
@@ -136,9 +134,9 @@ fun collectWatchedFields(objects: Collection<Any>): Map<Any, List<WatchedField<*
         return fields
     }
 
-    val watchedFieldsForObjects = mutableMapOf<Any, List<WatchedField<*, *>>>()
+    val watchedFieldsForObjects = mutableMapOf<Any, List<WatchedField<*, *, *>>>()
     objects.forEach { obj ->
-        val watchedFields = mutableListOf<WatchedField<*, *>>()
+        val watchedFields = mutableListOf<WatchedField<*, *, *>>()
         for (field in getAllFields(obj::class)) {
             field.setAccessible(true)
             if (field.isAnnotationPresent(WatchDouble::class.java)) {

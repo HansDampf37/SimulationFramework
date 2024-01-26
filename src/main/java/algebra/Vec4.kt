@@ -27,6 +27,8 @@ class Vec4(x: Double, y: Double, z: Double, var w: Double) : Vec(x, y, z) {
 }
 
 class Vec2(var x: Double, var y: Double) {
+
+    constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
     override fun toString(): String {
         return "($x, $y)"
     }

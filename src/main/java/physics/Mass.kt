@@ -1,14 +1,17 @@
 package physics
 
-import framework.Camera
-import framework.Simulateable
-import framework.Graphics3d
 import algebra.Point3d
 import algebra.Vec
+import framework.Camera
+import framework.Entity
+import framework.Graphics3d
+import framework.Vertex
 import java.awt.Color
 import java.awt.Graphics
 
-open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Simulateable{
+open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Entity {
+    override val outlineRasterization: Boolean = false
+
     var velocity: Vec
     private val acceleration: Vec
     val mass: Double
@@ -29,19 +32,12 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
         move(dt)
     }
 
-    override fun render(drawer: Graphics3d, g: Graphics) {
+    open fun render(drawer: Graphics3d, g: Graphics) {
         drawer.drawDot(this, 0.25, Color.white, g)
     }
 
-    open fun render(cam: Camera, g: Graphics) {
-        val (coords, dist) = cam.project(this.positionVector)
-        g.color = Color.WHITE
-        val radius = 1 / dist
-        g.fillOval(
-            (coords.x - radius / cam.zoomX).toInt(),
-            (coords.y - radius / cam.zoomY).toInt(),
-            (2 * radius / cam.zoomX).toInt(),
-            (2 * radius / cam.zoomY).toInt())
+    override fun render(camera: Camera) {
+        camera.renderSphere(Vertex(positionVector, Vec.ones * 255, Vec.zero), 0.1f, this)
     }
 
     private fun accelerate(dt: Seconds) {

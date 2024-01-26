@@ -1,7 +1,9 @@
 package simulations
 
 import framework.MassSimulation
+import framework.WatchBoolean
 import framework.WatchDouble
+import framework.WatchString
 import physics.*
 import kotlin.math.PI
 
@@ -13,7 +15,13 @@ import kotlin.math.PI
  */
 @SuppressWarnings("unused")
 class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
+    @WatchBoolean("Outline")
+    private var outline: Boolean = true
     private lateinit var connections: MutableList<Connection>
+
+    @WatchString("TestString")
+    private var someString = "hallo"
+
     @Suppress("SameParameterValue")
     @WatchDouble("Sphere Size", 2.0, 10.0)
     private var sphereRadius: Double = 5.0
@@ -44,6 +52,7 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
     }
 
     override fun calcForces(dt: Seconds) {
+        sphere.outlineRasterization = outline
         input()
         masses.shuffle()
         connections.shuffle()

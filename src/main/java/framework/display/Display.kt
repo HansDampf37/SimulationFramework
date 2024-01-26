@@ -31,6 +31,7 @@ class Display(
         canvas.setPreferredSize(Dimension(width - controlWidth, height))
         canvas.setMaximumSize(Dimension(width, height))
         canvas.setMinimumSize(Dimension(width - controlWidth, height))
+        canvas.addKeyListener(KeyManager)
         window.add(canvas, BorderLayout.WEST)
 
         controls = ControlPanel(controlWidth, height)
@@ -45,7 +46,7 @@ class Display(
         return window.width
     }
 
-    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *>>>) {
+    fun setWatchedFields(watchedFields: Map<Any, List<WatchedField<*, *, *>>>) {
         controls.setWatchedFields(watchedFields)
         controls.revalidate()
         controls.repaint()
