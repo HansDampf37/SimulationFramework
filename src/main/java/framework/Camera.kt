@@ -2,6 +2,7 @@ package framework
 
 import algebra.*
 import physics.Meters
+import java.awt.image.BufferedImage
 import java.lang.IllegalArgumentException
 import java.lang.Math.PI
 import kotlin.math.*
@@ -236,10 +237,29 @@ class Camera(
     private var projectionMatrixIsValid = false
 
     private val rasterizer = Rasterizer(this)
-    val image
-        get() = rasterizer.image
-    fun prepareForNewFrame() = rasterizer.prepareForNewFrame()
 
+    /**
+     * Calls to rendering methods like [renderSphere], [renderLine], [renderTriangle],
+     * or [renderStrip] draw the respective primitives on this [BufferedImage] which can then be retrieved.
+     * To reset the image along with internal logic use [newFrame].
+     */
+    val image: BufferedImage
+        get() = rasterizer.image
+
+    /**
+     * Resets the [image]. Furthermore, for each pixel coordinate [getEntityAt] returns null again.
+     */
+    fun newFrame() = rasterizer.newFrame()
+
+    /**
+     * Projects the specified 3-dimensional vector to a 2-dimensional vector describing the pixel coordinates.
+     * Additionally, the distance between [v] and the [Camera] is returned. If the pixel is behind the camera, the
+     * distance is negative. It should be checked that the returned distance is positive before drawing the pixel to
+     * avoid drawing objects that are behind the camera.
+     *
+     * @param v the 3-dimensional vector
+     * @return pair containing the pixel coordinate and the distance from the camera
+     */
     fun project(v: Vec): Pair<Vec2, Meters> {
         if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
@@ -257,15 +277,61 @@ class Camera(
         return Pair(Vec2(-1.0, -1.0), Double.NEGATIVE_INFINITY)
     }
 
+    /**
+     * Returns a string describing the cameras position, orientation and looking direction
+     */
     fun cameraSettingsToString(): String {
         fun round(value: Double) = (value * 100).toInt().toDouble() / 100
         return "x: ${round(x)}, y: ${round(y)}, z: ${round(z)}, \n" +
                 "yaw: ${round(yaw / PI)}π, pitch: ${round(pitch / PI)}π, roll: ${round(roll / PI)}π, \n" +
                 "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
     }
+
+    /**
+     * Draws a line on the [image] between the specified vertices and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param v1 first [Vertex]
+     * @param v2 second [Vertex]
+     * @param entity the entity to register on each of the drawn pixels
+     */
     fun renderLine(v1: Vertex, v2: Vertex, entity: Entity? = null) = rasterizer.rasterizeLine(Line(v1, v2), entity)
+
+    /**
+     * Draws a triangle on the [image] between the specified vertices and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param v1 first [Vertex]
+     * @param v2 second [Vertex]
+     * @param v3 second [Vertex]
+     * @param entity the entity to register on each of the drawn pixels
+     */
     fun renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex, entity: Entity? = null) = rasterizer.rasterizeTriangle(Triangle(v1, v2, v3), entity)
 
+    /**
+     * Draws a sphere on the [image] around the specified vertex and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param v1 first [Vertex]
+     * @param radius the radius of the sphere in world coordinates
+     * @param entity the entity to register on each of the drawn pixels
+     */
     fun renderSphere(v1: Vertex, radius: Float, entity: Entity? = null) = rasterizer.rasterizeCircle(Circle(v1, radius), entity)
+
+    /**
+     * Draws a triangle-strip on the [image] and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param vertices list of vertices for the strip.
+     * @param entity the entity to register on each of the drawn pixels
+     */
     fun renderStrip(vertices: List<Vertex>, entity: Entity? = null) = rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
+
+    /**
+     * Returns the [Entity] drawn at the specified coordinates. If no entity is drawn at the specified location,
+     * null is returned. In order to associate drawn pixels with entities the entities must be passed via the
+     * rendering methods. If an entity is drawn at the specified coordinates, but it was not passed as an argument
+     * to the respective rasterization method, null is returned.
+     * @see [renderStrip]
+     * @see [renderSphere]
+     * @see [renderLine]
+     * @see [renderTriangle]
+     */
+    fun getEntityAt(x: Int, y: Int) = rasterizer.getEntityAt(x, y)
 }

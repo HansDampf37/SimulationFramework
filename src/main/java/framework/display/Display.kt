@@ -3,6 +3,8 @@ package framework.display
 import com.formdev.flatlaf.FlatDarculaLaf
 import framework.WatchedField
 import java.awt.*
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import java.text.NumberFormat
 import javax.swing.*
 

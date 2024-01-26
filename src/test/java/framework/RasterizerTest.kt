@@ -1,8 +1,12 @@
 package framework
 
 import algebra.Vec
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import physics.Seconds
 import java.awt.FlowLayout
+import java.awt.image.BufferedImage
 import java.lang.Thread.sleep
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -12,9 +16,14 @@ import javax.swing.JLabel
 class RasterizerTest {
     private val camera = Camera(0.0, 0.0, 0.0,
     1.0, 1.0,
-    10.0,
+    100.0,
     1000, 600)
     private val rasterizer = Rasterizer(camera)
+
+    @BeforeEach
+    fun setup() {
+        rasterizer.newFrame()
+    }
 
     @Test
     fun testRasterization() {
@@ -34,9 +43,9 @@ class RasterizerTest {
         val v6 = Vertex(position = Vec(10.0, 10.0, 1.0), color = c6, normal = zero)
         val triangle2 = Triangle(v4, v5, v6)
         val line = Line(v1, v4)
-        rasterizer.rasterizeTriangle(triangle1)
-        rasterizer.rasterizeTriangle(triangle2)
-        rasterizer.rasterizeLine(line)
+        rasterizer.rasterizeTriangle(triangle1, null)
+        rasterizer.rasterizeTriangle(triangle2, null)
+        rasterizer.rasterizeLine(line, null)
 
         val frame = JFrame()
         frame.contentPane.setLayout(FlowLayout())
@@ -44,5 +53,69 @@ class RasterizerTest {
         frame.pack()
         frame.isVisible = true
         sleep(20000)
+    }
+
+    @Test
+    fun testGetEntityTriangle() {
+        val entity = object : Entity {
+            override fun tick(dt: Seconds) = Unit
+
+            override fun render(camera: Camera) = Unit
+
+            override var outlineRasterization: Boolean = false
+        }
+        rasterizer.rasterizeTriangle(
+            Triangle(
+                Vertex(Vec(10.0, 20.0, -3.0), Vec.ones*255, Vec.zero),
+                Vertex(Vec(10.0, -20.0, 7.0), Vec.ones*255, Vec.zero),
+                Vertex(Vec(10.0, -35.0, -20.0), Vec.ones*255, Vec.zero)
+            ),
+            entity)
+        testEntityIsStoredInEachNonBlackPixel(entity)
+    }
+
+    @Test
+    fun testGetEntitySphere() {
+        val entity = object : Entity {
+            override fun tick(dt: Seconds) = Unit
+
+            override fun render(camera: Camera) = Unit
+
+            override var outlineRasterization: Boolean = false
+        }
+        rasterizer.rasterizeCircle(
+            Circle(
+                Vertex(Vec(10.0, 0.0, 0.0), Vec.ones*255, Vec.zero),
+                9.0f
+            ),
+            entity
+        )
+        testEntityIsStoredInEachNonBlackPixel(entity)
+    }
+
+    private fun testEntityIsStoredInEachNonBlackPixel(entity: Entity) {
+        val entityIsAt = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
+        val entityButNoPixel = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
+        val pixelButNoEntity = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
+        for (x in 0 until camera.screenWidth) {
+            for (y in 0 until camera.screenHeight) {
+                if (rasterizer.getEntityAt(x, y) == entity) {
+                    entityIsAt.setRGB(x, y, 0b111111111111111111111111)
+                    if (rasterizer.image.getRGB(x, y) == 0) {
+                        entityButNoPixel.setRGB(x, y, 0b111111111111111111111111)
+                    }
+                } else {
+                    if (rasterizer.image.getRGB(x, y) > 0) {
+                        pixelButNoEntity.setRGB(x, y, 0b111111111111111111111111)
+                    }
+                }
+            }
+        }
+        for (x in 0 until camera.screenWidth) {
+            for (y in 0 until camera.screenHeight) {
+                assertEquals(pixelButNoEntity.getRGB(x, y), 0)
+                assertEquals(entityButNoPixel.getRGB(x, y), 0)
+            }
+        }
     }
 }

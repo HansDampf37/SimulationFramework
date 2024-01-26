@@ -32,14 +32,20 @@ class Circle(val v1: Vertex, val radius: Float)
 class TriangleStrip(val vertices: List<Vertex> = ArrayList())
 
 class Rasterizer(val camera: Camera) {
+    /**
+     * Calls to rasterization methods like [rasterizeCircle], [rasterizeLine], [rasterizeTriangle],
+     * or [rasterizeTriangleStrip] draw the respective primitives on this [BufferedImage] which can then be retrieved.
+     * To reset the image along with internal logic use [newFrame].
+     */
     var image: BufferedImage =
         BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB) // image puffer
+        private set
     private var zBuffer: FloatArray =
         FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
     private var entityPuffer: Array<Entity?> = Array(camera.screenWidth * camera.screenHeight) { null }
 
     init {
-        prepareForNewFrame()
+        newFrame()
     }
 
     fun rasterizeLine(line: Line, entity: Entity?) {
@@ -276,18 +282,57 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
-    fun prepareForNewFrame() {
+    /**
+     * Resets the [image] + z-puffer. Furthermore, for each pixel coordinate [getEntityAt] returns null again.
+     */
+    fun newFrame() {
         val graphics = image.graphics
         graphics.color = Color.BLACK
         graphics.fillRect(0, 0, image.width, image.height)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
-        Arrays.fill(entityPuffer, null)
+        Arrays.fill(entityPuffer, null) // reset entity puffer with null
     }
 
+    /**
+     * When called the [image] and additional internal variables are resized to match the [camera]'s
+     * screen's width and height.
+     */
     fun updateWidthHeightFromCamera() {
         image = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
-        zBuffer = FloatArray(camera.screenWidth * camera.screenHeight)
-        prepareForNewFrame()
+        zBuffer = FloatArray(camera.screenWidth * camera.screenHeight) { Float.MAX_VALUE }
+        entityPuffer = arrayOfNulls(camera.screenWidth * camera.screenHeight)
+    }
+
+
+    /**
+     * Returns the [Entity] drawn at the specified coordinates. If no entity is drawn at the specified location,
+     * null is returned. In order to associate drawn pixels with entities the entities must be passed via the
+     * rasterization methods. If an entity is drawn at the specified coordinates, but it was not passed as an argument
+     * to the respective rasterization method, null is returned.
+     * @see [rasterizeTriangleStrip]
+     * @see [rasterizeCircle]
+     * @see [rasterizeLine]
+     * @see [rasterizeTriangle]
+     */
+    fun getEntityAt(x: Int, y: Int): Entity? {
+        return entityPuffer[y * camera.screenWidth + x]
+    }
+
+    /**
+     * Returns a [BufferedImage] where pixels are white if and only if the pixel is on top of the specified entity.
+     * @param entity the specified entity
+     * @return a mask for this entity
+     */
+    fun entityMask(entity: Entity): BufferedImage {
+        val maskImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
+        for (x in 0 until camera.screenWidth) {
+            for (y in 0 until camera.screenHeight) {
+                if (getEntityAt(x, y) == entity) {
+                    maskImage.setRGB(x, y, 0b111111111111111111111111)
+                }
+            }
+        }
+        return maskImage
     }
 }
 

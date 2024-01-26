@@ -10,7 +10,7 @@ import java.awt.Color
 import java.awt.Graphics
 
 open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Entity {
-    override val outlineRasterization: Boolean = false
+    override var outlineRasterization: Boolean = false
 
     var velocity: Vec
     private val acceleration: Vec

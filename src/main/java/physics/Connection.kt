@@ -35,7 +35,7 @@ class ImpulseConnection(
     maxEnergy: Double,
     private val springConstant: Double = 300.0
 ) : Connection(m1, m2, maxEnergy) {
-    override val outlineRasterization: Boolean = false
+    override var outlineRasterization: Boolean = false
 
     override fun tick(dt: Seconds) {
         if (broken) return

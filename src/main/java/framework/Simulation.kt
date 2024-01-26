@@ -2,8 +2,12 @@ package framework
 
 import framework.display.Display
 import framework.display.KeyManager
+import framework.display.MouseManager
 import physics.Seconds
-import java.awt.*
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 
 /**
  * Simulations run by the [start] and [stop] methods. They implement a [tick] method that updates simulated objects and
@@ -15,7 +19,7 @@ abstract class Simulation(
     private val renderingFrequency: Double = 25.0,
     private val antiAliasing: Boolean = true
 ) : ISimulation {
-    @WatchDouble("Speed",0.5, 2.0)
+    @WatchDouble("Speed",0.0, 2.0)
     private var speed = 1.0
     protected var drawer: Graphics3d = Graphics3d()
     private var running = false
@@ -26,8 +30,13 @@ abstract class Simulation(
         display.getWidth(), display.getHeight()
     )
 
+    private val mouseManager = MouseManager(camera)
+    private val keyManager = KeyManager
+
     init {
-        display.window.addKeyListener(KeyManager)
+        display.window.addKeyListener(keyManager)
+        display.canvas.addMouseMotionListener(mouseManager)
+        display.canvas.addMouseListener(mouseManager)
     }
 
     /**
@@ -50,7 +59,8 @@ abstract class Simulation(
 
             // render to reach fps goal
             if (delta >= 1) {
-                KeyManager.tick()
+                keyManager.tick()
+                mouseManager.tick()
                 listenForInput(dt)
                 initializeRendering()
                 delta--
@@ -63,29 +73,29 @@ abstract class Simulation(
     private var threadTickingAndRendering: Thread = Thread(tickAndRender)
 
     private fun listenForInput(dt: Seconds) {
-        if (KeyManager.w) drawer.moveVerticalCamera(dt)
-        if (KeyManager.s) drawer.moveVerticalCamera(-dt)
-        if (KeyManager.d) drawer.moveHorizontalCamera(dt)
-        if (KeyManager.a) drawer.moveHorizontalCamera(-dt)
-        if (KeyManager.y) drawer.zoom(1 + dt)
-        if (KeyManager.out) drawer.zoom(1 - dt)
-        if (KeyManager.n) reset()
+        if (keyManager.w) drawer.moveVerticalCamera(dt)
+        if (keyManager.s) drawer.moveVerticalCamera(-dt)
+        if (keyManager.d) drawer.moveHorizontalCamera(dt)
+        if (keyManager.a) drawer.moveHorizontalCamera(-dt)
+        if (keyManager.y) drawer.zoom(1 + dt)
+        if (keyManager.out) drawer.zoom(1 - dt)
+        if (keyManager.n) reset()
 
-        if (KeyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
-        if (KeyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
-        if (KeyManager.d) camera.add(-camera.left * dt * 5.0)
-        if (KeyManager.a) camera.add(camera.left * dt * 5.0)
-        if (KeyManager.shift) camera.add(-camera.up * dt * 5.0)
-        if (KeyManager.space) camera.add(camera.up * dt * 5.0)
-        if (KeyManager.y) camera.zoom *= 1 + dt
-        if (KeyManager.out) camera.zoom *= 1 - dt
-        if (KeyManager.n) reset()
-        if (KeyManager.up) camera.theta += dt
-        if (KeyManager.down) camera.theta -= dt
-        if (KeyManager.left) camera.phi -= dt
-        if (KeyManager.right) camera.phi += dt
-        if (KeyManager.f) camera.focalLength *= 1 + dt
-        if (KeyManager.g) camera.focalLength *= 1 - dt
+        if (keyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
+        if (keyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
+        if (keyManager.d) camera.add(-camera.left * dt * 5.0)
+        if (keyManager.a) camera.add(camera.left * dt * 5.0)
+        if (keyManager.shift) camera.add(-camera.up * dt * 5.0)
+        if (keyManager.space) camera.add(camera.up * dt * 5.0)
+        if (keyManager.y) camera.zoom *= 1 + dt
+        if (keyManager.out) camera.zoom *= 1 - dt
+        if (keyManager.n) reset()
+        if (keyManager.up) camera.theta += dt
+        if (keyManager.down) camera.theta -= dt
+        if (keyManager.left) camera.phi -= dt
+        if (keyManager.right) camera.phi += dt
+        if (keyManager.f) camera.focalLength *= 1 + dt
+        if (keyManager.g) camera.focalLength *= 1 - dt
     }
 
     /**
@@ -109,7 +119,7 @@ abstract class Simulation(
         val canvasWidth = width
         val canvasHeight = height
         if (canvasWidth > 0 && canvasHeight > 0) {
-            camera.prepareForNewFrame()
+            camera.newFrame()
             render()
             g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
         }

@@ -24,5 +24,5 @@ interface Entity {
     /**
      * Weather or not the entity should be outlined when drawn
      */
-    val outlineRasterization: Boolean
+    var outlineRasterization: Boolean
 }
