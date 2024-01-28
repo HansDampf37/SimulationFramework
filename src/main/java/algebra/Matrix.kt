@@ -36,6 +36,31 @@ class Matrix4X4(
         )
     }
 
+    operator fun times(scalar: Number): Matrix4X4 {
+        return Matrix4X4(
+            a * scalar.toDouble(), b * scalar.toDouble(), c * scalar.toDouble(), d * scalar.toDouble(),
+            e * scalar.toDouble(), f * scalar.toDouble(), g * scalar.toDouble(), h * scalar.toDouble(),
+            i * scalar.toDouble(), j * scalar.toDouble(), k * scalar.toDouble(), l * scalar.toDouble(),
+            m * scalar.toDouble(), n * scalar.toDouble(), o * scalar.toDouble(), p * scalar.toDouble(),
+        )
+    }
+
+    operator fun plus(mat: Matrix4X4): Matrix4X4 {
+        return Matrix4X4(
+            this.a + mat.a, this.b + mat.b, this.c + mat.c, this.d + mat.d,
+            this.e + mat.e, this.f + mat.f, this.g + mat.g, this.h + mat.h,
+            this.i + mat.i, this.j + mat.j, this.k + mat.k, this.l + mat.l,
+            this.m + mat.m, this.n + mat.n, this.o + mat.o, this.p + mat.p
+        )
+    }
+
+    fun transpose() = Matrix4X4(
+        a, e, i, m,
+        b, f, j, n,
+        c, g, k, o,
+        d, h, l, p
+    )
+
     override fun toString(): String {
         return "| $a, $b, $c, $d |\n" +
                 "| $e, $f, $g, $h |\n" +

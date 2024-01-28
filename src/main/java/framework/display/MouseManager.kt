@@ -33,7 +33,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     }
 
     override fun mouseClicked(e: MouseEvent?) {
-        TODO("Not yet implemented")
+        e?.component?.requestFocus()
     }
 
     override fun mousePressed(e: MouseEvent?) {

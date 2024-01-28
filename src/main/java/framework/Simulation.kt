@@ -81,12 +81,12 @@ abstract class Simulation(
         if (keyManager.out) drawer.zoom(1 - dt)
         if (keyManager.n) reset()
 
-        if (keyManager.w) camera.add(camera.lookingDirection * dt * 5.0)
-        if (keyManager.s) camera.add(-camera.lookingDirection * dt * 5.0)
-        if (keyManager.d) camera.add(-camera.left * dt * 5.0)
-        if (keyManager.a) camera.add(camera.left * dt * 5.0)
-        if (keyManager.shift) camera.add(-camera.up * dt * 5.0)
-        if (keyManager.space) camera.add(camera.up * dt * 5.0)
+        if (keyManager.w) camera.moveForward(dt)
+        if (keyManager.s) camera.moveBackward(dt)
+        if (keyManager.d) camera.moveRight(dt)
+        if (keyManager.a) camera.moveLeft(dt)
+        if (keyManager.shift) camera.moveDown(dt)
+        if (keyManager.space) camera.moveUp(dt)
         if (keyManager.y) camera.zoom *= 1 + dt
         if (keyManager.out) camera.zoom *= 1 - dt
         if (keyManager.n) reset()

@@ -31,9 +31,8 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
         camera.x = -10.0
         camera.y = 0.0
         camera.z = 8.0
-        camera.pitch = 5 * PI / 4
-        camera.yaw = PI
-        camera.roll = 0.0
+        camera.theta = 5 * PI / 4
+        camera.phi = PI
         camera.focalLength = 10.0
         camera.zoom = 0.03
     }

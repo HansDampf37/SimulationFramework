@@ -2,6 +2,7 @@ package simulations
 
 import algebra.Vec
 import framework.Simulation
+import framework.Vertex
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -52,7 +53,34 @@ class EmptySimulation: Simulation("Test") {
     }
 
     override fun render() {
-        TODO("Not yet implemented")
+        val dx = Vec(sizeSquares, 0.0, 0.0)
+        val dy = Vec(0.0, sizeSquares, 0.0)
+        val dz = Vec(0.0, 0.0, sizeSquares)
+        val Z = dz * 50
+        val Y = dy * 50
+        val X = dx * 50
+        for (x in 0 until amountSquares) {
+            for (y in 0 until amountSquares) {
+                var color = if ((y + x) % 2 == 0) Vec(255, 0, 0) else Vec(255, 255, 255)
+                camera.renderTriangle(
+                    Vertex(dx * x + dy * y, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y + dy, color, Vec.zero))
+                camera.renderTriangle(
+                    Vertex(dx * x + dy * y, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y + dy, color, Vec.zero),
+                    Vertex(dy * y + dy + dx * x, color, Vec.zero))
+                color = if ((y + x) % 2 == 0) Vec(255, 0, 0) else Vec(255, 255, 255)
+                camera.renderTriangle(
+                    Vertex(dx * x + dy * y + Z, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y + Z, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec.zero))
+                camera.renderTriangle(
+                    Vertex(dx * x + dy * y + Z, color, Vec.zero),
+                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec.zero),
+                    Vertex(dy * y + dy + dx * x + Z, color, Vec.zero))
+            }
+        }
     }
 
     override fun reset() {
