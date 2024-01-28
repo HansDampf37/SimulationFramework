@@ -65,6 +65,7 @@ abstract class Simulation(
                 initializeRendering()
                 delta--
                 lastTime = now
+                println("running")
             }
         }
         stop()
@@ -99,7 +100,7 @@ abstract class Simulation(
     }
 
     /**
-     * Calls [Simulation.render] with a new [Graphics] object
+     * Clears the image and calls [Camera.newFrame] and [Simulation.render].
      */
     private fun initializeRendering() {
         val bs = display.canvas.bufferStrategy
@@ -110,18 +111,20 @@ abstract class Simulation(
         val g = bs.drawGraphics
         g.clearRect(0, 0, display.canvas.width, display.canvas.height)
         g.color = Color.white
-        g.drawString(camera.cameraSettingsToString(), 10, 10)
         if (antiAliasing) (g as Graphics2D).setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON
         )
-        drawer.setWindowHeightAndWidth(width, height)
-        val canvasWidth = width
-        val canvasHeight = height
+        val canvasWidth = display.canvas.width
+        val canvasHeight = display.canvas.height
         if (canvasWidth > 0 && canvasHeight > 0) {
+            drawer.setWindowHeightAndWidth(canvasWidth, canvasHeight)
+            camera.screenWidth = canvasWidth
+            camera.screenHeight = canvasHeight
             camera.newFrame()
             render()
             g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+            g.drawString(camera.cameraSettingsToString(), 10, 10)
         }
         bs.show()
         g.dispose()
@@ -144,10 +147,4 @@ abstract class Simulation(
             e.printStackTrace()
         }
     }
-
-    private val height: Int
-        get() = display.canvas.height
-    private val width: Int
-        get() = display.canvas.width
-
 }

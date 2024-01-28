@@ -180,6 +180,9 @@ class Camera(
             return I + k * sin(theta) + k * k * (1 - cos(theta))
         }
 
+    /**
+     * Maps a vector in the camera coordinate system to pixel coordinates
+     */
     private val cameraToPixelCoords
         get() = Matrix3x4(
             -focalLength / zoomX, 0.0, screenWidth / 2.0, 0.0,
@@ -190,13 +193,13 @@ class Camera(
     private var projectionMatrixIsValid = false
 
     /**
-     * Map vector to pixel coordinates:
+     * Map world coordinates to pixel coordinates:
      * 1. translate vector with the [translationMatrix4x4]
      * 2. rotate around the [left] vector for [theta] with [matrixTheta]
      * 3. rotate around the z-axis for [phi] with [matrixPhi]
      * 4. map camera to pixel coordinates with [cameraToPixelCoords]
-     * This matrix is cached meaning that if the camera position or rotation is not changed this matrix is not
-     * recalculated but used again.
+     * This matrix is cached in [projectionMatrix] meaning that if the camera position or rotation is not
+     * changed this matrix is not recalculated but used again.
      */
     private var projectionMatrix: Matrix3x4 = cameraToPixelCoords * matrixPhi * matrixTheta * translationMatrix4x4
         get() {
