@@ -2,7 +2,6 @@ package simulations
 
 import framework.MassSimulation
 import framework.WatchDouble
-import framework.WatchString
 import physics.*
 import kotlin.math.PI
 
@@ -28,19 +27,17 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
         drawer.setZoom(30.0)
         drawer.setCameraAngleHorizontal(0.2)
         camera.focalLength = 10.0
-        camera.x = -10.0
-        camera.y = 0.0
-        camera.z = 8.0
-        camera.theta = 5 * PI / 4
+        camera.x = 0.0
+        camera.y = -25.0
+        camera.z = 12.0
+        camera.theta = 1 * PI / 3
         camera.phi = PI
         camera.focalLength = 10.0
-        camera.zoom = 0.03
+        camera.zoom = 0.01
     }
     override fun render() {
         masses.forEach{it.render(camera)}
         connections.filter { !it.broken }.forEach{ it.render(camera) }
-        //masses.filter{it != sphere}.forEach{it.render(camera)}
-        //sphere.renderStrip(camera)
     }
 
     override fun calcForces(dt: Seconds) {
@@ -93,7 +90,6 @@ class Cloth(private val size: Int): MassSimulation<Sphere>("Cloth") {
         }
 
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
-        sphere.outlineRasterization = true
         addNewMass(sphere, true)
     }
 }

@@ -36,7 +36,7 @@ abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: S
     abstract var controlComponent: C
     abstract var displayComponent: D
 
-    fun set(value: T) {
+    open fun set(value: T) {
         field.isAccessible = true
         field.set(obj, value)
         val memberProperty = obj::class.members.find { it.name == field.name }

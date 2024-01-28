@@ -15,7 +15,8 @@ import kotlin.math.*
  * [maybe useful](https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula#Matrix_notation)
  * [phi] describes the ccw rotation around the z-axis from the x-axis from above.
  * [theta] describes the rotation around the [left]-vector from the z-axis from down (-PI / 2) to up (PI / 2).
- * If [phi] and [theta] are both zero the camera should point at down at (0, 0, 1) and the up vector should be (0, 1, 0)
+ * If [phi] and [theta] are both zero the camera should point at down at (0, 0, 1), the [up] vector should be (0, 1, 0)
+ * and the [left] vector should point at (1, 0, 0)
  * @param x position coordinate
  * @param y position coordinate
  * @param z position coordinate
@@ -40,15 +41,15 @@ class Camera(
     private val movementSpeed: Double = 5.0
     private val turningSpeed: Double = 5.0
 
-    //@WatchDouble("Φ", -PI/2, PI/2)
+    @WatchDouble("Φ", -2 * PI, 2 * PI)
     var phi: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @WatchDouble("θ",0.0, 2*PI)
-    var theta: Double = PI/2
+    @WatchDouble("θ",-PI/2, PI/2)
+    var theta: Double = 0.0
         set(value) {
             projectionMatrixIsValid = false
             field = min(PI/2, max(-PI/2, value))
@@ -121,7 +122,7 @@ class Camera(
         }
 
     val left: Vec
-        get() = Vec(cos(-phi), sin(-phi), 0)
+        get() = Vec(cos(phi), sin(phi), 0)
 
     var zoom: Double
         get() = zoomX
@@ -135,22 +136,6 @@ class Camera(
             1.0, 0.0, 0.0, -x,
             0.0, 1.0, 0.0, -y,
             0.0, 0.0, 1.0, -z,
-            0.0, 0.0, 0.0, 1.0
-        )
-
-    private val swpAxis
-        get() = Matrix4X4(
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        )
-
-    private val swpAxisInv
-        get() = Matrix4X4(
-            0.0, 0.0, 1.0, 0.0,
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         )
 
@@ -168,7 +153,6 @@ class Camera(
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            return I
             return I + k * sin(phi) + k * k * (1 - cos(phi))
         }
 
@@ -193,7 +177,6 @@ class Camera(
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            return I
             return I + k * sin(theta) + k * k * (1 - cos(theta))
         }
 
@@ -241,8 +224,11 @@ class Camera(
     fun moveRight(dt: Double = 1.0) = move(-left, dt)
 
     fun turn(dif: Vec2, dt: Double = 1.0) {
-        val turnUp = dif.y * dt
-        val turnRight = dif.x * dt
+        val turnUp = dif.y * dt * turningSpeed
+        val turnRight = dif.x * dt * turningSpeed
+        phi += turnRight
+        theta += turnUp
+
     }
 
     private fun move(direction: Vec, dt: Double) {
