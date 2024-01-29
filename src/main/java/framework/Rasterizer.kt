@@ -33,7 +33,7 @@ class TriangleStrip(val vertices: List<Vertex> = ArrayList())
 
 class Rasterizer(val camera: Camera) {
     /**
-     * Calls to rasterization methods like [rasterizeCircle], [rasterizeLine], [rasterizeTriangle],
+     * Calls to rasterization methods like [rasterizeSphere], [rasterizeLine], [rasterizeTriangle],
      * or [rasterizeTriangleStrip] draw the respective primitives on this [BufferedImage] which can then be retrieved.
      * To reset the image along with internal logic use [newFrame].
      */
@@ -78,7 +78,7 @@ class Rasterizer(val camera: Camera) {
                 val depth = (1 - t) * line.v1.depth + t * line.v2.depth
                 // Check against z-buffer
                 val index = y0 * camera.screenWidth + x0
-                if (depth < zBuffer[index]) {
+                if (depth >= 0 && depth < zBuffer[index]) {
                     // Update z-buffer
                     zBuffer[index] = depth
                     entityPuffer[index] = entity
@@ -171,7 +171,7 @@ class Rasterizer(val camera: Camera) {
 
                     // Check against z-buffer
                     val index = y * camera.screenWidth + x
-                    if (depth < zBuffer[index]) {
+                    if (depth >= 0 && depth < zBuffer[index]) {
                         // Update z-buffer
                         zBuffer[index] = depth
                         entityPuffer[index] = entity
@@ -192,21 +192,24 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
-    fun rasterizeCircle(circle: Circle, entity: Entity?) {
-        fun interpolateDepthColorNormal(v1: Vertex, pixel: Vec2, radius: Float): InterpolationResult {
+    fun rasterizeSphere(circle: Circle, entity: Entity?) {
+        fun interpolateDepthColorNormal(
+            v1: Vertex, pixel: Vec2, radiusPixel: Int, radiusWorldCoords: Float
+        ): InterpolationResult {
             // Check if the point is inside the sphere
-            val dx = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
-            val dy = pixel.y.toFloat() - v1.screenPosition!!.y.toFloat()
-            val distanceFromCenterSquared = dx * dx + dy * dy
-            val radiusSquared = radius * radius
+            val dxPixels = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
+            val dyPixels = pixel.y.toFloat() - v1.screenPosition!!.y.toFloat()
+            val distanceFromCenterSquaredPixels = dxPixels * dxPixels + dyPixels * dyPixels
+            val radiusSquaredPixels = radiusPixel * radiusPixel
 
-            return if (distanceFromCenterSquared <= radiusSquared) {
+            return if (distanceFromCenterSquaredPixels <= radiusSquaredPixels) {
                 // Point is inside the sphere
                 // Calculate the depth adjustment based on the distance from the sphere's center
-                val depthAdjustment = sqrt(radiusSquared - distanceFromCenterSquared)
+                val depthAdjustmentPixels = sqrt(radiusSquaredPixels - distanceFromCenterSquaredPixels)
+                val depthAdjustment = depthAdjustmentPixels / radiusPixel * radiusWorldCoords
 
                 // Calculate the normal vector by normalizing the vector pointing from the sphere's center to the surface point
-                val sphereCenterToSurface = Vec(dx, dy, sqrt(radiusSquared - distanceFromCenterSquared))
+                val sphereCenterToSurface = Vec(dxPixels, dyPixels, depthAdjustmentPixels)
                 val normal = sphereCenterToSurface.normalize()
 
                 // Simple shading: Use dot product with light direction
@@ -217,7 +220,7 @@ class Rasterizer(val camera: Camera) {
                     depth = v1.depth - depthAdjustment,
                     color = v1.color * shadingFactor,
                     normal = normal,
-                    radius - sqrt(distanceFromCenterSquared) <= 2
+                    radiusPixel - sqrt(distanceFromCenterSquaredPixels) <= 2
                 )
             } else {
                 InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
@@ -229,12 +232,12 @@ class Rasterizer(val camera: Camera) {
         circle.v1.depth = distance.toFloat()
         if (distance < 0) return
 
-        val radius = circle.radius * camera.focalLength / (distance * camera.zoom)
+        val radiusPixels = (circle.radius * camera.focalLength / (distance * camera.zoom)).toInt()
         val bb = BoundingBox(
-            (circle.v1.screenPosition!!.x - radius).toInt(),
-            (circle.v1.screenPosition!!.y - radius).toInt(),
-            (circle.v1.screenPosition!!.x + radius).toInt(),
-            (circle.v1.screenPosition!!.y + radius).toInt()
+            (circle.v1.screenPosition!!.x - radiusPixels).toInt(),
+            (circle.v1.screenPosition!!.y - radiusPixels).toInt(),
+            (circle.v1.screenPosition!!.x + radiusPixels).toInt(),
+            (circle.v1.screenPosition!!.y + radiusPixels).toInt()
         )
 
         // Clip bounding box to image bounds
@@ -246,13 +249,18 @@ class Rasterizer(val camera: Camera) {
         // Iterate over pixels in the bounding box
         for (y in bb.minY..bb.maxY) {
             for (x in bb.minX..bb.maxX) {
-                val interpolation = interpolateDepthColorNormal(circle.v1, Vec2(x.toDouble(), y.toDouble()), radius.toFloat())
+                val interpolation = interpolateDepthColorNormal(
+                    circle.v1,
+                    Vec2(x.toDouble(), y.toDouble()),
+                    radiusPixels,
+                    circle.radius
+                )
                 // Check if the current pixel is inside the triangle
                 if (interpolation.inPrimitive) {
                     // pixel is inside
                     // Check against z-buffer
                     val index = y * camera.screenWidth + x
-                    if (interpolation.depth < zBuffer[index]) {
+                    if (interpolation.depth >= 0 && interpolation.depth < zBuffer[index]) {
                         // Update z-buffer
                         zBuffer[index] = interpolation.depth
                         entityPuffer[index] = entity
@@ -310,7 +318,7 @@ class Rasterizer(val camera: Camera) {
      * rasterization methods. If an entity is drawn at the specified coordinates, but it was not passed as an argument
      * to the respective rasterization method, null is returned.
      * @see [rasterizeTriangleStrip]
-     * @see [rasterizeCircle]
+     * @see [rasterizeSphere]
      * @see [rasterizeLine]
      * @see [rasterizeTriangle]
      */
@@ -329,6 +337,20 @@ class Rasterizer(val camera: Camera) {
             for (y in 0 until camera.screenHeight) {
                 if (getEntityAt(x, y) == entity) {
                     maskImage.setRGB(x, y, 0b111111111111111111111111)
+                }
+            }
+        }
+        return maskImage
+    }
+
+    fun depthMask(entity: Entity?): BufferedImage {
+        val maskImage = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_BYTE_GRAY)
+        for (x in 0 until camera.screenWidth) {
+            for (y in 0 until camera.screenHeight) {
+                val entityAtXY = getEntityAt(x, y)
+                if (entity == null || entityAtXY == entity) {
+                    val dist = zBuffer[y * camera.screenWidth + x]
+                    maskImage.setRGB(x, y, (-dist).toInt())
                 }
             }
         }

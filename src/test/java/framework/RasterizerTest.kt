@@ -14,10 +14,12 @@ import javax.swing.JLabel
 
 
 class RasterizerTest {
-    private val camera = Camera(0.0, 0.0, 0.0,
-    1.0, 1.0,
-    100.0,
-    1000, 600)
+    private val camera = Camera(
+        x = 0.0, y = 0.0, z = 0.0,
+        phi = 0.0, theta = 0.0,
+        zoom = 0.01, focalLength = 1.0,
+        1000, 600
+    )
     private val rasterizer = Rasterizer(camera)
 
     @BeforeEach
@@ -47,12 +49,7 @@ class RasterizerTest {
         rasterizer.rasterizeTriangle(triangle2, null)
         rasterizer.rasterizeLine(line, null)
 
-        val frame = JFrame()
-        frame.contentPane.setLayout(FlowLayout())
-        frame.contentPane.add(JLabel(ImageIcon(rasterizer.image)))
-        frame.pack()
-        frame.isVisible = true
-        sleep(20000)
+        displayImage(rasterizer.image)
     }
 
     @Test
@@ -66,11 +63,12 @@ class RasterizerTest {
         }
         rasterizer.rasterizeTriangle(
             Triangle(
-                Vertex(Vec(10.0, 20.0, -3.0), Vec.ones*255, Vec.zero),
-                Vertex(Vec(10.0, -20.0, 7.0), Vec.ones*255, Vec.zero),
-                Vertex(Vec(10.0, -35.0, -20.0), Vec.ones*255, Vec.zero)
+                Vertex(Vec(10.0, 20.0, -3.0), Vec.ones * 255, Vec.zero),
+                Vertex(Vec(10.0, -20.0, 7.0), Vec.ones * 255, Vec.zero),
+                Vertex(Vec(10.0, -35.0, -20.0), Vec.ones * 255, Vec.zero)
             ),
-            entity)
+            entity
+        )
         testEntityIsStoredInEachNonBlackPixel(entity)
     }
 
@@ -83,9 +81,9 @@ class RasterizerTest {
 
             override var outlineRasterization: Boolean = false
         }
-        rasterizer.rasterizeCircle(
+        rasterizer.rasterizeSphere(
             Circle(
-                Vertex(Vec(10.0, 0.0, 0.0), Vec.ones*255, Vec.zero),
+                Vertex(Vec(10.0, 0.0, 0.0), Vec.ones * 255, Vec.zero),
                 9.0f
             ),
             entity
@@ -117,5 +115,27 @@ class RasterizerTest {
                 assertEquals(entityButNoPixel.getRGB(x, y), 0)
             }
         }
+    }
+
+    @Test
+    fun testDepthCircle() {
+        rasterizer.rasterizeSphere(
+            Circle(
+                Vertex(10 * camera.lookingDirection, Vec.ones * 255, Vec.zero),
+                9.0f
+            ),
+            null
+        )
+        val depthMask = rasterizer.depthMask(null)
+        displayImage(depthMask)
+    }
+
+    fun displayImage(image: BufferedImage) {
+        val frame = JFrame()
+        frame.contentPane.setLayout(FlowLayout())
+        frame.contentPane.add(JLabel(ImageIcon(image)))
+        frame.pack()
+        frame.isVisible = true
+        sleep(2000)
     }
 }

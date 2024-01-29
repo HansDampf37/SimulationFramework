@@ -4,17 +4,21 @@ import algebra.*
 import physics.Meters
 import java.awt.image.BufferedImage
 import java.lang.Math.PI
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sin
 
 /**
  * Projects 3d coordinates into 2d Space with the [project]-method. As opposed to [Graphics3d] the projection
- * is not orthographic. Furthermore, the camera can be placed at arbitrary positions and orientations in space.
+ * is not orthographic. Furthermore, the camera can be placed at arbitrary positions ([x], [y], [z]) and orientations
+ * ([phi], [theta]) in space. This camera implements the pinhole camera model. In this model light is directed through
+ * a hole. Behind this hole is the projection screen. The [focalLength] measures the distance between hole and screen.
+ * Points in the world coordinate system are first translated and rotated in the camera coordinate system.
+ * These points are then projected onto the screen through the hole.
  * Further material: [Lecture about Camera transformation](https://www.cse.psu.edu/~rtc12/CSE486/lecture12.pdf),
  * [Lecture 2](https://www.cse.psu.edu/~rtc12/CSE486/lecture13.pdf),
- * [Rotation Matrices](https://en.wikipedia.org/wiki/Rotation_matrix)
- * [maybe useful](https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula#Matrix_notation)
- * [phi] describes the ccw rotation around the z-axis from the x-axis from above.
- * [theta] describes the rotation around the [left]-vector from the z-axis from down (-PI / 2) to up (PI / 2).
+ * [Rotation matrices](https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula#Matrix_notation)
  * If [phi] and [theta] are both zero the camera should point at down at (0, 0, 1), the [up] vector should be (0, 1, 0)
  * and the [left] vector should point at (1, 0, 0)
  * @param x position coordinate
@@ -26,33 +30,42 @@ import kotlin.math.*
  */
 class Camera(
     x: Double, y: Double, z: Double,
-    zoomX: Double, zoomY: Double,
-    focalLength: Double,
-    screenWidth: Int,
-    screenHeight: Int,
+    phi: Double = 0.0, theta: Double = 0.0,
+    zoom: Double, focalLength: Double,
+    screenWidth: Int, screenHeight: Int,
 ) : Point3d(x, y, z) {
-    init {
-        if (zoomX <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
-        if (zoomY <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
-        if (focalLength <= 0.0) throw IllegalArgumentException("Focal length must be > 0")
-    }
+
+    constructor(
+        position: Vec,
+        phi: Double = 0.0, theta: Double = 0.0,
+        zoom: Double, focalLength: Double,
+        screenWidth: Int, screenHeight: Int
+    ) : this(
+        position.x, position.y, position.z, phi, theta, zoom, focalLength, screenWidth, screenHeight
+    )
 
     @WatchFloat("Speed", 0f, 10f)
     private val movementSpeed: Double = 5.0
     private val turningSpeed: Double = 5.0
 
+    /**
+     *  [phi] describes the ccw rotation around the z-axis from the x-axis from above.
+     */
     @WatchDouble("Φ", -2 * PI, 2 * PI)
-    var phi: Double = 0.0
+    var phi: Double = phi
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    @WatchDouble("θ",-PI/2, PI/2)
-    var theta: Double = 0.0
+    /**
+     * [theta] describes the rotation around the [left]-vector from the z-axis from down (-PI / 2) to up (PI / 2).
+     */
+    @WatchDouble("θ", 0.0, PI)
+    var theta: Double = theta
         set(value) {
             projectionMatrixIsValid = false
-            field = min(PI/2, max(-PI/2, value))
+            field = min(PI, max(0.0, value))
         }
 
     @WatchDouble("X", -100.0, 100.0)
@@ -76,13 +89,13 @@ class Camera(
             field = value
         }
 
-    private var zoomX: Double = zoomX
+    private var zoomX: Double = zoom
         set(value) {
             projectionMatrixIsValid = false
             field = value
         }
 
-    private var zoomY: Double = zoomY
+    private var zoomY: Double = zoom
         set(value) {
             projectionMatrixIsValid = false
             field = value
@@ -131,6 +144,11 @@ class Camera(
             zoomY = value
         }
 
+    init {
+        if (zoom <= 0.0) throw IllegalArgumentException("Zoom must be > 0")
+        if (focalLength <= 0.0) throw IllegalArgumentException("Focal length must be > 0")
+    }
+
     private val translationMatrix4x4
         get() = Matrix4X4(
             1.0, 0.0, 0.0, -x,
@@ -156,12 +174,6 @@ class Camera(
             return I + k * sin(phi) + k * k * (1 - cos(phi))
         }
 
-    private val matrixPhiInv: Matrix4X4
-        get() = matrixPhi.transpose()
-
-    private val matrixThetaInv: Matrix4X4
-        get() = matrixTheta.transpose()
-
     private val matrixTheta: Matrix4X4
         get() {
             // as we apply this transformation first, we rotate around the x-axis.
@@ -180,6 +192,12 @@ class Camera(
             return I + k * sin(theta) + k * k * (1 - cos(theta))
         }
 
+    private val matrixPhiInv: Matrix4X4
+        get() = matrixPhi.transpose()
+
+    private val matrixThetaInv: Matrix4X4
+        get() = matrixTheta.transpose()
+
     /**
      * Maps a vector in the camera coordinate system to pixel coordinates
      */
@@ -190,6 +208,10 @@ class Camera(
             0.0, 0.0, 1.0, 0.0
         )
 
+    /**
+     * This variable is true if and only if all relevant properties
+     * of the camera have not changed, since the last calculation of the [projectionMatrix].
+     */
     private var projectionMatrixIsValid = false
 
     /**
@@ -225,6 +247,9 @@ class Camera(
     fun moveDown(dt: Double = 1.0) = move(-up, dt)
     fun moveLeft(dt: Double = 1.0) = move(left, dt)
     fun moveRight(dt: Double = 1.0) = move(-left, dt)
+    private fun move(direction: Vec, dt: Double) {
+        add(direction.normalize() * movementSpeed * dt)
+    }
 
     fun turn(dif: Vec2, dt: Double = 1.0) {
         val turnUp = dif.y * dt * turningSpeed
@@ -232,10 +257,6 @@ class Camera(
         phi += turnRight
         theta += turnUp
 
-    }
-
-    private fun move(direction: Vec, dt: Double) {
-        add(direction.normalize() * movementSpeed * dt)
     }
 
     /**
@@ -300,7 +321,7 @@ class Camera(
      * @param entity the entity to register on each of the drawn pixels
      */
     fun renderSphere(v1: Vertex, radius: Float, entity: Entity? = null) =
-        rasterizer.rasterizeCircle(Circle(v1, radius), entity)
+        rasterizer.rasterizeSphere(Circle(v1, radius), entity)
 
     /**
      * Draws a triangle-strip on the [image] and registers the entity on each pixel that is filled.

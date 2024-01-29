@@ -25,8 +25,9 @@ abstract class Simulation(
     private var running = false
     protected val display: Display = Display(title)
     protected var camera = Camera(
-        0.0, 2.0, 0.0,
-        1.0, 1.0, 1.0,
+        x = 0.0, y = 0.0, z = 0.0,
+        phi = 0.0, theta = 0.0,
+        zoom = 1.0, focalLength = 1.0,
         display.getWidth(), display.getHeight()
     )
 
