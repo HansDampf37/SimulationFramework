@@ -2,6 +2,7 @@ package framework
 
 import algebra.Vec
 import algebra.Vec2
+import algebra.Vec4
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.*
@@ -213,7 +214,9 @@ class Rasterizer(val camera: Camera) {
                 val normal = sphereCenterToSurface.normalize()
 
                 // Simple shading: Use dot product with light direction
-                val shadingFactor = maxOf(0.0, normal * Vec(0.0, 0.0, 1.0))
+                val lightDirHom = (camera.rotateCameraToWorld * Vec4(0.0, 0.0, -1.0, 1.0))
+                val lightDir = Vec(lightDirHom.x, lightDirHom.y, lightDirHom.z)
+                val shadingFactor = 0.3 + 0.7 * maxOf(0.0, normal * lightDir)
 
                 InterpolationResult(
                     inPrimitive = true,

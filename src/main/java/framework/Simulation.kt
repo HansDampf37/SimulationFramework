@@ -20,15 +20,18 @@ abstract class Simulation(
 ) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
     private var speed = 1.0
-    private var running = false
-
-    protected var camera = Camera()
     protected var drawer: Graphics3d = Graphics3d()
-
+    private var running = false
     protected val keyManager = KeyManager()
-    private val mouseManager = MouseManager(camera)
-
     protected val display: Display = Display(title, keyManager = keyManager)
+
+    protected var camera = Camera(
+        x = 0.0, y = 0.0, z = 0.0,
+        phi = 0.0, theta = 0.0,
+        zoom = 1.0, focalLength = 1.0,
+        display.getWidth(), display.getHeight()
+    )
+    private val mouseManager = MouseManager(camera)
 
     init {
         display.window.addKeyListener(keyManager)

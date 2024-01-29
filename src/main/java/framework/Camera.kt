@@ -205,7 +205,7 @@ class Camera(
             return matrixPhi * matrixTheta
         }
 
-    private val rotateCameraToWorld: Matrix4X4
+    val rotateCameraToWorld: Matrix4X4
         get() {
             return matrixThetaInv * matrixPhiInv
         }
