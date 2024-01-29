@@ -65,7 +65,7 @@ abstract class Simulation(
                 initializeRendering()
                 delta--
                 lastTime = now
-                println("running")
+                //println("running")
             }
         }
         stop()

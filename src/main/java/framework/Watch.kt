@@ -94,7 +94,11 @@ class WatchedFloat(displayName: String, field: Field, obj: Any, min: Float, max:
     WatchedNumber<Float>(displayName, field, obj, min, max)
 
 class WatchedInt(displayName: String, field: Field, obj: Any, min: Int, max: Int) :
-    WatchedNumber<Int>(displayName, field, obj, min, max)
+    WatchedNumber<Int>(displayName, field, obj, min, max) {
+    override fun set(value: Int) {
+        super.set(value)
+    }
+}
 
 class WatchedString(displayName: String, field: Field, obj: Any) :
     WatchedField<String, JLabel, JTextField>(displayName, field, obj) {

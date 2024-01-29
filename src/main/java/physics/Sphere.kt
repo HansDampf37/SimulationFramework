@@ -17,7 +17,7 @@ open class Sphere(
     var radius: Double, mass: Double): Mass(mass, x, y, z) {
     override var outlineRasterization: Boolean = false
 
-    val color: Vec = Vec.random * 255
+    override var color: Vec? = Vec.random * 255
 
     fun testForCollision(other: Sphere): Boolean {
         return this.getDistanceTo(other) < this.radius + other.radius
@@ -28,7 +28,7 @@ open class Sphere(
     }
 
     override fun render(camera: Camera) {
-        camera.renderSphere(Vertex(this.positionVector, color, Vec.zero), radius.toFloat(), this)
+        camera.renderSphere(Vertex(this.positionVector, color ?: Vec.zero, Vec.zero), radius.toFloat(), this)
     }
 
     fun renderStrip(cam: Camera) {
@@ -54,7 +54,7 @@ open class Sphere(
                     )
                     val n1 = v1 - this.positionVector
                     val shadingFactor1 = maxOf(0.0, n1 * Vec(0.0, 0.0, 1.0))
-                    Vertex(v1, color * shadingFactor1, n1)
+                    Vertex(v1, (color?:Vec.zero) * shadingFactor1, n1)
                 }
 
                 vertices.add(tempVertices[0])

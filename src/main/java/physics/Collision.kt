@@ -16,7 +16,7 @@ class Collision {
          * @return energy transmitted in the collision
          */
         fun occur(mass1: Mass, mass2: Mass, k: Double = 1.0): Double {
-            val dir = mass1.getDirectionTo(mass2)
+            val dir = mass2.positionVector - mass1.positionVector
             if (dir.length == 0.0) return 0.0
             val v1 = mass1.velocity.projectOnto(dir)
             val v2 = mass2.velocity.projectOnto(dir)

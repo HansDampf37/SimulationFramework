@@ -1,5 +1,6 @@
 package framework
 
+import algebra.Vec
 import physics.Seconds
 
 /**
@@ -25,4 +26,6 @@ interface Entity {
      * Weather or not the entity should be outlined when drawn
      */
     var outlineRasterization: Boolean
+
+    var color: Vec?
 }

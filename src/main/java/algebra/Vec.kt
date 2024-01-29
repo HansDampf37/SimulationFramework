@@ -33,6 +33,16 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
     }
 
     /**
+     * Returns the result of the subtraction v - s. The returned vector is safe to use.
+     *
+     * @param s other vector
+     * @return v - s
+     */
+    operator fun minus(s: Number): Vec {
+        return Vec(x - s.toFloat(), y - s.toFloat(), z - s.toFloat())
+    }
+
+    /**
      * Returns the result of the scalar multiplication v * scalar without changing v. The returned vector is safe to use.
      * @param scalar factor
      * @return the result of the scalar multiplication v * scalar

@@ -15,16 +15,18 @@ abstract class MassSimulation<T : Mass>(
     private var affectedByGravity = HashMap<T, Boolean>()
 
     fun addNewMass(mass: T, affectedByGravity: Boolean) {
-        masses.add(mass)
+        synchronized(masses) { masses.add(mass) }
         this.affectedByGravity[mass] = affectedByGravity
     }
 
     override fun tick(dt: Seconds) {
         calcForces(dt)
-        for (mass in masses) {
-            mass.tick(dt)
-            if (affectedByGravity[mass]!!) mass.accelerate(gravity)
-            mass.velocity = mass.velocity.scaleInPlace((1-frictionPerSecond * dt))
+        synchronized(masses) {
+            for (mass in masses) {
+                mass.tick(dt)
+                if (affectedByGravity[mass]!!) mass.accelerate(gravity)
+                mass.velocity = mass.velocity.scaleInPlace((1 - frictionPerSecond * dt))
+            }
         }
     }
 

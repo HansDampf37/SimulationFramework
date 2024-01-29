@@ -13,7 +13,7 @@ abstract class Connection(
     protected val maxEnergy: Double,
     var broken: Boolean = false
 ) : Entity {
-    val color = 255 * Vec.random
+    override var color: Vec? = null
 
     abstract override fun tick(dt: Seconds)
 
@@ -22,8 +22,8 @@ abstract class Connection(
     }
 
     override fun render(camera: Camera) {
-        val v1 = Vertex(m1.positionVector, color, Vec.zero)
-        val v2 = Vertex(m2.positionVector, color, Vec.zero)
+        val v1 = Vertex(m1.positionVector, m1.color ?: Vec.zero, Vec.zero)
+        val v2 = Vertex(m2.positionVector, m2.color ?: Vec.zero, Vec.zero)
         camera.renderLine(v1, v2, this)
     }
 }
