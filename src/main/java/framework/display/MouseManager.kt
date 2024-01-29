@@ -1,6 +1,5 @@
 package framework.display
 
-import algebra.Vec2
 import framework.Camera
 import framework.Entity
 import java.awt.event.MouseEvent
@@ -11,6 +10,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private var mouseX: Int = -1
     private var mouseY: Int = -1
     private var lastHoveredEntity: Entity? = null
+    private var draggedEntity: Entity? = null
 
     fun tick() {
         if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
@@ -29,7 +29,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     }
 
     override fun mouseDragged(e: MouseEvent?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun mouseClicked(e: MouseEvent?) {
@@ -37,11 +37,12 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     }
 
     override fun mousePressed(e: MouseEvent?) {
-        TODO("Not yet implemented")
+        if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
+        draggedEntity = camera.getEntityAt(mouseX, mouseY)
     }
 
     override fun mouseReleased(e: MouseEvent?) {
-        TODO("Not yet implemented")
+        draggedEntity = null
     }
 
     override fun mouseEntered(e: MouseEvent?) {

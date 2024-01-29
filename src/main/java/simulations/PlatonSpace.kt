@@ -1,10 +1,9 @@
 package simulations
 
-import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
-import framework.display.KeyManager
+import framework.Simulation
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -13,7 +12,7 @@ import kotlin.math.pow
 /**
  * Simulation that simulated points that are repelling each other yet can not leave the surface of a sphere.
  */
-@SuppressWarnings("unused")
+@Suppress("unused")
 class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
     private lateinit var points: Array<Point3d>
     private lateinit var forces: Array<Vec>
@@ -35,7 +34,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
     fun render(g: Graphics) {
         coordSys.render(drawer, g)
         drawPoints(g)
-        if (KeyManager.f) drawForces(g)
+        if (keyManager.f) drawForces(g)
     }
 
     override fun render() {

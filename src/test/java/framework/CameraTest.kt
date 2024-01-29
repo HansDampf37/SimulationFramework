@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.math.PI
 import kotlin.math.abs
 
 class CameraTest {
@@ -143,6 +142,7 @@ class CameraTest {
         assertEquals(Vec(1,0,0), camera.left)
     }
 
+    @Suppress("unused")
     private fun assertAlmostEquals(a: Double, b: Double, eps: Double) {
         assertTrue(abs(a - b) < eps, "Expected $a does not equal actual $b")
     }

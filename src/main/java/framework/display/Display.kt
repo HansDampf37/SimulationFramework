@@ -2,11 +2,13 @@ package framework.display
 
 import com.formdev.flatlaf.FlatDarculaLaf
 import framework.WatchedField
-import java.awt.*
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
+import java.awt.BorderLayout
+import java.awt.Canvas
+import java.awt.Dimension
+import java.awt.Font
 import java.text.NumberFormat
-import javax.swing.*
+import javax.swing.JFrame
+import javax.swing.WindowConstants
 
 
 class Display(
@@ -14,6 +16,7 @@ class Display(
     height: Int = 1000,
     width: Int = 1600,
     controlWidth: Int = 500,
+    keyManager: KeyManager
 ) {
     val window: JFrame = JFrame(title)
     val canvas: Canvas
@@ -33,7 +36,7 @@ class Display(
         canvas.setPreferredSize(Dimension(width - controlWidth, height))
         canvas.setMaximumSize(Dimension(width, height))
         canvas.setMinimumSize(Dimension(width - controlWidth, height))
-        canvas.addKeyListener(KeyManager)
+        canvas.addKeyListener(keyManager)
         window.add(canvas, BorderLayout.WEST)
 
         controls = ControlPanel(controlWidth, height)

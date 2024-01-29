@@ -130,7 +130,7 @@ class RasterizerTest {
         displayImage(depthMask)
     }
 
-    fun displayImage(image: BufferedImage) {
+    private fun displayImage(image: BufferedImage) {
         val frame = JFrame()
         frame.contentPane.setLayout(FlowLayout())
         frame.contentPane.add(JLabel(ImageIcon(image)))

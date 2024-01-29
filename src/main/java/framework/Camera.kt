@@ -29,10 +29,10 @@ import kotlin.math.sin
  * @param screenHeight resolution of projection plane
  */
 class Camera(
-    x: Double, y: Double, z: Double,
+    x: Double = 0.0, y: Double = 0.0, z: Double = 0.0,
     phi: Double = 0.0, theta: Double = 0.0,
-    zoom: Double, focalLength: Double,
-    screenWidth: Int, screenHeight: Int,
+    zoom: Double = 1.0, focalLength: Double = 1.0,
+    screenWidth: Int = 100, screenHeight: Int = 100,
 ) : Point3d(x, y, z) {
 
     constructor(
@@ -49,7 +49,7 @@ class Camera(
     private val turningSpeed: Double = 5.0
 
     /**
-     *  [phi] describes the ccw rotation around the z-axis from the x-axis from above.
+     * [phi] describes the ccw rotation around the z-axis from the x-axis from above.
      */
     @WatchDouble("Φ", -2 * PI, 2 * PI)
     var phi: Double = phi
@@ -149,11 +149,19 @@ class Camera(
         if (focalLength <= 0.0) throw IllegalArgumentException("Focal length must be > 0")
     }
 
-    private val translationMatrix4x4
+    private val translateWorldToCamera
         get() = Matrix4X4(
             1.0, 0.0, 0.0, -x,
             0.0, 1.0, 0.0, -y,
             0.0, 0.0, 1.0, -z,
+            0.0, 0.0, 0.0, 1.0
+        )
+
+    private val translateCameraToWorld
+        get() = Matrix4X4(
+            1.0, 0.0, 0.0, x,
+            0.0, 1.0, 0.0, y,
+            0.0, 0.0, 1.0, z,
             0.0, 0.0, 0.0, 1.0
         )
 
@@ -192,6 +200,16 @@ class Camera(
             return I + k * sin(theta) + k * k * (1 - cos(theta))
         }
 
+    private val rotateWorldToCamera: Matrix4X4
+        get() {
+            return matrixPhi * matrixTheta
+        }
+
+    private val rotateCameraToWorld: Matrix4X4
+        get() {
+            return matrixThetaInv * matrixPhiInv
+        }
+
     private val matrixPhiInv: Matrix4X4
         get() = matrixPhi.transpose()
 
@@ -208,6 +226,12 @@ class Camera(
             0.0, 0.0, 1.0, 0.0
         )
 
+    private val worldToCameraCoords
+        get() = rotateWorldToCamera * translateWorldToCamera
+
+    private val cameraToWorldCoords
+        get() = translateCameraToWorld * rotateCameraToWorld
+
     /**
      * This variable is true if and only if all relevant properties
      * of the camera have not changed, since the last calculation of the [projectionMatrix].
@@ -216,17 +240,17 @@ class Camera(
 
     /**
      * Map world coordinates to pixel coordinates:
-     * 1. translate vector with the [translationMatrix4x4]
+     * 1. translate vector with the [translateWorldToCamera]
      * 2. rotate around the [left] vector for [theta] with [matrixTheta]
      * 3. rotate around the z-axis for [phi] with [matrixPhi]
      * 4. map camera to pixel coordinates with [cameraToPixelCoords]
      * This matrix is cached in [projectionMatrix] meaning that if the camera position or rotation is not
      * changed this matrix is not recalculated but used again.
      */
-    private var projectionMatrix: Matrix3x4 = cameraToPixelCoords * matrixPhi * matrixTheta * translationMatrix4x4
+    private var projectionMatrix: Matrix3x4 = cameraToPixelCoords * worldToCameraCoords
         get() {
             if (!projectionMatrixIsValid) {
-                projectionMatrix = cameraToPixelCoords * matrixPhi * matrixTheta * translationMatrix4x4
+                projectionMatrix = cameraToPixelCoords * worldToCameraCoords
                 projectionMatrixIsValid = true
             }
             return field

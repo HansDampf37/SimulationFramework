@@ -5,7 +5,6 @@ import framework.display.KeyManager
 import framework.display.MouseManager
 import physics.Seconds
 import java.awt.Color
-import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 
@@ -21,18 +20,15 @@ abstract class Simulation(
 ) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
     private var speed = 1.0
-    protected var drawer: Graphics3d = Graphics3d()
     private var running = false
-    protected val display: Display = Display(title)
-    protected var camera = Camera(
-        x = 0.0, y = 0.0, z = 0.0,
-        phi = 0.0, theta = 0.0,
-        zoom = 1.0, focalLength = 1.0,
-        display.getWidth(), display.getHeight()
-    )
 
+    protected var camera = Camera()
+    protected var drawer: Graphics3d = Graphics3d()
+
+    protected val keyManager = KeyManager()
     private val mouseManager = MouseManager(camera)
-    private val keyManager = KeyManager
+
+    protected val display: Display = Display(title, keyManager = keyManager)
 
     init {
         display.window.addKeyListener(keyManager)

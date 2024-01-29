@@ -1,15 +1,14 @@
 package simulations
 
-import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
-import framework.display.KeyManager
+import framework.Simulation
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
-@SuppressWarnings("unused")
+@Suppress("unused")
 class Pendulum(private val amountOfPoints: Int) : Simulation("Pendulum") {
     private var cart = CartesianCoordinateSystem(true, 500, 500.0, Color.black)
     private val maxRopeSegmentLength = 10000
@@ -37,10 +36,10 @@ class Pendulum(private val amountOfPoints: Int) : Simulation("Pendulum") {
 
     private val input: Unit
         get() {
-            if (KeyManager.up) forces[0] = Vec(10.0, 0.0, 0.0)
-            if (KeyManager.down) forces[0] = Vec(-10.0, 0.0, 0.0)
-            if (KeyManager.left) forces[0] = Vec(0.0, 0.0, 10.0)
-            if (KeyManager.right) forces[0] = Vec(0.0, 0.0, -10.0)
+            if (keyManager.up) forces[0] = Vec(10.0, 0.0, 0.0)
+            if (keyManager.down) forces[0] = Vec(-10.0, 0.0, 0.0)
+            if (keyManager.left) forces[0] = Vec(0.0, 0.0, 10.0)
+            if (keyManager.right) forces[0] = Vec(0.0, 0.0, -10.0)
         }
 
     private fun airResist() {

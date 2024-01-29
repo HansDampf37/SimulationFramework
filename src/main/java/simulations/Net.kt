@@ -1,11 +1,10 @@
 package simulations
 
-import framework.Simulation
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
+import framework.Simulation
 import framework.Vertex
-import framework.display.KeyManager
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -59,16 +58,16 @@ class Net : Simulation("Net") {
 
     private val input: Unit
         get() {
-            if (KeyManager.f) {
+            if (keyManager.f) {
                 moveEdge(Vec(0.0, 100.0, 0.0))
             }
-            if (KeyManager.g) {
+            if (keyManager.g) {
                 moveEdge(Vec(0.0, -100.0, 0.0))
             }
-            if (KeyManager.v) {
+            if (keyManager.v) {
                 moveEdge(Vec(100.0, 0.0, 0.0))
             }
-            if (KeyManager.b) {
+            if (keyManager.b) {
                 moveEdge(Vec(-100.0, 0.0, 0.0))
             }
         }
