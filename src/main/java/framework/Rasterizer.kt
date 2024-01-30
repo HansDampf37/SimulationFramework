@@ -301,7 +301,7 @@ class Rasterizer(val camera: Camera) {
      */
     fun newFrame() {
         val graphics = image.graphics
-        graphics.color = Color.BLACK
+        graphics.color = Conf.background_color
         graphics.fillRect(0, 0, image.width, image.height)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
         Arrays.fill(entityPuffer, null) // reset entity puffer with null

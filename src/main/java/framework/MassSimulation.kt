@@ -28,7 +28,10 @@ abstract class MassSimulation<T : Mass>(
                 mass.velocity = mass.velocity.scaleInPlace((1 - frictionPerSecond * dt))
             }
         }
+        correct()
     }
+
+    abstract fun correct()
 
     abstract fun calcForces(dt: Seconds)
 }

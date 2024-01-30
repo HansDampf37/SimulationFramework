@@ -17,7 +17,7 @@ open class Sphere(
     var radius: Double, mass: Double): Mass(mass, x, y, z) {
     override var outlineRasterization: Boolean = false
 
-    override var color: Vec? = Vec.random * 255
+    override var color: Vec? = Conf.mass_color
 
     fun testForCollision(other: Sphere): Boolean {
         return this.getDistanceTo(other) < this.radius + other.radius

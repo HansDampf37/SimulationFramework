@@ -43,7 +43,18 @@ abstract class Simulation(
      * triggers [Simulation.render] on every simulation at a given frequency.
      * triggers [Simulation.tick] as often as possible
      */
-    private val tickAndRender = Runnable {
+    private val tickJob = Runnable {
+        var lastTime = System.currentTimeMillis()
+        while (running) {
+            val now = System.currentTimeMillis()
+            val dt: Seconds = (now - lastTime) / 1000.0
+            tick(dt * speed)
+            lastTime = now
+        }
+        stop()
+    }
+
+    private val renderJob = Runnable {
         val watchedFields = collectWatchedFields(listOf(this, camera))
         display.setWatchedFields(watchedFields)
         var lastTime = System.currentTimeMillis()
@@ -54,9 +65,7 @@ abstract class Simulation(
 
             // always tick
             val dt: Seconds = (now - lastTime) / 1000.0
-            tick(dt * speed)
             delta += (now - lastTime) / msPerTick
-
             // render to reach fps goal
             if (delta >= 1) {
                 keyManager.tick()
@@ -71,7 +80,8 @@ abstract class Simulation(
         stop()
     }
 
-    private var threadTickingAndRendering: Thread = Thread(tickAndRender)
+    private var tickingThread: Thread = Thread(tickJob)
+    private var renderingThread: Thread = Thread(renderJob)
 
     private fun listenForInput(dt: Seconds) {
         if (keyManager.w) drawer.moveVerticalCamera(dt)
@@ -134,7 +144,8 @@ abstract class Simulation(
     override fun start() {
         if (running) return
         running = true
-        threadTickingAndRendering.start()
+        tickingThread.start()
+        renderingThread.start()
     }
 
     @Synchronized
@@ -142,7 +153,8 @@ abstract class Simulation(
         if (!running) return
         running = false
         try {
-            threadTickingAndRendering.join()
+            tickingThread.join()
+            renderingThread.join()
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }

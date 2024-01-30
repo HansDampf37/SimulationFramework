@@ -172,6 +172,10 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
         return acos(vec * this / (vec.length * this.length))
     }
 
+    fun removeComponentParallelTo(direction: Vec): Vec {
+        return this - projectOnto(direction)
+    }
+
     companion object{
         val ones = Vec(1.0, 1.0, 1.0)
         val zero = Vec(0.0,0.0,0.0)

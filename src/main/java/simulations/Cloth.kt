@@ -15,6 +15,10 @@ import kotlin.math.PI
  */
 @SuppressWarnings("unused")
 class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
+    override fun correct() {
+        TODO("Not yet implemented")
+    }
+
     @WatchInt("Size", 1, 20)
     private var size: Int = size
         set(value) {
@@ -92,7 +96,7 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
                 for (z in 0 until size) {
                     val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
                     val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
-                    mass.color = Vec(245, 245 ,220) + (Vec.random * 20) - 10
+                    mass.color = Conf.mass_color + (Vec.random * 20) - 10
                     addNewMass(mass, !isOnEdge)
                     masses.last().status = if (isOnEdge) Mass.Status.Immovable else Mass.Status.Movable
                 }

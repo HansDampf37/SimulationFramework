@@ -55,14 +55,14 @@ class ImpulseConnection(
             if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
                 m1.applyForce(force)
                 m2.applyForce(-force)
-                //m1.set(m1 + ropeDir * delta)
-                //m2.set(m2 - ropeDir * delta)
+                m1.set(m1 + ropeDir * delta)
+                m2.set(m2 - ropeDir * delta)
             } else if (m2.status == Mass.Status.Movable) {
                 m2.applyForce(-force)
-                //m2.set(m1 + ropeDir * maxDistance)
+                m2.set(m1 + ropeDir * maxDistance)
             } else if (m1.status == Mass.Status.Movable) {
                 m1.applyForce(force)
-                //m1.set(m2 - ropeDir * maxDistance)
+                m1.set(m2 - ropeDir * maxDistance)
             }
         }
     }
