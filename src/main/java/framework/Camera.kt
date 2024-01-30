@@ -226,6 +226,11 @@ class Camera(
             0.0, 0.0, 1.0, 0.0
         )
 
+    fun pixelToCameraCoords(x: Int, y: Int, planeDist: Double) {
+
+    }
+
+
     private val worldToCameraCoords
         get() = rotateWorldToCamera * translateWorldToCamera
 

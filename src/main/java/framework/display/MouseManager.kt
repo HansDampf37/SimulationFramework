@@ -69,7 +69,10 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private fun onMouseDragged(e: MouseEvent, dt: Double) {
         val dx = e.x - lastDragX!!
         val dy = e.y - lastDragY!!
-        val s = camera.zoom / (camera.getDistanceTo(draggedEntity as Sphere) * camera.focalLength)
+        val sphere = draggedEntity as Sphere
+        val cosAlpha = camera.lookingDirection * camera.getDirectionTo(sphere)
+        val z = cosAlpha * camera.getDistanceTo(sphere)
+        val s = camera.zoom / (camera.focalLength) * z
         val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
         val w = camera.rotateCameraToWorld * v
         (draggedEntity as Sphere).set((draggedEntity as Sphere).positionVector - w)
