@@ -55,11 +55,13 @@ class Pend(
 
     override fun correct() {
         synchronized(masses) {
-            masses.forEachIndexed { i, mass ->
-                if (i != 0) {
-                    if (connections[i - 1].broken) return
-                    if (mass.getDistanceTo(masses[i - 1]) >= maxRopeSegmentLength) {
-                        mass.set(masses[i - 1].positionVector + masses[i - 1].getDirectionTo(mass) * maxRopeSegmentLength)
+            synchronized(connections) {
+                masses.forEachIndexed { i, mass ->
+                    if (i != 0) {
+                        if (connections[i - 1].broken) return
+                        if (mass.getDistanceTo(masses[i - 1]) >= maxRopeSegmentLength) {
+                            mass.set(masses[i - 1].positionVector + masses[i - 1].getDirectionTo(mass) * maxRopeSegmentLength)
+                        }
                     }
                 }
             }
@@ -107,7 +109,7 @@ class Pend(
         camera.x = 0.0
         camera.y = -25.0
         camera.z = -length / 2
-        camera.theta = PI/2
+        camera.theta = PI / 2
         camera.phi = PI
         camera.focalLength = 10.0
         camera.zoom = 0.001
