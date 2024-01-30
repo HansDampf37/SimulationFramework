@@ -69,7 +69,7 @@ abstract class Simulation(
             // render to reach fps goal
             if (delta >= 1) {
                 keyManager.tick()
-                mouseManager.tick()
+                mouseManager.tick(dt)
                 listenForInput(dt)
                 initializeRendering()
                 delta--
