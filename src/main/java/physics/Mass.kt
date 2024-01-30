@@ -13,10 +13,17 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     override var outlineRasterization: Boolean = false
     override var color: Vec? = Conf.mass_color
 
-    var velocity: Vec
+    override var velocity: Vec = Vec(0,0,0)
     private val acceleration: Vec
     val mass: Double
     var status = Status.Movable
+    override var position: Vec
+        get() = positionVector
+        set(value) {
+            x = value.x
+            y = value.y
+            z = value.z
+        }
 
     init {
         require(mass != 0.0) { "Mass can't be equal to 0" }
@@ -24,8 +31,8 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
         acceleration = Vec(0.0, 0.0, 0.0)
         this.mass = mass
     }
-
     constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)
+
     constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
 
     override fun tick(dt: Seconds) {

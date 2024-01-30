@@ -29,8 +29,17 @@ open class Point3d(open var x: Double, open var y: Double, open var z: Double) {
         return result.normalize()
     }
 
+    fun getDirectionToPointAt(other: Vec): Vec {
+        val result = positionVector - other
+        return result.normalize()
+    }
+
     fun getDistanceTo(other: Point3d): Double {
         return getConnectingVectorTo(other).length
+    }
+
+    fun getDistanceToPointAt(other: Vec): Double {
+        return (positionVector - other).length
     }
 
     val positionVector: Vec

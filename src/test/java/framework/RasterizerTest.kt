@@ -1,5 +1,6 @@
 package framework
 
+import algebra.Point3d
 import algebra.Vec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -60,6 +61,8 @@ class RasterizerTest {
             override fun render(camera: Camera) = Unit
 
             override var outlineRasterization: Boolean = false
+            override var position: Vec = Vec(0.0, 0.0, 0.0)
+            override var color: Vec? = Vec(0, 0, 0)
         }
         rasterizer.rasterizeTriangle(
             Triangle(
@@ -80,6 +83,8 @@ class RasterizerTest {
             override fun render(camera: Camera) = Unit
 
             override var outlineRasterization: Boolean = false
+            override var position: Vec = Vec(0.0, 0.0, 0.0)
+            override var color: Vec? = Vec(0, 0, 0)
         }
         rasterizer.rasterizeSphere(
             Circle(

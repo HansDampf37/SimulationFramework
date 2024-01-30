@@ -1,5 +1,6 @@
 package framework
 
+import algebra.Point3d
 import algebra.Vec
 import physics.Seconds
 
@@ -23,9 +24,18 @@ interface Entity {
     fun render(camera: Camera)
 
     /**
+     * The entities anchor position
+     */
+    var position: Vec
+
+    /**
+     * The velocity in space
+     */
+    var velocity: Vec
+
+    /**
      * Weather or not the entity should be outlined when drawn
      */
     var outlineRasterization: Boolean
-
     var color: Vec?
 }

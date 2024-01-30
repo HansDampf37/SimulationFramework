@@ -7,11 +7,11 @@ import physics.Sphere
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
-import java.lang.reflect.Array
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
-    private val eventQueue: MutableList<MouseEvent> = ArrayList()
+    private val eventQueue: Queue<MouseEvent> = ConcurrentLinkedQueue()
     private var mouseX: Int = -1
     private var mouseY: Int = -1
     private var lastDragX: Int? = null
@@ -19,13 +19,13 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private var lastHoveredEntity: Entity? = null
     private var draggedEntity: Entity? = null
 
-    @Synchronized private fun addEvent(e: MouseEvent) {
+    private fun addEvent(e: MouseEvent) {
         eventQueue.add(e)
     }
 
     fun tick(dt: Double) {
         while(eventQueue.isNotEmpty()) {
-            val event = eventQueue.removeFirst()
+            val event = eventQueue.poll()
             when (event.id) {
                 MouseEvent.MOUSE_MOVED -> onMouseMoved(event)
                 MouseEvent.MOUSE_CLICKED -> onMouseClicked(event)
@@ -34,7 +34,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
                 MouseEvent.MOUSE_DRAGGED -> onMouseDragged(event, dt)
                 MouseEvent.MOUSE_ENTERED -> Unit
                 MouseEvent.MOUSE_EXITED -> Unit
-                else -> TODO("Not implemented")
+                else -> TODO("${event.id} not implemented")
             }
         }
     }
@@ -69,15 +69,19 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private fun onMouseDragged(e: MouseEvent, dt: Double) {
         val dx = e.x - lastDragX!!
         val dy = e.y - lastDragY!!
-        val sphere = draggedEntity as Sphere
-        val cosAlpha = camera.lookingDirection * camera.getDirectionTo(sphere)
-        val z = cosAlpha * camera.getDistanceTo(sphere)
-        val s = camera.zoom / (camera.focalLength) * z
-        val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
-        val w = camera.rotateCameraToWorld * v
-        (draggedEntity as Sphere).set((draggedEntity as Sphere).positionVector - w)
-        lastDragX = e.x
-        lastDragY = e.y
+        val ent = draggedEntity
+        if (ent != null) {
+            val position = ent.position
+            val cosAlpha = camera.lookingDirection * camera.getDirectionToPointAt(position)
+            val z = cosAlpha * camera.getDistanceToPointAt(position)
+            val s = camera.zoom / (camera.focalLength) * z
+            val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
+            val w = camera.rotateCameraToWorld * v
+            ent.position += w
+            ent.velocity += w * dt
+            lastDragX = e.x
+            lastDragY = e.y
+        }
     }
 
     //----------------------------------------------------------------------------------
