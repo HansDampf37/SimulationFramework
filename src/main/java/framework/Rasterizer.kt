@@ -163,7 +163,7 @@ class Rasterizer(val camera: Camera) {
         bb.maxY = min((image.height - 1), bb.maxY)
 
         // Iterate over pixels in the bounding box
-        for (y in bb.minY..bb.maxY) {
+        IntRange(bb.minY, bb.maxY).toList().parallelStream().forEach { y ->
             for (x in bb.minX..bb.maxX) {
                 // Check if the current pixel is inside the triangle
                 val interpolation = interpolateDepthColorNormal(
