@@ -3,6 +3,7 @@ package framework.display
 import algebra.Vec4
 import framework.Camera
 import framework.interfaces.Entity
+import framework.interfaces.Status
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -17,6 +18,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private var lastDragY: Int? = null
     private var lastHoveredEntity: Entity? = null
     private var draggedEntity: Entity? = null
+    private var previousMovementStatusOfDraggedObject: Status? = null
 
     private fun addEvent(e: MouseEvent) {
         eventQueue.add(e)
@@ -53,6 +55,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private fun onMouseClicked(e: MouseEvent): Nothing = TODO("implement me")
 
     private fun onMouseReleased(e: MouseEvent) {
+        draggedEntity?.status = previousMovementStatusOfDraggedObject!!
         draggedEntity = null
         lastDragX = null
         lastDragY = null
@@ -61,6 +64,8 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private fun onMousePressed(e: MouseEvent) {
         if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
         draggedEntity = camera.getEntityAt(mouseX, mouseY)
+        previousMovementStatusOfDraggedObject = draggedEntity?.status
+        draggedEntity?.status = Status.Immovable
         lastDragX = e.x
         lastDragY = e.y
     }

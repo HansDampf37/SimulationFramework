@@ -1,5 +1,6 @@
 package physics
 
+import framework.interfaces.Status
 import kotlin.math.pow
 
 /**
@@ -22,7 +23,7 @@ class Collision {
             val v2 = mass2.velocity.projectOnto(dir)
             val v1O = mass1.velocity - v1
             val v2O = mass2.velocity - v2
-            if (listOf(mass1, mass2).all { it.status == Mass.Status.Movable }) {
+            if (listOf(mass1, mass2).all { it.status == Status.Movable }) {
                 val m1: Double = mass1.mass
                 val m2: Double = mass2.mass
                 val v1New = (v1 * m1 + v2 * m2 - (v1 - v2) * m2 * k) / (m1 + m2)
@@ -30,11 +31,11 @@ class Collision {
                 mass1.velocity = v1New + v1O
                 mass2.velocity = v2New + v2O
                 return m1 * m2 / (2 * m1 + 2 * m2) * (v1.length - v2.length).pow(2) * (1-k.pow(2))
-            } else if (mass1.status == Mass.Status.Immovable && mass2.status == Mass.Status.Movable) {
+            } else if (mass1.status == Status.Immovable && mass2.status == Status.Movable) {
                 // if mass 1 is not movable treat it like its mass is infinity
                 mass2.velocity = v1 + (v1 - v2) * k + v2O
                 return (k-1).pow(2)/2 * mass1.mass * (v1.length - v2.length).pow(2)
-            } else if (mass1.status == Mass.Status.Movable && mass2.status == Mass.Status.Immovable) {
+            } else if (mass1.status == Status.Movable && mass2.status == Status.Immovable) {
                 // if mass 2 is not movable treat it like its mass is infinity
                 mass1.velocity = v2 + (v2 - v1) * k + v1O
                 return (k-1).pow(2)/2 * mass2.mass * (v1.length - v2.length).pow(2)

@@ -1,6 +1,7 @@
 package framework.interfaces
 
 import algebra.Vec
+import physics.Mass
 
 /**
  * An entity in the 3-dimensional [ISimulation] has a [position] and a [velocity]. It can be [rendered][render] and
@@ -22,4 +23,10 @@ interface Entity : Tickable, Renderable, Drawable {
      * The acceleration as difference in velocity per second
      */
     var acceleration: Vec
+    var status: Status
+}
+
+enum class Status {
+    Immovable,
+    Movable
 }

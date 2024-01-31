@@ -28,7 +28,5 @@ class JustASphere(): MassSimulation<Sphere>("Sphere") {
         camera.zoom = 0.001
     }
 
-    override fun correct() = Unit
-
     override fun calcForces(dt: Seconds) = Unit
 }

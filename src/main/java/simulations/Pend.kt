@@ -5,6 +5,7 @@ import algebra.Vec
 import framework.MassSimulation
 import framework.WatchDouble
 import framework.WatchInt
+import framework.interfaces.Status
 import physics.*
 import java.awt.Graphics
 import java.lang.Thread.sleep
@@ -28,7 +29,7 @@ class Pend(
                     val pos = masses.last().positionVector - Vec(0, 0, maxRopeSegmentLength * 0.8)
                     val mass = Sphere(pos.x, pos.y, pos.z, 0.25, 1.0)
                     connections.add(ImpulseConnection(masses.last(), mass, maxRopeSegmentLength, 30.0))
-                    addNewMass(mass, true)
+                    addNewMass(mass)
                 }
             }
             Thread {
@@ -53,7 +54,7 @@ class Pend(
         }
     }
 
-    override fun correct() {
+    fun correct() {
         synchronized(masses) {
             synchronized(connections) {
                 masses.forEachIndexed { i, mass ->
@@ -95,10 +96,11 @@ class Pend(
             for (i in 0 until amountOfPoints) {
                 val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
                 val mass = Sphere(pos.x, pos.y, pos.z, 0.025, 1.0)
-                addNewMass(mass, i != 0)
+                if (i == 0) mass.status = Status.Immovable
+                addNewMass(mass)
             }
         }
-        masses[0].status = Mass.Status.Immovable
+        masses[0].status = Status.Immovable
         synchronized(connections) {
             connections.clear()
             for (i in 0 until amountOfPoints - 1) {

@@ -6,6 +6,7 @@ import algebra.Vec
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.Entity
+import framework.interfaces.Status
 
 open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
     // Drawable
@@ -15,6 +16,7 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
     // Entity
     override var velocity: Vec = Vec(0, 0, 0)
     override var acceleration: Vec = Vec(0, 0, 0)
+    override var status = Status.Movable
     override var position: Vec
         get() = positionVector
         set(value) {
@@ -25,7 +27,6 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
 
     // Mass
     val mass: Double
-    var status = Status.Movable
 
     init {
         require(mass != 0.0) { "Mass can't be equal to 0" }
@@ -68,10 +69,4 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
 
     val impulse: Vec
         get() = velocity * mass
-
-
-    enum class Status {
-        Immovable,
-        Movable
-    }
 }

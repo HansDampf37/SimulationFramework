@@ -4,6 +4,7 @@ import algebra.Vec
 import framework.*
 import framework.interfaces.Drawable
 import framework.interfaces.Renderable
+import framework.interfaces.Status
 import framework.interfaces.Tickable
 import physics.Collision.Companion.occur
 import java.awt.Color
@@ -55,15 +56,15 @@ class ImpulseConnection(
                 broken = true
                 return
             }
-            if (m1.status == Mass.Status.Movable && m2.status == Mass.Status.Movable) {
+            if (m1.status == Status.Movable && m2.status == Status.Movable) {
                 m1.applyForce(force)
                 m2.applyForce(-force)
                 m1.set(m1 + ropeDir * delta)
                 m2.set(m2 - ropeDir * delta)
-            } else if (m2.status == Mass.Status.Movable) {
+            } else if (m2.status == Status.Movable) {
                 m2.applyForce(-force)
                 m2.set(m1 + ropeDir * maxDistance)
-            } else if (m1.status == Mass.Status.Movable) {
+            } else if (m1.status == Status.Movable) {
                 m1.applyForce(force)
                 m1.set(m2 - ropeDir * maxDistance)
             }

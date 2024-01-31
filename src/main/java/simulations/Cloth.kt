@@ -4,6 +4,7 @@ import algebra.Vec
 import framework.MassSimulation
 import framework.WatchDouble
 import framework.WatchInt
+import framework.interfaces.Status
 import physics.*
 import kotlin.math.PI
 
@@ -15,10 +16,6 @@ import kotlin.math.PI
  */
 @SuppressWarnings("unused")
 class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
-    override fun correct() {
-        TODO("Not yet implemented")
-    }
-
     @WatchInt("Size", 1, 20)
     private var size: Int = size
         set(value) {
@@ -67,7 +64,7 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
                         Collision.occur(sphere, it, 1.0)
                         val targetDistance = sphere.radius + it.radius
                         val overlap = targetDistance - sphere.getDistanceTo(it)
-                        val massMovable = it.status == Mass.Status.Movable
+                        val massMovable = it.status == Status.Movable
                         val overlap1 = if (massMovable) sphere.mass / (it.mass + sphere.mass) * overlap else 0.0
                         val overlap2 = if (massMovable) it.mass / (it.mass + sphere.mass) * overlap else overlap
                         if ((it.positionVector - sphere.positionVector).length != 0.0) {
@@ -96,9 +93,10 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
                 for (z in 0 until size) {
                     val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
                     val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
+                    mass.status = if (isOnEdge) Status.Immovable else Status.Movable
                     mass.color = Conf.mass_color + (Vec.random * 20) - 10
-                    addNewMass(mass, !isOnEdge)
-                    masses.last().status = if (isOnEdge) Mass.Status.Immovable else Mass.Status.Movable
+                    addNewMass(mass)
+                    masses.last().status = if (isOnEdge) Status.Immovable else Status.Movable
                 }
             }
         }
@@ -126,6 +124,6 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
             }
         }
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
-        addNewMass(sphere, true)
+        addNewMass(sphere)
     }
 }

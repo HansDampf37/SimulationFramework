@@ -1,6 +1,7 @@
 package framework
 
 import algebra.Vec
+import framework.interfaces.Status
 import physics.Mass
 import physics.Seconds
 import kotlin.collections.ArrayList
@@ -14,9 +15,8 @@ abstract class MassSimulation<T : Mass>(
     protected var masses: MutableList<T> = ArrayList()
     private var affectedByGravity = HashMap<T, Boolean>()
 
-    fun addNewMass(mass: T, affectedByGravity: Boolean) {
+    fun addNewMass(mass: T) {
         synchronized(masses) { masses.add(mass) }
-        this.affectedByGravity[mass] = affectedByGravity
     }
 
     override fun tick(dt: Seconds) {
@@ -24,14 +24,18 @@ abstract class MassSimulation<T : Mass>(
         synchronized(masses) {
             for (mass in masses) {
                 mass.tick(dt)
-                if (affectedByGravity[mass]!!) mass.accelerate(gravity)
+                if (mass.status == Status.Movable) mass.accelerate(gravity)
                 mass.velocity = mass.velocity.scaleInPlace((1 - frictionPerSecond * dt))
             }
         }
-        correct()
+        correctState()
     }
 
-    abstract fun correct()
+    /**
+     * This method is invoked after the repositioning of the masses and can be used to correct poorly calculated
+     * positions.
+     */
+    open fun correctState() = Unit
 
     abstract fun calcForces(dt: Seconds)
 }
