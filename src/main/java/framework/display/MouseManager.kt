@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import javax.swing.SwingUtilities
 
 class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private val eventQueue: Queue<MouseEvent> = ConcurrentLinkedQueue()
@@ -48,30 +49,20 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
         }
     }
 
-    private fun onMouseMoved(e: MouseEvent) {
-        mouseX = e.x
-        mouseY = e.y
-        if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
-        val hoveredEntity = camera.getEntityAt(mouseX, mouseY)
-        if (hoveredEntity != lastHoveredEntity) {
-            lastHoveredEntity?.outlineRasterization = false
-            hoveredEntity?.outlineRasterization = true
-            lastHoveredEntity = hoveredEntity
-        }
-    }
-
-    private fun onMouseClicked(e: MouseEvent): Nothing = TODO("implement me")
+    private fun onMouseClicked(e: MouseEvent) = Unit
 
     private fun onMousePressed(e: MouseEvent) {
-        if (e.button == MouseEvent.BUTTON1 || e.button == MouseEvent.NOBUTTON) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
             // left button
             if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
             draggedEntity = camera.getEntityAt(mouseX, mouseY)
-            previousMovementStatusOfDraggedObject = draggedEntity?.status
-            draggedEntity?.status = Status.Immovable
+            val entity = draggedEntity
+            previousMovementStatusOfDraggedObject = entity?.status
+            entity?.status = Status.Immovable
+            if (entity != null) distToDraggedObj = camera.getDistanceToPointAt(entity.position)
             lastDragX = e.x
             lastDragY = e.y
-        } else if (e.button == MouseEvent.BUTTON2) {
+        } else if (SwingUtilities.isRightMouseButton(e)) {
             // right button
             lastRotateX = e.x
             lastRotateY = e.y
@@ -79,7 +70,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     }
 
     private fun onMouseDragged(e: MouseEvent, dt: Double) {
-        if (e.button == MouseEvent.BUTTON1 || e.button == MouseEvent.NOBUTTON) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
             val dx = e.x - lastDragX!!
             val dy = e.y - lastDragY!!
             val ent = draggedEntity
@@ -96,7 +87,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
                 lastDragX = e.x
                 lastDragY = e.y
             }
-        } else if (e.button == MouseEvent.BUTTON2) {
+        } else if (SwingUtilities.isRightMouseButton(e)) {
             // right button
             val dx = e.x - lastRotateX!!
             val dy = e.y - lastRotateY!!
@@ -107,12 +98,13 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     }
 
     private fun onMouseReleased(e: MouseEvent) {
-        if (e.button == MouseEvent.BUTTON1 || e.button == MouseEvent.NOBUTTON) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            draggedEntity?.status = previousMovementStatusOfDraggedObject!!
             draggedEntity = null
             lastDragX = null
             lastDragY = null
             distToDraggedObj = null
-        } else if (e.button == MouseEvent.BUTTON2) {
+        } else if (SwingUtilities.isRightMouseButton(e)) {
             // right button
             lastRotateX = null
             lastRotateY = null
