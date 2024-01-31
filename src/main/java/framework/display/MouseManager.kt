@@ -2,8 +2,7 @@ package framework.display
 
 import algebra.Vec4
 import framework.Camera
-import framework.Entity
-import physics.Sphere
+import framework.interfaces.Entity
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -51,7 +50,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
         }
     }
 
-    private fun onMouseClicked(e: MouseEvent) = Unit
+    private fun onMouseClicked(e: MouseEvent): Nothing = TODO("implement me")
 
     private fun onMouseReleased(e: MouseEvent) {
         draggedEntity = null

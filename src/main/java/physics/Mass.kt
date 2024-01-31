@@ -1,22 +1,20 @@
 package physics
 
+import Conf
 import algebra.Point3d
 import algebra.Vec
 import framework.Camera
-import framework.Entity
-import framework.Graphics3d
 import framework.Vertex
-import java.awt.Color
-import java.awt.Graphics
+import framework.interfaces.Entity
 
-open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z), Entity {
+open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
+    // Drawable
     override var outlineRasterization: Boolean = false
     override var color: Vec? = Conf.mass_color
 
-    override var velocity: Vec = Vec(0,0,0)
-    private val acceleration: Vec
-    val mass: Double
-    var status = Status.Movable
+    // Entity
+    override var velocity: Vec = Vec(0, 0, 0)
+    override var acceleration: Vec = Vec(0, 0, 0)
     override var position: Vec
         get() = positionVector
         set(value) {
@@ -25,12 +23,15 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
             z = value.z
         }
 
+    // Mass
+    val mass: Double
+    var status = Status.Movable
+
     init {
         require(mass != 0.0) { "Mass can't be equal to 0" }
-        velocity = Vec(0.0, 0.0, 0.0)
-        acceleration = Vec(0.0, 0.0, 0.0)
         this.mass = mass
     }
+
     constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)
 
     constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
@@ -38,10 +39,6 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double): Point3d(x, y, z)
     override fun tick(dt: Seconds) {
         accelerate(dt)
         move(dt)
-    }
-
-    open fun render(drawer: Graphics3d, g: Graphics) {
-        drawer.drawDot(this, 0.25, Color.white, g)
     }
 
     override fun render(camera: Camera) {

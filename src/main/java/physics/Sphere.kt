@@ -1,12 +1,9 @@
 package physics
 
+import Conf
 import algebra.Vec
 import framework.Camera
-import framework.Graphics3d
 import framework.Vertex
-import java.awt.Color
-import java.awt.Graphics
-import java.util.ArrayList
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -23,14 +20,11 @@ open class Sphere(
         return this.getDistanceTo(other) < this.radius + other.radius
     }
 
-    override fun render(drawer: Graphics3d, g: Graphics) {
-        drawer.drawDot(this, radius = radius, Color.white, g)
-    }
-
     override fun render(camera: Camera) {
         camera.renderSphere(Vertex(this.positionVector, color ?: Vec.zero, Vec.zero), radius.toFloat(), this)
     }
 
+    @Suppress("unused")
     fun renderStrip(cam: Camera) {
         cam.renderStrip(triangleStrip(cam), this)
     }

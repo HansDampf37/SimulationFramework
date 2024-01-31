@@ -1,10 +1,10 @@
 package physics
 
 import algebra.Vec
-import framework.Camera
-import framework.Entity
-import framework.Graphics3d
-import framework.Vertex
+import framework.*
+import framework.interfaces.Drawable
+import framework.interfaces.Renderable
+import framework.interfaces.Tickable
 import physics.Collision.Companion.occur
 import java.awt.Color
 import java.awt.Graphics
@@ -15,14 +15,7 @@ abstract class Connection(
     protected val m2: Mass,
     protected val maxEnergy: Double,
     var broken: Boolean = false
-) : Entity {
-    override var position: Vec
-        get() = m1.positionVector
-        set(value) {
-            m1.x = value.x
-            m1.y = value.y
-            m1.z = value.z
-        }
+) : Drawable, Tickable, Renderable {
     override var color: Vec? = null
 
     abstract override fun tick(dt: Seconds)
@@ -34,7 +27,7 @@ abstract class Connection(
     override fun render(camera: Camera) {
         val v1 = Vertex(m1.positionVector, m1.color ?: Vec.zero, Vec.zero)
         val v2 = Vertex(m2.positionVector, m2.color ?: Vec.zero, Vec.zero)
-        camera.renderLine(v1, v2, this)
+        camera.renderLine(v1, v2)
     }
 }
 
@@ -84,8 +77,4 @@ class ImpulseConnection(
         drawer.drawLine(m1, m2, g)
         g.color = oldColor
     }
-
-    override var velocity: Vec
-        get() = TODO("Not yet implemented")
-        set(value) {}
 }

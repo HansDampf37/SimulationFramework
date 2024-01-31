@@ -1,6 +1,7 @@
 package framework
 
 import algebra.*
+import framework.interfaces.Entity
 import physics.Meters
 import java.awt.image.BufferedImage
 import java.lang.Math.PI
@@ -225,11 +226,6 @@ class Camera(
             0.0, -focalLength / zoomY, screenHeight / 2.0, 0.0,
             0.0, 0.0, 1.0, 0.0
         )
-
-    fun pixelToCameraCoords(x: Int, y: Int, planeDist: Double) {
-
-    }
-
 
     private val worldToCameraCoords
         get() = rotateWorldToCamera * translateWorldToCamera

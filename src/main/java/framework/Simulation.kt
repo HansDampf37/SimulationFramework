@@ -3,6 +3,7 @@ package framework
 import framework.display.Display
 import framework.display.KeyManager
 import framework.display.MouseManager
+import framework.interfaces.ISimulation
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics2D

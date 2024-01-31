@@ -1,7 +1,7 @@
 package framework
 
-import algebra.Point3d
 import algebra.Vec
+import framework.interfaces.Entity
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,12 +57,12 @@ class RasterizerTest {
     fun testGetEntityTriangle() {
         val entity = object : Entity {
             override fun tick(dt: Seconds) = Unit
-
             override fun render(camera: Camera) = Unit
-
             override var outlineRasterization: Boolean = false
+            override var color: Vec? = null
             override var position: Vec = Vec(0.0, 0.0, 0.0)
-            override var color: Vec? = Vec(0, 0, 0)
+            override var velocity: Vec = Vec(0.0, 0.0, 0.0)
+            override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
         }
         rasterizer.rasterizeTriangle(
             Triangle(
@@ -79,12 +79,12 @@ class RasterizerTest {
     fun testGetEntitySphere() {
         val entity = object : Entity {
             override fun tick(dt: Seconds) = Unit
-
             override fun render(camera: Camera) = Unit
-
             override var outlineRasterization: Boolean = false
+            override var color: Vec? = null
             override var position: Vec = Vec(0.0, 0.0, 0.0)
-            override var color: Vec? = Vec(0, 0, 0)
+            override var velocity: Vec = Vec(0.0, 0.0, 0.0)
+            override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
         }
         rasterizer.rasterizeSphere(
             Circle(

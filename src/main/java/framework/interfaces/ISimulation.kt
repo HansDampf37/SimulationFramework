@@ -1,4 +1,4 @@
-package framework
+package framework.interfaces
 
 import physics.Seconds
 import java.awt.Graphics

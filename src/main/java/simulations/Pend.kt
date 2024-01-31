@@ -82,8 +82,8 @@ class Pend(
     }
 
     fun render(g: Graphics) {
-        for (m in masses) m.render(drawer, g)
-        for (c in connections) c.render(drawer, g)
+        for (m in masses) m.render(camera)
+        for (c in connections) c.render(camera)
         for (i in masses.indices) {
             g.drawString(masses[i].toString(), 10, 100 + i * 20)
         }

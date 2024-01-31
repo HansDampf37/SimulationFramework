@@ -3,7 +3,7 @@ package framework
 import algebra.Vec
 import algebra.Vec2
 import algebra.Vec4
-import java.awt.Color
+import framework.interfaces.Entity
 import java.awt.image.BufferedImage
 import java.util.*
 import kotlin.math.*
