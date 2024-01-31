@@ -82,7 +82,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
             val w = camera.rotateCameraToWorld * v
             ent.position += w
-            ent.velocity += w * dt
+            ent.velocity = w * dt
             lastDragX = e.x
             lastDragY = e.y
         }

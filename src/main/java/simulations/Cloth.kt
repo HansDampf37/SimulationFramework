@@ -86,7 +86,7 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
         if (keyManager.space) sphere.accelerate(Vec(0.0, -40.0, 0.0))*/
     }
 
-    override fun reset() {
+    override fun    reset() {
         synchronized(masses) {
             masses.clear()
             for (x in 0 until size) {
@@ -101,25 +101,27 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
             }
         }
         synchronized(connections) {
-            connections.clear()
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    if (x + 1 < size) connections.add(
-                        ImpulseConnection(
-                            masses[x * size + y],
-                            masses[(x + 1) * size + y],
-                            1.1,
-                            1000.0
+            synchronized(masses) {
+                connections.clear()
+                for (x in 0 until size) {
+                    for (y in 0 until size) {
+                        if (x + 1 < size) connections.add(
+                            ImpulseConnection(
+                                masses[x * size + y],
+                                masses[(x + 1) * size + y],
+                                1.1,
+                                1000.0
+                            )
                         )
-                    )
-                    if (y + 1 < size) connections.add(
-                        ImpulseConnection(
-                            masses[x * size + y],
-                            masses[x * size + y + 1],
-                            1.1,
-                            1000.0
+                        if (y + 1 < size) connections.add(
+                            ImpulseConnection(
+                                masses[x * size + y],
+                                masses[x * size + y + 1],
+                                1.1,
+                                1000.0
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
