@@ -277,9 +277,9 @@ class Camera(
     }
 
     fun turn(dif: Vec2, dt: Double = 1.0) {
-        val turnUp = dif.y * dt * turningSpeed
-        val turnRight = dif.x * dt * turningSpeed
-        phi += turnRight
+        val turnUp = dif.y * dt * turningSpeed * 0.01
+        val turnRight = dif.x * dt * turningSpeed * 0.01
+        phi -= turnRight
         theta += turnUp
 
     }
