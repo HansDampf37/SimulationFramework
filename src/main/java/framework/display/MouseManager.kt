@@ -6,6 +6,7 @@ import framework.interfaces.Entity
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
+import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -17,6 +18,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
     private var lastDragY: Int? = null
     private var lastHoveredEntity: Entity? = null
     private var draggedEntity: Entity? = null
+    private var distToDraggedObj: Double? = null
 
     private fun addEvent(e: MouseEvent) {
         eventQueue.add(e)
@@ -27,9 +29,9 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             val event = eventQueue.poll()
             when (event.id) {
                 MouseEvent.MOUSE_MOVED -> onMouseMoved(event)
-                MouseEvent.MOUSE_CLICKED -> onMouseClicked(event)
+                MouseEvent.MOUSE_CLICKED -> onMouseClicked()
                 MouseEvent.MOUSE_PRESSED -> onMousePressed(event)
-                MouseEvent.MOUSE_RELEASED -> onMouseReleased(event)
+                MouseEvent.MOUSE_RELEASED -> onMouseReleased()
                 MouseEvent.MOUSE_DRAGGED -> onMouseDragged(event, dt)
                 MouseEvent.MOUSE_ENTERED -> Unit
                 MouseEvent.MOUSE_EXITED -> Unit
@@ -50,29 +52,33 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
         }
     }
 
-    private fun onMouseClicked(e: MouseEvent): Nothing = TODO("implement me")
+    private fun onMouseClicked() = Unit
 
-    private fun onMouseReleased(e: MouseEvent) {
+    private fun onMouseReleased() {
         draggedEntity = null
         lastDragX = null
         lastDragY = null
+        distToDraggedObj = null
     }
 
     private fun onMousePressed(e: MouseEvent) {
         if (mouseX < 0 || mouseX >= camera.screenWidth || mouseY < 0 || mouseY >= camera.screenHeight) return
-        draggedEntity = camera.getEntityAt(mouseX, mouseY)
+        val ent = camera.getEntityAt(mouseX, mouseY)
         lastDragX = e.x
         lastDragY = e.y
+        distToDraggedObj = if (ent != null) camera.getDistanceToPointAt(ent.position) else null
+        draggedEntity = ent
     }
 
     private fun onMouseDragged(e: MouseEvent, dt: Double) {
         val dx = e.x - lastDragX!!
         val dy = e.y - lastDragY!!
         val ent = draggedEntity
-        if (ent != null) {
+        val dist = distToDraggedObj
+        if (ent != null && dist != null) {
             val position = ent.position
             val cosAlpha = camera.lookingDirection * camera.getDirectionToPointAt(position)
-            val z = cosAlpha * camera.getDistanceToPointAt(position)
+            val z = cosAlpha * dist
             val s = camera.zoom / (camera.focalLength) * z
             val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
             val w = camera.rotateCameraToWorld * v
@@ -80,6 +86,8 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             ent.velocity += w * dt
             lastDragX = e.x
             lastDragY = e.y
+        } else {
+            throw IllegalStateException("Variables should not be null")
         }
     }
 
