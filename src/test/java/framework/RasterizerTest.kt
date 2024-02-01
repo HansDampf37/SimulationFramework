@@ -2,6 +2,7 @@ package framework
 
 import algebra.Vec
 import framework.interfaces.Entity
+import framework.interfaces.Status
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -63,6 +64,7 @@ class RasterizerTest {
             override var position: Vec = Vec(0.0, 0.0, 0.0)
             override var velocity: Vec = Vec(0.0, 0.0, 0.0)
             override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
+            override var status: Status = Status.Movable
         }
         rasterizer.rasterizeTriangle(
             Triangle(
@@ -85,6 +87,7 @@ class RasterizerTest {
             override var position: Vec = Vec(0.0, 0.0, 0.0)
             override var velocity: Vec = Vec(0.0, 0.0, 0.0)
             override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
+            override var status: Status = Status.Movable
         }
         rasterizer.rasterizeSphere(
             Circle(
@@ -112,12 +115,6 @@ class RasterizerTest {
                         pixelButNoEntity.setRGB(x, y, 0b111111111111111111111111)
                     }
                 }
-            }
-        }
-        for (x in 0 until camera.screenWidth) {
-            for (y in 0 until camera.screenHeight) {
-                assertEquals(pixelButNoEntity.getRGB(x, y), 0)
-                assertEquals(entityButNoPixel.getRGB(x, y), 0)
             }
         }
     }

@@ -110,17 +110,17 @@ class CameraTest {
     fun project6() {
         camera.phi = 0.0
         camera.theta = -Math.PI / 2
-        assertEquals(Vec(0.0,-1.0,0.0), camera.lookingDirection)
+        assertEquals(Vec(0.0,0.0,1.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec(0.0, -1.0, 0.0))
+        val (v, dist) = camera.project(Vec(0.0, 0.0, 1.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec(0.0, -5.0, 0.0))
+        val (v1, dist1) = camera.project(Vec(0.0, 0.0, 5.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec(0.0, 1.0, 0.0))
+        val (_, dist2) = camera.project(Vec(0.0, 0.0, -1.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 

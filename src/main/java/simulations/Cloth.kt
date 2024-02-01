@@ -86,7 +86,7 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
         if (keyManager.space) sphere.accelerate(Vec(0.0, -40.0, 0.0))*/
     }
 
-    override fun    reset() {
+    override fun reset() {
         synchronized(masses) {
             masses.clear()
             for (x in 0 until size) {

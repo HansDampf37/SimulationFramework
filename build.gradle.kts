@@ -1,5 +1,8 @@
+import java.util.regex.Pattern.compile
+
 plugins {
     kotlin("jvm") version "1.9.22"
+    application
 }
 
 repositories {
@@ -17,3 +20,15 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+application {
+    // Define the main class for the application.
+    mainClass = "Launcher"
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = project.application.mainClass
+    }
+}
+
