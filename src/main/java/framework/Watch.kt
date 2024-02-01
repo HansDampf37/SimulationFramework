@@ -33,17 +33,17 @@ abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: S
 
     class WatchFieldTypeNotMatching(field: Field) : Exception("Field $field is annotated with the wrong Watch annotation. Types dont match.")
 
-    abstract var controlComponent: C
-    abstract var displayComponent: D
+    abstract val controlComponent: C
+    abstract val displayComponent: D
 
     open fun set(value: T) {
-        field.isAccessible = true
-        field.set(obj, value)
         val memberProperty = obj::class.members.find { it.name == field.name }
         if (memberProperty is KMutableProperty<*>) {
             memberProperty.isAccessible = true
             memberProperty.setter.call(obj, value)
         }
+        field.isAccessible = true
+        field.set(obj, value)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -58,29 +58,35 @@ abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: S
     abstract fun updateControlComponent()
 }
 
-@Suppress("LeakingThis", "UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST")
 abstract class WatchedNumber<T : Number>(displayName: String, field: Field, obj: Any, min: Number, max: Number) :
     WatchedField<T, JSlider, JLabel>(displayName, field, obj) {
-
-    override var controlComponent: JSlider = JSlider(
-        JSlider.HORIZONTAL,
-        (min.toDouble() * 100).toInt(),
-        (max.toDouble() * 100).toInt(),
-        (get().toDouble() * 100).toInt()
-    ).apply {
-        preferredSize = Dimension(100, 25)
-        maximumSize = Dimension(100, 25)
-        minimumSize = Dimension(100, 25)
-        majorTickSpacing = ((max.toDouble() * 100).toInt() - (min.toDouble() * 100).toInt()) / 100
-        paintTicks = false
-        paintLabels = false
-        addChangeListener {
-            val newValue = value / 100.0
-            set(newValue as T)
-            displayComponent.text = "$newValue"
+    override val displayComponent: JLabel = JLabel("${get()}")
+    override var controlComponent: JSlider = try {
+        JSlider(
+            JSlider.HORIZONTAL,
+            (min.toDouble() * 100).toInt(),
+            (max.toDouble() * 100).toInt(),
+            (get().toDouble() * 100).toInt()
+        ).apply {
+            preferredSize = Dimension(100, 25)
+            maximumSize = Dimension(100, 25)
+            minimumSize = Dimension(100, 25)
+            majorTickSpacing = ((max.toDouble() * 100).toInt() - (min.toDouble() * 100).toInt()) / 100
+            paintTicks = false
+            paintLabels = false
+            addChangeListener {
+                val newValue = value / 100.0
+                set(newValue as T)
+                displayComponent.text = "$newValue"
+            }
         }
+    } catch (e: IllegalArgumentException) {
+        throw IllegalArgumentException(
+            "Check range parameters for field \"${obj::class.simpleName}.${field.name}\"\n" +
+                "min: $min, max: $max, current: ${get()}"
+        )
     }
-    override var displayComponent: JLabel = JLabel(Display.round(controlComponent.value / 100.0))
 
     override fun updateControlComponent() {
         controlComponent.value = (get().toDouble() * 100).toInt()
@@ -95,8 +101,25 @@ class WatchedFloat(displayName: String, field: Field, obj: Any, min: Float, max:
 
 class WatchedInt(displayName: String, field: Field, obj: Any, min: Int, max: Int) :
     WatchedNumber<Int>(displayName, field, obj, min, max) {
-    override fun set(value: Int) {
-        super.set(value)
+
+    override var controlComponent: JSlider = JSlider(
+        JSlider.HORIZONTAL, min, max, get()
+    ).apply {
+        preferredSize = Dimension(100, 25)
+        maximumSize = Dimension(100, 25)
+        minimumSize = Dimension(100, 25)
+        majorTickSpacing = max - min
+        paintTicks = false
+        paintLabels = false
+        addChangeListener {
+            val newValue = value
+            set(newValue.toInt())
+            displayComponent.text = "$newValue"
+        }
+    }
+    override var displayComponent: JLabel = JLabel("${controlComponent.value}")
+    override fun updateControlComponent() {
+        controlComponent.value = get()
     }
 }
 

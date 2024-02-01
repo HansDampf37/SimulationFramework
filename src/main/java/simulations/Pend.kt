@@ -1,62 +1,78 @@
 package simulations
 
 import algebra.Point3d
-import algebra.Vec
 import framework.MassSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
-import physics.*
+import physics.ImpulseConnection
+import physics.Mass
+import physics.Seconds
+import physics.Sphere
 import java.awt.Graphics
-import java.lang.Thread.sleep
 import kotlin.math.PI
 
 @Suppress("unused")
 class Pend(
     amountOfPoints: Int,
-    @WatchDouble("Length", 1.0, 20.0)
-    private val length: Double
+    length: Double,
 ) : MassSimulation<Mass>("String") {
-    @WatchInt("Segments", 1, 50)
-    private var amountOfPoints: Int = amountOfPoints
+    private val radius = 0.025
+    private var maxEnergy = 30.0
+        set(value) = connections.forEach { it.maxEnergy = value }
+    private val connections: MutableList<ImpulseConnection> = ArrayList()
+    private val maxRopeSegmentLength: Double
+        get() = length / amountOfPoints
+    @WatchDouble("Rope-Length", 1.0, 3.0)
+    private var length: Double = length
         set(value) {
             field = value
             synchronized(connections) {
-                connections.subList(value - 1, connections.size).forEach { it.broken = true }
+                connections.forEach { it.maxDistance = maxRopeSegmentLength }
             }
-            synchronized(masses) {
-                repeat(value - masses.size) {
-                    val pos = masses.last().positionVector - Vec(0, 0, maxRopeSegmentLength * 0.8)
-                    val mass = Sphere(pos.x, pos.y, pos.z, 0.25, 1.0)
-                    connections.add(ImpulseConnection(masses.last(), mass, maxRopeSegmentLength, 30.0))
-                    addNewMass(mass)
-                }
-            }
-            Thread {
-                sleep(1000)
-                synchronized(masses) {
-                    for (i in (value until masses.size).reversed()) masses.removeAt(i)
-                }
-            }.start()
         }
-    private val maxRopeSegmentLength: Double
-        get() = length / amountOfPoints
-    private val connections: MutableList<Connection> = ArrayList()
+    @WatchInt("Segments", 1, 100)
+    private var amountOfPoints: Int = amountOfPoints
+        set(value) {
+            synchronized(connections) {
+                synchronized(masses) {
+                    val delta = amountOfPoints - value
+                    if (delta > 0) {
+                        // field > value -> remove delta masses from the rope
+                        repeat(delta) {
+                            val removedMass = masses.removeLast()
+                            val lastMass = masses.last()
+                            connections.removeAll { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
+                        }
+                    } else if (delta < 0) {
+                        repeat(-delta) {
+                            val lastMass = masses.last()
+                            val sphere = Sphere(lastMass.x, lastMass.y, lastMass.z - maxRopeSegmentLength * 0.8,
+                                radius, lastMass.mass)
+                            connections.add(ImpulseConnection(lastMass, sphere, maxRopeSegmentLength, maxEnergy))
+                            addNewMass(sphere)
+                        }
+                    }
+                }
+                connections.forEach { it.maxDistance = maxRopeSegmentLength }
+            }
+            field = value
+        }
 
     init {
         reset()
     }
 
     override fun calcForces(dt: Seconds) {
-        input()
         synchronized(connections) {
             connections.forEach { it.tick(dt) }
+            connections.removeAll { it.broken }
         }
     }
 
     fun correct() {
-        synchronized(masses) {
-            synchronized(connections) {
+        synchronized(connections) {
+            synchronized(masses) {
                 masses.forEachIndexed { i, mass ->
                     if (i != 0) {
                         if (connections[i - 1].broken) return
@@ -74,14 +90,6 @@ class Pend(
         synchronized(connections) { connections.filter { !it.broken }.forEach { it.render(camera) } }
     }
 
-    private fun input() {
-        if (keyManager.f) masses[0].accelerate(Vec(40.0, 0.0, 0.0))
-        if (keyManager.g) masses[0].accelerate(Vec(-40.0, 0.0, 0.0))
-        if (keyManager.v) masses[0].accelerate(Vec(0.0, 20.0, 0.0))
-        if (keyManager.b) masses[0].accelerate(Vec(0.0, -20.0, 0.0))
-        if (keyManager.up) masses[1].applyForce(Vec(10.0, 0.0, 0.0))
-    }
-
     fun render(g: Graphics) {
         for (m in masses) m.render(camera)
         for (c in connections) c.render(camera)
@@ -95,7 +103,7 @@ class Pend(
             masses.clear()
             for (i in 0 until amountOfPoints) {
                 val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
-                val mass = Sphere(pos.x, pos.y, pos.z, 0.025, 1.0)
+                val mass = Sphere(pos.x, pos.y, pos.z, radius, 1.0)
                 if (i == 0) mass.status = Status.Immovable
                 addNewMass(mass)
             }
@@ -104,7 +112,7 @@ class Pend(
         synchronized(connections) {
             connections.clear()
             for (i in 0 until amountOfPoints - 1) {
-                connections.add(ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, 30.0))
+                connections.add(ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, maxEnergy))
             }
         }
         camera.focalLength = 10.0

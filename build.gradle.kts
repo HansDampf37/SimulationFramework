@@ -1,8 +1,8 @@
-import java.util.regex.Pattern.compile
+import org.jetbrains.kotlin.fir.declarations.builder.buildScript
 
 plugins {
     kotlin("jvm") version "1.9.22"
-    application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {
@@ -21,14 +21,8 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = "Launcher"
-}
-
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = project.application.mainClass
+        attributes["Main-Class"] = "Launcher"
     }
 }
-

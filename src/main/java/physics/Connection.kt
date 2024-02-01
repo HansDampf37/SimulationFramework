@@ -14,7 +14,7 @@ import kotlin.math.pow
 abstract class Connection(
     protected val m1: Mass,
     protected val m2: Mass,
-    protected val maxEnergy: Double,
+    var maxEnergy: Double,
     var broken: Boolean = false
 ) : Drawable, Tickable, Renderable {
     override var color: Vec? = null
@@ -30,12 +30,14 @@ abstract class Connection(
         val v2 = Vertex(m2.positionVector, m2.color ?: Vec.zero, Vec.zero)
         camera.renderLine(v1, v2)
     }
+
+    public fun isConnectedTo(mass: Mass) : Boolean = m1 == mass || m2 == mass
 }
 
 class ImpulseConnection(
     m1: Mass,
     m2: Mass,
-    private val maxDistance: Double,
+    var maxDistance: Double,
     maxEnergy: Double,
     private val springConstant: Double = 300.0
 ) : Connection(m1, m2, maxEnergy) {
