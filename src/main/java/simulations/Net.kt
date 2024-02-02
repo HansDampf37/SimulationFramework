@@ -25,9 +25,6 @@ class Net : Simulation("Net") {
             (153 + 40 * Math.random() - 20).toInt(),
             (239 + 20 * Math.random() - 10).toInt()
         ) } }
-        drawer.setCameraAngleHorizontal(Math.PI / 4)
-        drawer.setCameraAngleVertical(Math.PI / 4)
-        drawer.setZoom(0.1)
     }
 
     override fun tick(dt: Seconds) {
@@ -120,26 +117,6 @@ class Net : Simulation("Net") {
         for (i in 1 until points.size - 1) {
             points[i][0].add(delta)
             points[i][points.size - 1].add(delta)
-        }
-    }
-
-    fun render(g: Graphics) {
-        cart.render(drawer, g)
-        // ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        for (x in points.indices) {
-            for (y in points[x].indices) {
-                drawer.drawDot(points[x][y], 0.25, colors[x][y], g)
-            }
-        }
-        for (x in 0 until points.size - 1) {
-            for (y in 0 until points[x].size - 1) {
-                drawer.drawLine(points[x][y], points[x + 1][y], g)
-                drawer.drawLine(points[x][y], points[x][y + 1], g)
-            }
-        }
-        for (i in 0 until points.size - 1) {
-            drawer.drawLine(points[i][points[i].size - 1], points[i + 1][points[i].size - 1], g)
-            drawer.drawLine(points[points.size - 1][i], points[points.size - 1][i + 1], g)
         }
     }
 

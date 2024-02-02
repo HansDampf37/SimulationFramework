@@ -1,7 +1,7 @@
 package simulations
 
 import algebra.Vec
-import framework.MassSimulation
+import framework.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
@@ -16,7 +16,7 @@ import kotlin.math.PI
  * @param size the amount masses in one dimension of the cloth
  */
 @SuppressWarnings("unused")
-class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
+class Cloth(size: Int): PhysicsSimulation("Cloth") {
     @WatchInt("Size", 1, 20)
     private var size: Int = size
         set(value) {
@@ -34,8 +34,6 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
     private var sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
     init {
         reset()
-        drawer.setZoom(30.0)
-        drawer.setCameraAngleHorizontal(0.2)
         camera.focalLength = 10.0
         camera.x = 0.0
         camera.y = -25.0
@@ -45,24 +43,16 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
         camera.focalLength = 10.0
         camera.zoom = 0.01
     }
-    override fun render() {
-        synchronized(masses) { masses.forEach{it.render(camera)} }
-        synchronized(connections) { connections.filter { !it.broken }.forEach{ it.render(camera) } }
-    }
 
     override fun calcForces(dt: Seconds) {
-        input()
-        sphere.tick(dt)
         synchronized(connections) {
-            connections.shuffle()
-            connections.forEach { it.tick(dt) }
+            connections.forEach{it.tick(dt)}
         }
-        synchronized(masses)  {
-            masses.shuffle()
-            masses.forEach {
+        synchronized(entities)  {
+            collidables.forEach {
                 if (it != sphere) {
-                    if (sphere.testForCollision(it)) {
-                        Collision.occur(sphere, it, 1.0)
+                    if (testCollision(sphere, it)) {
+                        Collision.occur(sphere, it as Sphere, 1.0)
                         val targetDistance = sphere.radius + it.radius
                         val overlap = targetDistance - sphere.getDistanceTo(it)
                         val massMovable = it.status == Status.Movable
@@ -78,55 +68,50 @@ class Cloth(size: Int): MassSimulation<Sphere>("Cloth") {
         }
     }
 
-    private fun input() {
-        /*if (keyManager.up) sphere.accelerate(Vec(40.0, 0.0, 0.0))
-        if (keyManager.down) sphere.accelerate(Vec(-40.0, 0.0, 0.0))
-        if (keyManager.left) sphere.accelerate(Vec(0.0, 0.0, 40.0))
-        if (keyManager.right) sphere.accelerate(Vec(0.0, 0.0, -40.0))
-        if (keyManager.shift) sphere.accelerate(Vec(0.0, 40.0, 0.0))
-        if (keyManager.space) sphere.accelerate(Vec(0.0, -40.0, 0.0))*/
+    override fun render() {
+        synchronized(entities) {entities.forEach { it.render(camera) }}
+        synchronized(connections) {connections.forEach { it.render(camera) }}
     }
 
     override fun reset() {
-        synchronized(masses) {
-            masses.clear()
-            for (x in 0 until size) {
-                for (z in 0 until size) {
-                    val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
-                    val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
-                    mass.status = if (isOnEdge) Status.Immovable else Status.Movable
-                    mass.color = Conf.mass_color + (Vec.random * 20) - 10
-                    addNewMass(mass)
-                    masses.last().status = if (isOnEdge) Status.Immovable else Status.Movable
-                }
+        synchronized(entities) {
+            entities.clear()
+        }
+        for (x in 0 until size) {
+            for (z in 0 until size) {
+                val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
+                val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
+                mass.status = if (isOnEdge) Status.Immovable else Status.Movable
+                mass.color = Conf.mass_color + (Vec.random * 20) - 10
+                addEntity(mass)
+                entities.last().status = if (isOnEdge) Status.Immovable else Status.Movable
             }
         }
-        synchronized(connections) {
-            synchronized(masses) {
-                connections.clear()
-                for (x in 0 until size) {
-                    for (y in 0 until size) {
-                        if (x + 1 < size) connections.add(
-                            ImpulseConnection(
-                                masses[x * size + y],
-                                masses[(x + 1) * size + y],
-                                1.1,
-                                1000.0
-                            )
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                if (x + 1 < size) {
+                    connections.add(
+                        ImpulseConnection(
+                            masses[x * size + y],
+                            masses[(x + 1) * size + y],
+                            1.1,
+                            1000.0
                         )
-                        if (y + 1 < size) connections.add(
-                            ImpulseConnection(
-                                masses[x * size + y],
-                                masses[x * size + y + 1],
-                                1.1,
-                                1000.0
-                            )
+                    )
+                }
+                if (y + 1 < size) {
+                    connections.add(
+                        ImpulseConnection(
+                            masses[x * size + y],
+                            masses[x * size + y + 1],
+                            1.1,
+                            1000.0
                         )
-                    }
+                    )
                 }
             }
         }
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
-        addNewMass(sphere)
+        addEntity(sphere)
     }
 }

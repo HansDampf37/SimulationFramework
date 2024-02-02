@@ -31,7 +31,7 @@ abstract class Connection(
         camera.renderLine(v1, v2)
     }
 
-    public fun isConnectedTo(mass: Mass) : Boolean = m1 == mass || m2 == mass
+    fun isConnectedTo(mass: Mass) : Boolean = m1 == mass || m2 == mass
 }
 
 class ImpulseConnection(

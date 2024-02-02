@@ -1,15 +1,18 @@
 package simulations
 
-import framework.MassSimulation
+import framework.Simulation
 import physics.Seconds
 import physics.Sphere
 import kotlin.math.PI
 
-class JustASphere(): MassSimulation<Sphere>("Sphere") {
+class JustASphere: Simulation("Sphere") {
     private val sphere = Sphere(0.0, 0.0, 0.0, 1.0, 1.0)
     init {
         reset()
     }
+
+    override fun tick(dt: Seconds) = Unit
+
     override fun render() {
         sphere.render(camera)
     }
@@ -27,6 +30,4 @@ class JustASphere(): MassSimulation<Sphere>("Sphere") {
         camera.focalLength = 10.0
         camera.zoom = 0.001
     }
-
-    override fun calcForces(dt: Seconds) = Unit
 }

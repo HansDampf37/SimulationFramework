@@ -60,7 +60,6 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             val entity = draggedEntity
             previousMovementStatusOfDraggedObject = entity?.status
             entity?.status = Status.Immovable
-            entity?.velocity = Vec(0,0,0)
             if (entity != null) distToDraggedObj = camera.getDistanceToPointAt(entity.position)
             lastDragX = e.x
             lastDragY = e.y

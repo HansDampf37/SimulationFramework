@@ -5,6 +5,7 @@ import framework.display.KeyManager
 import framework.display.MouseManager
 import framework.interfaces.ISimulation
 import physics.Seconds
+import physics.collisions.CollisionManager
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
@@ -14,14 +15,9 @@ import java.awt.RenderingHints
  * a [render]-method that displays the objects.The [drawer] and [camera] object can be used in the render method
  * to map the three-dimensional space into the drawing plane.
  */
-abstract class Simulation(
-    title: String,
-    private val renderingFrequency: Double = 25.0,
-    private val antiAliasing: Boolean = true
-) : ISimulation {
+abstract class Simulation(title: String, private val renderingFrequency: Double = 25.0) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
     private var speed = 1.0
-    protected var drawer: Graphics3d = Graphics3d()
     private var running = false
     protected val keyManager = KeyManager()
     protected val display: Display = Display(title, keyManager = keyManager)
@@ -56,8 +52,6 @@ abstract class Simulation(
     }
 
     private val renderJob = Runnable {
-        val watchedFields = collectWatchedFields(listOf(this, camera))
-        display.setWatchedFields(watchedFields)
         var lastTime = System.currentTimeMillis()
         val msPerTick = 1000.0 / renderingFrequency
         var delta = 0.0
@@ -84,13 +78,11 @@ abstract class Simulation(
     private var tickingThread: Thread = Thread(tickJob)
     private var renderingThread: Thread = Thread(renderJob)
 
-    private fun listenForInput(dt: Seconds) {
-        if (keyManager.w) drawer.moveVerticalCamera(dt)
-        if (keyManager.s) drawer.moveVerticalCamera(-dt)
-        if (keyManager.d) drawer.moveHorizontalCamera(dt)
-        if (keyManager.a) drawer.moveHorizontalCamera(-dt)
-        if (keyManager.y) drawer.zoom(1 + dt)
-        if (keyManager.out) drawer.zoom(1 - dt)
+    /**
+     * Updates the internal state of the simulation based on the [KeyManagers][KeyManager] inputs. Can be overwritten
+     * for custom control over the entities in a simulation.
+     */
+    protected open fun listenForInput(dt: Seconds) {
         if (keyManager.n) reset()
 
         if (keyManager.w) camera.moveForward(dt)
@@ -122,14 +114,9 @@ abstract class Simulation(
         val g = bs.drawGraphics
         g.clearRect(0, 0, display.canvas.width, display.canvas.height)
         g.color = Color.white
-        if (antiAliasing) (g as Graphics2D).setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON
-        )
         val canvasWidth = display.canvas.width
         val canvasHeight = display.canvas.height
         if (canvasWidth > 0 && canvasHeight > 0) {
-            drawer.setWindowHeightAndWidth(canvasWidth, canvasHeight)
             camera.screenWidth = canvasWidth
             camera.screenHeight = canvasHeight
             camera.newFrame()
@@ -145,6 +132,8 @@ abstract class Simulation(
     override fun start() {
         if (running) return
         running = true
+        val watchedFields = collectWatchedFields(listOf(this, camera))
+        display.setWatchedFields(watchedFields)
         tickingThread.start()
         renderingThread.start()
     }

@@ -1,11 +1,12 @@
 package framework.interfaces
 
 import physics.Seconds
-import java.awt.Graphics
+import framework.Camera
+import framework.Graphics3d
 
 /**
  * Simulations run by the [start] adn [stop] methods. They implement a [tick] method that updates simulated objects and
- * a [render]-method that displays the objects.The [drawer] object can be used in the render method
+ * a [render]-method that displays the objects.The [Graphics3d] and [Camera] objects can be used in the render method
  * to map the three-dimensional space into the drawing plane.
  */
 interface ISimulation {
@@ -17,7 +18,11 @@ interface ISimulation {
     fun tick(dt: Seconds)
 
     /**
-     * Render all the primitives by calling [Camera.render] on all relevant primitives
+     * Render all the primitives by calling the [Camera]s rendering methods on all relevant primitives.
+     * @see Camera.renderSphere
+     * @see Camera.renderTriangle
+     * @see Camera.renderLine
+     * @see Camera.renderStrip
      */
     fun render()
 

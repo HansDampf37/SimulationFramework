@@ -24,18 +24,10 @@ class Fractal(private val dim: Int) : Simulation("Fractal") {
                 Point3d(points[points.size - 1].positionVector + points[points.size - 1].getConnectingVectorTo(corner) / 2)
             points.add(newPoint)
         }
-        drawer.setCameraAngleHorizontal(0.0)
-        drawer.setCameraAngleVertical(0.0)
     }
 
     override fun render() {
         TODO("Not yet implemented")
-    }
-
-    fun render(g: Graphics) {
-        // cart.render(drawer, g);
-        for (point in corners) drawer.drawDot(point, 4.0, Color.green, g)
-        for (point in points) drawer.drawDot(point, 1.0, Color.white, g)
     }
 
     override fun reset() {
@@ -58,6 +50,5 @@ class Fractal(private val dim: Int) : Simulation("Fractal") {
         //corners[1] = new Point3d(-95,-31,0);
         //corners[2] = new Point3d(-59,81,0);
         points.add(Point3d(Math.random() * radius * 2 - radius, Math.random() * radius * 2 - radius, 0.0))
-        drawer.setZoom(4.7)
     }
 }

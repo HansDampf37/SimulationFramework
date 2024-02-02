@@ -1,4 +1,0 @@
-package simulations
-
-class CollisionManager {
-}

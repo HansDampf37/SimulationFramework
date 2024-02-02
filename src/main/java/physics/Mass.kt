@@ -37,34 +37,16 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
 
     constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
 
-    override fun tick(dt: Seconds) {
-        accelerate(dt)
-        move(dt)
-    }
-
     override fun render(camera: Camera) {
         camera.renderSphere(Vertex(positionVector, Vec.ones * 255, Vec.zero), 0.1f, this)
     }
 
-    private fun accelerate(dt: Seconds) {
-        velocity += acceleration * dt
-        acceleration.setToZero()
-    }
-
-    private fun move(dt: Seconds) {
-        add(velocity * dt)
-    }
-
     fun applyForce(force: Vec) {
-        acceleration.addInPlace(force / mass)
-    }
-
-    fun accelerate(acceleration: Vec) {
-        this.acceleration.addInPlace(acceleration)
+        if (status == Status.Movable) acceleration.addInPlace(force / mass)
     }
 
     fun removeAccelerationInDirection(direction: Vec) {
-        acceleration.subInPlace(acceleration.projectOnto(direction))
+        if (status == Status.Movable) acceleration.subInPlace(acceleration.projectOnto(direction))
     }
 
     val impulse: Vec
