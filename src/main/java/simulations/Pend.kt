@@ -20,7 +20,6 @@ class Pend(
     private val radius = 0.025
     private var maxEnergy = 30.0
         set(value) = connections.forEach { it.maxEnergy = value }
-    private val connections: MutableList<ImpulseConnection> = ArrayList()
     private val maxRopeSegmentLength: Double
         get() = length / amountOfPoints
     @WatchDouble("Rope-Length", 1.0, 3.0)

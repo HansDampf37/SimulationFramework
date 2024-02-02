@@ -23,7 +23,6 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
             field = value
             reset()
         }
-    private val connections: MutableList<Connection> = ArrayList()
     @Suppress("SameParameterValue")
     @WatchDouble("Sphere Size", 2.0, 10.0)
     private var sphereRadius: Double = 5.0
@@ -46,7 +45,8 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
 
     override fun calcForces(dt: Seconds) {
         synchronized(connections) {
-            connections.forEach{it.tick(dt)}
+            connections.forEach { it.tick(dt) }
+            connections.removeAll { it.broken }
         }
         synchronized(entities)  {
             collidables.forEach {
@@ -70,7 +70,7 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
 
     override fun render() {
         synchronized(entities) {entities.forEach { it.render(camera) }}
-        synchronized(connections) {connections.forEach { it.render(camera) }}
+        synchronized(connections) { connections.filter { !it.broken }.forEach { it.render(camera) } }
     }
 
     override fun reset() {
