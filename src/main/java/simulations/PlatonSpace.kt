@@ -4,6 +4,7 @@ import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
 import framework.Simulation
+import framework.Vertex
 import physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
@@ -18,8 +19,8 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
     private lateinit var forces: Array<Vec>
     private val radius = 1000
     private var coordSys = CartesianCoordinateSystem(true, radius * 2, (radius / 10).toDouble(), Color(110, 106, 160))
-    private var colorLines = Color(200, 200, 200)
-    private var colorPoints = Color(163, 153, 239)
+    private var colorLines = Vec(200, 200, 200)
+    private var colorPoints = Vec(163, 153, 239)
 
     init {
         reset()
@@ -31,12 +32,6 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
         keepPointsInOrb()
     }
 
-    fun render(g: Graphics) {
-        coordSys.render(drawer, g)
-        drawPoints(g)
-        if (keyManager.f) drawForces(g)
-    }
-
     override fun render() {
         TODO("Not yet implemented")
     }
@@ -46,14 +41,9 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
             val force = forces[i]
             g.color = Color.ORANGE
             val shorten = 1 / force.length
-            drawer.drawLine(
-                points[i].x,
-                points[i].y,
-                points[i].z,
-                points[i].x + force.x * shorten,
-                points[i].y + force.y * shorten,
-                points[i].z + force.z * shorten,
-                g
+            camera.renderLine(
+                Vertex(points[i].positionVector, colorLines, Vec.zero),
+                Vertex(points[i].positionVector + force * shorten, colorLines, Vec.zero)
             )
         }
     }
@@ -87,7 +77,7 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
 
     private fun drawPoints(g: Graphics) {
         for (point in points) {
-            drawer.drawDot(point, 0.25, colorPoints, g)
+            camera.renderSphere(Vertex(point.positionVector, colorPoints, Vec.zero), 0.25f)
         }
         var shortestDist = Int.MAX_VALUE.toDouble()
         for (i in points.indices) {
@@ -102,8 +92,10 @@ class PlatonSpace(private val amountOfPoint3ds: Int) : Simulation("Platon") {
             for (j in i until points.size) {
                 if (j != i) {
                     if (points[i].getDistanceTo(points[j]) < 1.3 * shortestDist) {
-                        g.color = colorLines
-                        drawer.drawLine(points[i], points[j], g)
+                        camera.renderLine(
+                            Vertex(points[i].positionVector, colorLines, Vec.zero),
+                            Vertex(points[j].positionVector, colorLines, Vec.zero)
+                        )
                     }
                 }
             }

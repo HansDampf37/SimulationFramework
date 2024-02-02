@@ -20,7 +20,6 @@ class Pendulum(private val amountOfPoints: Int) : Simulation("Pendulum") {
 
     init {
         reset()
-        drawer.setZoom(0.03)
     }
 
     override fun tick(dt: Seconds) {
@@ -76,15 +75,6 @@ class Pendulum(private val amountOfPoints: Int) : Simulation("Pendulum") {
             }
             forces[i].addInPlace(gravity)
         }
-    }
-
-    fun render(g: Graphics) {
-        cart.render(drawer, g)
-        for (i in 0 until points.size - 1) {
-            drawer.drawDot(points[i], 0.25, Color.lightGray, g)
-            drawer.drawLine(points[i], points[i + 1], g)
-        }
-        drawer.drawDot(points[points.size - 1], 0.25, Color.lightGray, g)
     }
 
     override fun reset() {
