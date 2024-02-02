@@ -6,7 +6,7 @@ import framework.interfaces.Drawable
 import framework.interfaces.Renderable
 import framework.interfaces.Status
 import framework.interfaces.Tickable
-import physics.Collision.Companion.occur
+import physics.collisions.Collision.Companion.occur
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.pow

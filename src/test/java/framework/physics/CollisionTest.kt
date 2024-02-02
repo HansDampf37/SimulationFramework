@@ -2,7 +2,7 @@ package framework.physics
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import physics.Collision
+import physics.collisions.Collision
 import physics.Mass
 import algebra.Vec
 

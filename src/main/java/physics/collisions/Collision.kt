@@ -1,6 +1,7 @@
-package physics
+package physics.collisions
 
 import framework.interfaces.Status
+import physics.Mass
 import kotlin.math.pow
 
 /**

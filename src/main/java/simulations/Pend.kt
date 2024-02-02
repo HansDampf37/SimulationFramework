@@ -70,21 +70,6 @@ class Pend(
         }
     }
 
-    fun correct() {
-        synchronized(connections) {
-            synchronized(masses) {
-                masses.forEachIndexed { i, mass ->
-                    if (i != 0) {
-                        if (connections[i - 1].broken) return
-                        if (mass.getDistanceTo(masses[i - 1]) >= maxRopeSegmentLength) {
-                            mass.set(masses[i - 1].positionVector + masses[i - 1].getDirectionTo(mass) * maxRopeSegmentLength)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun render() {
         synchronized(masses) { for (m in masses) m.render(camera) }
         synchronized(connections) { connections.filter { !it.broken }.forEach { it.render(camera) } }
