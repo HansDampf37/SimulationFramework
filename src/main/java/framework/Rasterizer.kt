@@ -1,5 +1,6 @@
 package framework
 
+import Conf
 import algebra.Vec
 import algebra.Vec2
 import algebra.Vec4
@@ -43,7 +44,7 @@ class Rasterizer(val camera: Camera) {
         private set
     private var zBuffer: FloatArray =
         FloatArray(camera.screenWidth * camera.screenHeight) // Z-buffer to store depth values
-    private var entityPuffer: Array<Entity?> = Array(camera.screenWidth * camera.screenHeight) { null }
+    private var entityPuffer = arrayOfNulls<Entity>(camera.screenWidth * camera.screenHeight)
 
     init {
         newFrame()
@@ -110,8 +111,7 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
-
-    fun rasterizeTriangle(triangle: Triangle, entity: Entity?) {
+    fun rasterizeTriangle(triangle: Triangle, entity: Entity?){
         fun interpolateDepthColorNormal(v1: Vertex, v2: Vertex, v3: Vertex, pixel: Vec2): InterpolationResult {
             val p0: Vec2 = v1.screenPosition!!
             val p1: Vec2 = v2.screenPosition!!
@@ -304,7 +304,7 @@ class Rasterizer(val camera: Camera) {
         graphics.color = Conf.background_color
         graphics.fillRect(0, 0, image.width, image.height)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
-        Arrays.fill(entityPuffer, null) // reset entity puffer with null
+        Arrays.fill(entityPuffer, null)
     }
 
     /**
@@ -333,7 +333,7 @@ class Rasterizer(val camera: Camera) {
     }
 
     /**
-     * Returns a [BufferedImage] where pixels are white if and only if the pixel is on top of the specified entity.
+     * Returns a [BufferedImage] where pixels are white if and only if the pixel is on top of the specified [Entity].
      * @param entity the specified entity
      * @return a mask for this entity
      */

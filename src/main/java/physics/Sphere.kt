@@ -1,6 +1,5 @@
 package physics
 
-import Conf
 import algebra.Vec
 import framework.Camera
 import framework.Vertex

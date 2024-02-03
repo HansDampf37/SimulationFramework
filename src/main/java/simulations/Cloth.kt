@@ -1,7 +1,7 @@
 package simulations
 
 import algebra.Vec
-import framework.PhysicsSimulation
+import physics.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
@@ -44,11 +44,7 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
     }
 
     override fun calcForces(dt: Seconds) {
-        synchronized(connections) {
-            connections.forEach { it.tick(dt) }
-            connections.removeAll { it.broken }
-        }
-        synchronized(entities)  {
+        synchronized(moveables)  {
             collidables.forEach {
                 if (it != sphere) {
                     if (testCollision(sphere, it)) {
@@ -68,29 +64,23 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
         }
     }
 
-    override fun render() {
-        synchronized(entities) {entities.forEach { it.render(camera) }}
-        synchronized(connections) { connections.filter { !it.broken }.forEach { it.render(camera) } }
-    }
-
     override fun reset() {
-        synchronized(entities) {
-            entities.clear()
-        }
+        super.reset()
         for (x in 0 until size) {
-            for (z in 0 until size) {
-                val isOnEdge = (x == 0) or (z == 0) or (x == size - 1) or (z == size - 1)
-                val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, z.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
+            for (y in 0 until size) {
+                val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
+                val isOnCorner = !((x != 0 || x != size - 1) && (y != 0 || y != size - 1))
+                val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
                 mass.status = if (isOnEdge) Status.Immovable else Status.Movable
                 mass.color = Conf.mass_color + (Vec.random * 20) - 10
-                addEntity(mass)
-                entities.last().status = if (isOnEdge) Status.Immovable else Status.Movable
+                add(mass)
+                moveables.last().status = if (isOnEdge) Status.Immovable else Status.Movable
             }
         }
         for (x in 0 until size) {
             for (y in 0 until size) {
                 if (x + 1 < size) {
-                    connections.add(
+                    add(
                         ImpulseConnection(
                             masses[x * size + y],
                             masses[(x + 1) * size + y],
@@ -100,7 +90,7 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
                     )
                 }
                 if (y + 1 < size) {
-                    connections.add(
+                    add(
                         ImpulseConnection(
                             masses[x * size + y],
                             masses[x * size + y + 1],
@@ -112,6 +102,6 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
             }
         }
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
-        addEntity(sphere)
+        add(sphere)
     }
 }

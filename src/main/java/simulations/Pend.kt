@@ -1,7 +1,7 @@
 package simulations
 
 import algebra.Point3d
-import framework.PhysicsSimulation
+import physics.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
@@ -39,8 +39,8 @@ class Pend(
                     if (delta > 0) {
                         // field > value -> remove delta masses from the rope
                         repeat(delta) {
-                            val removedMass = entities.removeLast() as Mass
-                            val lastMass = entities.last() as Mass
+                            val removedMass = moveables.removeLast() as Mass
+                            val lastMass = moveables.last() as Mass
                             connections.removeAll { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
                         }
                     } else if (delta < 0) {
@@ -49,7 +49,7 @@ class Pend(
                             val sphere = Sphere(lastMass.x, lastMass.y, lastMass.z - maxRopeSegmentLength * 0.8,
                                 radius, lastMass.mass)
                             connections.add(ImpulseConnection(lastMass, sphere, maxRopeSegmentLength, maxEnergy))
-                            addEntity(sphere)
+                            add(sphere)
                         }
                     }
                 }
@@ -84,12 +84,12 @@ class Pend(
 
     override fun reset() {
         synchronized(masses) {
-            entities.clear()
+            moveables.clear()
             for (i in 0 until amountOfPoints) {
                 val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
                 val mass = Sphere(pos.x, pos.y, pos.z, radius, 1.0)
                 if (i == 0) mass.status = Status.Immovable
-                addEntity(mass)
+                add(mass)
             }
         }
         masses[0].status = Status.Immovable

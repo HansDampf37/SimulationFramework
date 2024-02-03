@@ -2,8 +2,8 @@ package framework
 
 import algebra.Vec
 import framework.interfaces.Entity
+import framework.interfaces.Moveable
 import framework.interfaces.Status
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import physics.Seconds
@@ -99,7 +99,7 @@ class RasterizerTest {
         testEntityIsStoredInEachNonBlackPixel(entity)
     }
 
-    private fun testEntityIsStoredInEachNonBlackPixel(entity: Entity) {
+    private fun testEntityIsStoredInEachNonBlackPixel(entity: Moveable) {
         val entityIsAt = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
         val entityButNoPixel = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)
         val pixelButNoEntity = BufferedImage(camera.screenWidth, camera.screenHeight, BufferedImage.TYPE_INT_RGB)

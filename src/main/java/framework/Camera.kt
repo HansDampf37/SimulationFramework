@@ -158,14 +158,6 @@ class Camera(
             0.0, 0.0, 0.0, 1.0
         )
 
-    private val translateCameraToWorld
-        get() = Matrix4X4(
-            1.0, 0.0, 0.0, x,
-            0.0, 1.0, 0.0, y,
-            0.0, 0.0, 1.0, z,
-            0.0, 0.0, 0.0, 1.0
-        )
-
     private val matrixPhi: Matrix4X4
         get() {
             val k = Matrix4X4(
@@ -174,13 +166,13 @@ class Camera(
                 -1.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            val I = Matrix4X4(
+            val unitMatrix = Matrix4X4(
                 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            return I + k * sin(phi) + k * k * (1 - cos(phi))
+            return unitMatrix + k * sin(phi) + k * k * (1 - cos(phi))
         }
 
     private val matrixTheta: Matrix4X4
@@ -192,13 +184,13 @@ class Camera(
                 -left.y, left.x, 0.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            val I = Matrix4X4(
+            val unitMatrix = Matrix4X4(
                 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0
             )
-            return I + k * sin(theta) + k * k * (1 - cos(theta))
+            return unitMatrix + k * sin(theta) + k * k * (1 - cos(theta))
         }
 
     private val rotateWorldToCamera: Matrix4X4
@@ -229,9 +221,6 @@ class Camera(
 
     private val worldToCameraCoords
         get() = rotateWorldToCamera * translateWorldToCamera
-
-    private val cameraToWorldCoords
-        get() = translateCameraToWorld * rotateCameraToWorld
 
     /**
      * This variable is true if and only if all relevant properties

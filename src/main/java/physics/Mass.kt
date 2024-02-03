@@ -5,15 +5,14 @@ import algebra.Point3d
 import algebra.Vec
 import framework.Camera
 import framework.Vertex
-import framework.interfaces.Entity
-import framework.interfaces.Status
+import framework.interfaces.*
 
 open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
     // Drawable
     override var outlineRasterization: Boolean = false
     override var color: Vec? = Conf.mass_color
 
-    // Entity
+    // Moveable
     override var velocity: Vec = Vec(0, 0, 0)
     override var acceleration: Vec = Vec(0, 0, 0)
     override var status = Status.Movable
@@ -44,11 +43,4 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
     fun applyForce(force: Vec) {
         if (status == Status.Movable) acceleration.addInPlace(force / mass)
     }
-
-    fun removeAccelerationInDirection(direction: Vec) {
-        if (status == Status.Movable) acceleration.subInPlace(acceleration.projectOnto(direction))
-    }
-
-    val impulse: Vec
-        get() = velocity * mass
 }

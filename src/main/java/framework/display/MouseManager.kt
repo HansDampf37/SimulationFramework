@@ -1,6 +1,5 @@
 package framework.display
 
-import algebra.Vec
 import algebra.Vec2
 import algebra.Vec4
 import framework.Camera
@@ -9,7 +8,6 @@ import framework.interfaces.Status
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
-import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import javax.swing.SwingUtilities
@@ -39,7 +37,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             val event = eventQueue.poll()
             when (event.id) {
                 MouseEvent.MOUSE_MOVED -> onMouseMoved(event)
-                MouseEvent.MOUSE_CLICKED -> onMouseClicked(event)
+                MouseEvent.MOUSE_CLICKED -> onMouseClicked()
                 MouseEvent.MOUSE_PRESSED -> onMousePressed(event)
                 MouseEvent.MOUSE_RELEASED -> onMouseReleased(event)
                 MouseEvent.MOUSE_DRAGGED -> onMouseDragged(event, dt)
@@ -50,7 +48,7 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
         }
     }
 
-    private fun onMouseClicked(e: MouseEvent) = Unit
+    private fun onMouseClicked() = Unit
 
     private fun onMousePressed(e: MouseEvent) {
         if (SwingUtilities.isLeftMouseButton(e)) {
@@ -124,8 +122,6 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
             lastHoveredEntity = hoveredEntity
         }
     }
-
-    private fun onMouseClicked() = Unit
 
     //----------------------------------------------------------------------------------
     override fun mouseMoved(e: MouseEvent?) = if (e!=null) addEvent(e) else Unit

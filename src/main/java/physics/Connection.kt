@@ -1,29 +1,31 @@
 package physics
 
 import algebra.Vec
-import framework.*
-import framework.interfaces.Drawable
+import framework.Camera
+import framework.Vertex
 import framework.interfaces.Renderable
 import framework.interfaces.Status
 import framework.interfaces.Tickable
 import physics.collisions.Collision.Companion.occur
-import java.awt.Color
-import java.awt.Graphics
 import kotlin.math.pow
 
+/**
+ * A connection connects two masses [m1] and [m2]. The two masses can then interact with each other in any way for
+ * example by sending impulses over the connection or by implementing a spring mechanism.
+ * If at some point the connection holds more energy than [maxEnergy] it should [break][broken]. Implementations should
+ * check that [broken] == false before [Rendering][render] or [ticking][tick].
+ * @see ImpulseConnection
+ * @see SpringConnection //TODO
+ */
 abstract class Connection(
     protected val m1: Mass,
     protected val m2: Mass,
-    var maxEnergy: Double,
+    var maxEnergy: Joule,
     var broken: Boolean = false
-) : Drawable, Tickable, Renderable {
+) : Tickable, Renderable {
     override var color: Vec? = null
 
     abstract override fun tick(dt: Seconds)
-
-    open fun render(drawer: Graphics3d, g: Graphics) {
-        if (!broken) drawer.drawLine(m1, m2, g)
-    }
 
     override fun render(camera: Camera) {
         val v1 = Vertex(m1.positionVector, m1.color ?: Vec.zero, Vec.zero)
@@ -34,6 +36,13 @@ abstract class Connection(
     fun isConnectedTo(mass: Mass) : Boolean = m1 == mass || m2 == mass
 }
 
+/**
+ * An ImpulseConnection is a [Connection] that sends impulses between the two masses if
+ *
+ * 1. the distance between them > maxDistance
+ *
+ * 2. they are moving away from each other
+ */
 class ImpulseConnection(
     m1: Mass,
     m2: Mass,
@@ -71,13 +80,5 @@ class ImpulseConnection(
                 m1.set(m2 - ropeDir * maxDistance)
             }
         }
-    }
-
-    override fun render(drawer: Graphics3d, g: Graphics) {
-        if (broken) return
-        val oldColor = g.color
-        g.color = if (m1.getDistanceTo(m2) < maxDistance) Color.green else Color.red
-        drawer.drawLine(m1, m2, g)
-        g.color = oldColor
     }
 }
