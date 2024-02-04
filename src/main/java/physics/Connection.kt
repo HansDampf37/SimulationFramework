@@ -4,14 +4,13 @@ import algebra.Vec
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.Renderable
-import physics.PointMass
 import framework.interfaces.Status
 import framework.interfaces.Tickable
 import physics.collisions.Collision.Companion.occur
 import kotlin.math.pow
 
 /**
- * A connection connects two [masses][Mass] [m1] and [m2]. The two masses can then interact with each other in any way for
+ * A connection connects two [masses][PointMass] [m1] and [m2]. The two masses can then interact with each other in any way for
  * example by sending impulses over the connection or by implementing a spring mechanism.
  * If at some point the connection holds more energy than [maxEnergy] it should [break][broken]. Implementations should
  * check that [broken] == false before [Rendering][render] or [ticking][tick].
@@ -29,6 +28,7 @@ abstract class Connection(
     abstract override fun tick(dt: Seconds)
 
     override fun render(camera: Camera) {
+        if (broken) return
         val v1 = Vertex(m1.positionVector, m1.color ?: Vec.zero, Vec.zero)
         val v2 = Vertex(m2.positionVector, m2.color ?: Vec.zero, Vec.zero)
         camera.renderLine(v1, v2)
@@ -38,7 +38,7 @@ abstract class Connection(
 }
 
 /**
- * An ImpulseConnection is a [Connection] that sends impulses between the two [masses][Mass] if
+ * An ImpulseConnection is a [Connection] that sends impulses between the two [masses][PointMass] if
  *
  * 1. the distance between them > maxDistance
  *

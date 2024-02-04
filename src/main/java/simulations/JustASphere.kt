@@ -5,8 +5,9 @@ import physics.Seconds
 import physics.Sphere
 import kotlin.math.PI
 
+@Suppress("unused")
 class JustASphere: Simulation("Sphere") {
-    private val sphere = Sphere(0.0, 0.0, 0.0, 1.0, 1.0)
+    private val dot = Sphere(0.0, 0.0, 0.0, 1.0, 1.0)
     init {
         reset()
     }
@@ -14,13 +15,13 @@ class JustASphere: Simulation("Sphere") {
     override fun tick(dt: Seconds) = Unit
 
     override fun render() {
-        sphere.render(camera)
+        dot.render(camera)
     }
 
     override fun reset() {
-        sphere.x = 0.0
-        sphere.y = 0.0
-        sphere.z = 0.0
+        dot.x = 0.0
+        dot.y = 0.0
+        dot.z = 0.0
         camera.focalLength = 10.0
         camera.x = 0.0
         camera.y = -25.0

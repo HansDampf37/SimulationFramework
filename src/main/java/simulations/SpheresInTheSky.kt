@@ -9,7 +9,7 @@ import kotlin.math.sin
 
 @Suppress("unused")
 class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
-    private val spheres = ArrayList<Sphere>()
+    private val dots = ArrayList<Sphere>()
 
     @WatchInt("Amount", 4, 100)
     var numDivisions = numDivisions
@@ -38,7 +38,7 @@ class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
     override fun tick(dt: Seconds) = Unit
 
     override fun render() {
-        synchronized(spheres) { spheres.forEach { it.render(camera) } }
+        synchronized(dots) { dots.forEach { it.render(camera) } }
         drawLookingDirection()
     }
 
@@ -49,8 +49,8 @@ class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
     }
 
     override fun reset() {
-        synchronized(spheres) {
-            spheres.clear()
+        synchronized(dots) {
+            dots.clear()
             for (lat in 0 until numDivisions) {
                 for (lon in 0 until numDivisions * 2) {
                     val theta = (lat * Math.PI / numDivisions).toFloat()
@@ -62,7 +62,7 @@ class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
                         radius,
                         1.0
                     )
-                    spheres.add(s)
+                    dots.add(s)
                 }
             }
         }

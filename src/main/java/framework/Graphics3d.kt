@@ -38,7 +38,7 @@ class Graphics3d(
         drawLine(a.x, a.y, a.z, b.x, b.y, b.z, g)
     }
 
-    fun drawDot(x: Double, y: Double, z: Double, radius: Double, color: Color?, g: Graphics) {
+    fun drawSphere(x: Double, y: Double, z: Double, radius: Double, color: Color?, g: Graphics) {
         g.color = color
         g.fillOval(
             (calcX(x, y, z) - radius * zoom).toInt(),
@@ -47,8 +47,8 @@ class Graphics3d(
             (2 * radius * zoom).toInt())
     }
 
-    fun drawDot(a: Point3d, radius: Double, color: Color?, g: Graphics) {
-        drawDot(a.x, a.y, a.z, radius, color, g)
+    fun drawSphere(a: Point3d, radius: Double, color: Color?, g: Graphics) {
+        drawSphere(a.x, a.y, a.z, radius, color, g)
     }
 
     private fun calcX(x: Double, y: Double, z: Double): Int {

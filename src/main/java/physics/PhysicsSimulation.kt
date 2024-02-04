@@ -8,42 +8,64 @@ import framework.interfaces.Collidable
 import physics.collisions.Collision
 import physics.collisions.CollisionManager
 import randomOrder
+import java.lang.IllegalArgumentException
 import kotlin.collections.ArrayList
 
+/**
+ * Physics Simulations are [Simulation]s that enable [registering][register] of [tickables][Tickable], [renderables][Renderable],
+ * and [collidables][Collidable]. If this classes [render]-method is called, [Renderable.render] is called on each
+ * registered [Renderable]. If this classes [tick]-method is called, [Tickable.tick] is called on each registered [Tickable]
+ * and Collisions are calculated between the registered [collidables].
+ * The
+ */
+@Suppress("KotlinConstantConditions")
 abstract class PhysicsSimulation(title: String) : Simulation(title) {
-    //private var frictionPerSecond: Double = 0.02
     @WatchDouble("g", 0.0, 15.0)
     private var g: MetersPerSecondPerSecond = 9.81
-    private val gravity: Vec get() = Vec(0.0, 0.0, -g)
-    protected val entities = ArrayList<Entity>()
-    protected val moveables: MutableList<Moveable> = ArrayList()
-    protected val tickables: MutableList<Tickable> = ArrayList()
-    protected val renderables: MutableList<Renderable> = ArrayList()
-    protected val collidables: MutableList<Collidable> = ArrayList()
-    protected val masses: MutableList<Mass> = ArrayList()
-    protected val connections: MutableList<ImpulseConnection> = ArrayList()
+    private val gravity get() = Vec(0.0, 0.0, -g)
+    //private var frictionPerSecond: Double = 0.02
+    private val tickables: MutableList<Tickable> = ArrayList()
+    private val renderables: MutableList<Renderable> = ArrayList()
+    private val collidables: MutableList<Collidable> = ArrayList()
 
     private var collisionManager: CollisionManager = CollisionManager()
 
-    fun add(el: Any) {
-        if (el is Entity) synchronized(entities) { entities.add(el) }
-        if (el is Moveable) synchronized(moveables) { moveables.add(el) }
-        if (el is Tickable) synchronized(tickables) { tickables.add(el) }
-        if (el is Renderable) synchronized(renderables) { renderables.add(el) }
-        if (el is Collidable) synchronized(collidables) { collidables.add(el) }
-        if (el is Mass) synchronized(masses) { masses.add(el) }
+    /**
+     * Registers a [Tickable], [Renderable], or [Collidable] at this Simulation.
+     * @throws IllegalArgumentException if specified object is neither [Tickable], [Renderable], nor [Collidable]
+     */
+    fun register(obj: Any) {
+        if (obj is Tickable) synchronized(tickables) { tickables.add(obj) }
+        if (obj is Renderable) synchronized(renderables) { renderables.add(obj) }
+        if (obj is Collidable) synchronized(collidables) { collidables.add(obj) }
+
+        if (obj !is Tickable && obj !is Renderable && obj !is Collidable) {
+            throw IllegalArgumentException("specified object is neither Tickable, Renderable, nor Collidable")
+        }
+    }
+
+    /**
+     * Unregisters a [Tickable], [Renderable], or [Collidable] from this Simulation.
+     * @throws IllegalArgumentException if specified object is neither [Tickable], [Renderable], nor [Collidable]
+     */
+    fun unregister(obj: Any) {
+        if (obj is Tickable) synchronized(tickables) { tickables.remove(obj) }
+        if (obj is Renderable) synchronized(renderables) { renderables.remove(obj) }
+        if (obj is Collidable) synchronized(collidables) { collidables.remove(obj) }
+
+        if (obj !is Tickable && obj !is Renderable && obj !is Collidable) {
+            throw IllegalArgumentException("specified object is neither Tickable, Renderable, nor Collidable")
+        }
     }
 
     override fun reset() {
-        synchronized(entities) { entities.clear() }
-        synchronized(moveables) { moveables.clear() }
         synchronized(tickables) { tickables.clear() }
         synchronized(renderables) { renderables.clear() }
         synchronized(collidables) { collidables.clear() }
-        synchronized(masses) { masses.clear() }
     }
 
     override fun tick(dt: Seconds) {
+        calcForces()
         synchronized(collidables)  {
             collidables.forEach { c1 ->
                 collidables.forEach { c2 ->
@@ -66,15 +88,6 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
                 }
             }
         }
-        synchronized(moveables) {
-            for (entity in moveables) {
-                if (entity.status == Status.Movable) {
-                    entity.acceleration += gravity * dt
-                    //entity.velocity = entity.velocity.scaleInPlace((1 - frictionPerSecond * dt))
-                    //entity.acceleration.setToZero()
-                }
-            }
-        }
         synchronized(tickables) {
             val order = randomOrder(tickables.size)
             for (index in order) tickables[index].tick(dt)
@@ -93,9 +106,15 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
     open fun correctState() = Unit
 
     /**
-     * Calculate the forces and accelerations on the [moveables] in this simulation
+     * Calculate the forces and accelerations on the objects in this simulation
      */
-    abstract fun calcForces(dt: Seconds)
+    abstract fun calcForces()
 
-    fun testCollision(c1: Collidable, c2: Collidable): Boolean = collisionManager.testCollision(c1, c2)
+    protected fun applyGravity(masses: Iterable<Mass>) {
+        for (mass in masses) {
+            mass.acceleration += gravity
+        }
+    }
+
+    private fun testCollision(c1: Collidable, c2: Collidable): Boolean = collisionManager.testCollision(c1, c2)
 }

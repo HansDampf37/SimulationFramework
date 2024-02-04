@@ -1,59 +1,66 @@
 package simulations
 
 import algebra.Point3d
-import physics.PhysicsSimulation
+import algebra.Vec
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
 import physics.ImpulseConnection
+import physics.PhysicsSimulation
 import physics.PointMass
-import physics.Seconds
-import physics.Sphere
-import java.awt.Graphics
 import kotlin.math.PI
 
 @Suppress("unused")
-class Pend(
-    amountOfPoints: Int,
-    length: Double,
-) : PhysicsSimulation("String") {
+class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
     private val radius = 0.025
+    private val links = ArrayList<ImpulseConnection>()
+    private val masses = ArrayList<PointMass>()
     private var maxEnergy = 30.0
-        set(value) = connections.forEach { it.maxEnergy = value }
+        set(value) = links.forEach { it.maxEnergy = value }
     private val maxRopeSegmentLength: Double
         get() = length / amountOfPoints
     @WatchDouble("Rope-Length", 1.0, 3.0)
     private var length: Double = length
         set(value) {
             field = value
-            synchronized(connections) {
-                connections.forEach { it.maxDistance = maxRopeSegmentLength }
+            synchronized(links) {
+                links.forEach { it.maxDistance = maxRopeSegmentLength }
             }
         }
     @WatchInt("Segments", 1, 100)
     private var amountOfPoints: Int = amountOfPoints
         set(value) {
-            synchronized(connections) {
+            synchronized(links) {
                 synchronized(masses) {
                     val delta = amountOfPoints - value
                     if (delta > 0) {
                         // field > value -> remove delta masses from the rope
                         repeat(delta) {
-                            val removedMass = moveables.removeLast() as PointMass
-                            val lastMass = moveables.last() as PointMass
-                            connections.removeAll { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
+                            val removedMass = masses.removeLast()
+                            val lastMass = masses.last()
+                            val toBeRemoved = links.filter { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
+                            links.removeAll(toBeRemoved.toSet())
+                            toBeRemoved.forEach { unregister(it) }
                         }
                     } else if (delta < 0) {
                         repeat(-delta) {
-                            val lastMass = masses.last() as PointMass
-                            val sphere = Sphere(lastMass.position.x, lastMass.position.y, lastMass.position.z - maxRopeSegmentLength * 0.8,
-                                radius, lastMass.mass)
-                            connections.add(ImpulseConnection(lastMass, sphere, maxRopeSegmentLength, maxEnergy))
-                            add(sphere)
+                            val lastMass = masses.last()
+                            val mass = PointMass(
+                                lastMass.mass,
+                                lastMass.position.x,
+                                lastMass.position.y,
+                                lastMass.position.z - maxRopeSegmentLength * 0.8,
+                                radius,
+                            )
+                            masses.add(mass)
+                            register(mass)
+                            val link = ImpulseConnection(lastMass, mass, maxRopeSegmentLength, maxEnergy)
+                            links.add(link)
+                            register(link)
                         }
                     }
                 }
-                connections.forEach { it.maxDistance = maxRopeSegmentLength }
+                links.forEach { it.maxDistance = maxRopeSegmentLength }
             }
             field = value
         }
@@ -62,36 +69,29 @@ class Pend(
         reset()
     }
 
-    override fun calcForces(dt: Seconds) = Unit
-
     override fun render() {
         synchronized(masses) { for (m in masses) m.render(camera) }
-        synchronized(connections) { connections.filter { !it.broken }.forEach { it.render(camera) } }
-    }
-
-    fun render(g: Graphics) {
-        for (m in masses) m.render(camera)
-        for (c in connections) c.render(camera)
-        for (i in masses.indices) {
-            g.drawString(masses[i].toString(), 10, 100 + i * 20)
-        }
+        synchronized(links) { links.filter { !it.broken }.forEach { it.render(camera) } }
     }
 
     override fun reset() {
+        super.reset()
         synchronized(masses) {
-            moveables.clear()
+            masses.clear()
             for (i in 0 until amountOfPoints) {
                 val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
-                val mass = Sphere(pos.x, pos.y, pos.z, radius, 1.0)
+                val mass = PointMass(1.0, pos.x, pos.y, pos.z, radius)
                 if (i == 0) mass.status = Status.Immovable
-                add(mass)
+                masses.add(mass)
+                register(mass)
             }
         }
-        masses[0].status = Status.Immovable
-        synchronized(connections) {
-            connections.clear()
+        synchronized(links) {
+            links.clear()
             for (i in 0 until amountOfPoints - 1) {
-                connections.add(ImpulseConnection(masses[i] as PointMass, masses[i + 1] as PointMass, maxRopeSegmentLength, maxEnergy))
+                val link = ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, maxEnergy)
+                links.add(link)
+                register(link)
             }
         }
         camera.focalLength = 10.0
@@ -102,5 +102,12 @@ class Pend(
         camera.phi = PI
         camera.focalLength = 10.0
         camera.zoom = 0.001
+    }
+
+    override fun calcForces() {
+        synchronized(masses) {
+            for (clothPoint in masses) clothPoint.acceleration = Vec.zero
+            applyGravity(masses)
+        }
     }
 }
