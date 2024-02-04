@@ -4,7 +4,8 @@ import algebra.Vec
 import framework.Simulation
 import framework.WatchDouble
 import framework.interfaces.*
-import physics.collisions.Collidable
+import framework.interfaces.Collidable
+import physics.collisions.Collision
 import physics.collisions.CollisionManager
 import randomOrder
 import kotlin.collections.ArrayList
@@ -43,7 +44,28 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
     }
 
     override fun tick(dt: Seconds) {
-        calcForces(dt)
+        synchronized(collidables)  {
+            collidables.forEach { c1 ->
+                collidables.forEach { c2 ->
+                    if (c1 != c2) {
+                        if (testCollision(c1, c2)) {
+                            Collision.occur(c1, c2, 1.0)
+                            if (c1 is Sphere && c2 is Sphere) {
+                                val targetDistance = c1.radius + c2.radius
+                                val overlap = targetDistance - c1.getDistanceTo(c2)
+                                val massMovable = c2.status == Status.Movable
+                                val overlap1 = if (massMovable) c1.mass / (c2.mass + c1.mass) * overlap else 0.0
+                                val overlap2 = if (massMovable) c2.mass / (c2.mass + c1.mass) * overlap else overlap
+                                if ((c2.positionVector - c1.positionVector).length != 0.0) {
+                                    c1.set(c1 + c2.getDirectionTo(c1) * overlap2)
+                                    c2.set(c2 + c1.getDirectionTo(c2) * overlap1)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         synchronized(moveables) {
             for (entity in moveables) {
                 if (entity.status == Status.Movable) {

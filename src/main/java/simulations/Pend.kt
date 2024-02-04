@@ -6,7 +6,7 @@ import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
 import physics.ImpulseConnection
-import physics.Mass
+import physics.PointMass
 import physics.Seconds
 import physics.Sphere
 import java.awt.Graphics
@@ -39,14 +39,14 @@ class Pend(
                     if (delta > 0) {
                         // field > value -> remove delta masses from the rope
                         repeat(delta) {
-                            val removedMass = moveables.removeLast() as Mass
-                            val lastMass = moveables.last() as Mass
+                            val removedMass = moveables.removeLast() as PointMass
+                            val lastMass = moveables.last() as PointMass
                             connections.removeAll { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
                         }
                     } else if (delta < 0) {
                         repeat(-delta) {
-                            val lastMass = masses.last()
-                            val sphere = Sphere(lastMass.x, lastMass.y, lastMass.z - maxRopeSegmentLength * 0.8,
+                            val lastMass = masses.last() as PointMass
+                            val sphere = Sphere(lastMass.position.x, lastMass.position.y, lastMass.position.z - maxRopeSegmentLength * 0.8,
                                 radius, lastMass.mass)
                             connections.add(ImpulseConnection(lastMass, sphere, maxRopeSegmentLength, maxEnergy))
                             add(sphere)
@@ -62,12 +62,7 @@ class Pend(
         reset()
     }
 
-    override fun calcForces(dt: Seconds) {
-        synchronized(connections) {
-            connections.forEach { it.tick(dt) }
-            connections.removeAll { it.broken }
-        }
-    }
+    override fun calcForces(dt: Seconds) = Unit
 
     override fun render() {
         synchronized(masses) { for (m in masses) m.render(camera) }
@@ -96,7 +91,7 @@ class Pend(
         synchronized(connections) {
             connections.clear()
             for (i in 0 until amountOfPoints - 1) {
-                connections.add(ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, maxEnergy))
+                connections.add(ImpulseConnection(masses[i] as PointMass, masses[i + 1] as PointMass, maxRopeSegmentLength, maxEnergy))
             }
         }
         camera.focalLength = 10.0
