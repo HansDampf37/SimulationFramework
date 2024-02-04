@@ -2,7 +2,6 @@ package physics.collisions
 
 import framework.interfaces.Mass
 import framework.interfaces.Status
-import physics.PointMass
 import kotlin.math.pow
 
 /**

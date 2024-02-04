@@ -38,9 +38,7 @@ open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Doub
         require(mass != 0.0) { "Mass can't be equal to 0" }
     }
 
-    constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)
-
-    constructor(mass: Double, positionVector: Vec) : this(mass, positionVector.x, positionVector.y, positionVector.z)
+    constructor(mass: Double, positionVector: Vec, radius: Double = 1.0) : this(mass, positionVector.x, positionVector.y, positionVector.z, radius)
 
     override fun render(camera: Camera) {
         camera.renderSphere(Vertex(this.positionVector, color ?: Vec.zero, Vec.zero), radius.toFloat(), this)

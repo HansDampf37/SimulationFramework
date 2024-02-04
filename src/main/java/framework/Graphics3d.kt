@@ -12,6 +12,8 @@ import kotlin.math.cos
  * the coordinates are mapped and the corresponding methods are called in [Graphics] objects that are also given as
  * arguments.
  */
+@Deprecated("Use Camera and Rasterizer instead")
+@Suppress("unused")
 class Graphics3d(
     cameraAngleHorizontal: Double = Math.PI / 4,
     cameraAngleVertical: Double = Math.PI / 4,
