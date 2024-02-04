@@ -1,9 +1,7 @@
 package physics.collisions
 
-import com.sun.source.tree.Tree
-import physics.Mass
+import framework.interfaces.Collidable
 import physics.Sphere
-import java.util.TreeMap
 
 class CollisionManager {
     val collidables: MutableList<Collidable> = ArrayList()

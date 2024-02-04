@@ -4,13 +4,14 @@ import algebra.Vec
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.Renderable
+import physics.PointMass
 import framework.interfaces.Status
 import framework.interfaces.Tickable
 import physics.collisions.Collision.Companion.occur
 import kotlin.math.pow
 
 /**
- * A connection connects two masses [m1] and [m2]. The two masses can then interact with each other in any way for
+ * A connection connects two [masses][Mass] [m1] and [m2]. The two masses can then interact with each other in any way for
  * example by sending impulses over the connection or by implementing a spring mechanism.
  * If at some point the connection holds more energy than [maxEnergy] it should [break][broken]. Implementations should
  * check that [broken] == false before [Rendering][render] or [ticking][tick].
@@ -18,8 +19,8 @@ import kotlin.math.pow
  * @see SpringConnection //TODO
  */
 abstract class Connection(
-    protected val m1: Mass,
-    protected val m2: Mass,
+    protected val m1: PointMass,
+    protected val m2: PointMass,
     var maxEnergy: Joule,
     var broken: Boolean = false
 ) : Tickable, Renderable {
@@ -33,19 +34,19 @@ abstract class Connection(
         camera.renderLine(v1, v2)
     }
 
-    fun isConnectedTo(mass: Mass) : Boolean = m1 == mass || m2 == mass
+    fun isConnectedTo(mass: PointMass) : Boolean = m1 == mass || m2 == mass
 }
 
 /**
- * An ImpulseConnection is a [Connection] that sends impulses between the two masses if
+ * An ImpulseConnection is a [Connection] that sends impulses between the two [masses][Mass] if
  *
  * 1. the distance between them > maxDistance
  *
  * 2. they are moving away from each other
  */
 class ImpulseConnection(
-    m1: Mass,
-    m2: Mass,
+    m1: PointMass,
+    m2: PointMass,
     var maxDistance: Double,
     maxEnergy: Double,
     private val springConstant: Double = 300.0

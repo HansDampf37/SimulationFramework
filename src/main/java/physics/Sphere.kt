@@ -4,19 +4,19 @@ import algebra.Vec
 import framework.Camera
 import framework.Vertex
 import physics.collisions.BoundingBox
-import physics.collisions.Collidable
+import framework.interfaces.Collidable
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * A Sphere is a round [Mass] that can be [collided][Collidable] with.
+ * A Sphere is a round [PointMass] that can be [collided][Collidable] with.
  */
 open class Sphere(
     x: Double,
     y: Double,
     z: Double,
     var radius: Double, mass: Double
-) : Mass(mass, x, y, z), Collidable {
+) : PointMass(mass, x, y, z), Collidable {
     override fun render(camera: Camera) {
         camera.renderSphere(Vertex(this.positionVector, color ?: Vec.zero, Vec.zero), radius.toFloat(), this)
     }

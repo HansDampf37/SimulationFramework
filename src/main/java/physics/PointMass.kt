@@ -6,8 +6,12 @@ import algebra.Vec
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.*
+import framework.interfaces.Mass
 
-open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z), Entity {
+/**
+ * Implementation of [Mass].
+ */
+open class PointMass(mass: Kg, x: Double, y: Double, z: Double) : Point3d(x, y, z), Mass {
     // Drawable
     override var outlineRasterization: Boolean = false
     override var color: Vec? = Conf.mass_color
@@ -24,12 +28,10 @@ open class Mass(mass: Double, x: Double, y: Double, z: Double) : Point3d(x, y, z
             z = value.z
         }
 
-    // Mass
-    val mass: Double
+    override val mass: Kg = mass
 
     init {
         require(mass != 0.0) { "Mass can't be equal to 0" }
-        this.mass = mass
     }
 
     constructor(mass: Double, pos: Point3d) : this(mass, pos.x, pos.y, pos.z)

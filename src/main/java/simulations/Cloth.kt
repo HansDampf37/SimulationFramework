@@ -6,11 +6,10 @@ import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
 import physics.*
-import physics.collisions.Collision
 import kotlin.math.PI
 
 /**
- * Simulates a grid of [masses][Mass] connected by [connections][ImpulseConnection] that transmit impulses.
+ * Simulates a grid of [masses][PointMass] connected by [connections][ImpulseConnection] that transmit impulses.
  * The cloth collides with a [Sphere]. Use W,A,S,D to control the camera position and up,down,left,right to control
  * the camera orientation
  * @param size the amount masses in one dimension of the cloth
@@ -23,7 +22,6 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
             field = value
             reset()
         }
-    @Suppress("SameParameterValue")
     @WatchDouble("Sphere Size", 2.0, 10.0)
     private var sphereRadius: Double = 5.0
         set(value) {
@@ -43,33 +41,12 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
         camera.zoom = 0.01
     }
 
-    override fun calcForces(dt: Seconds) {
-        synchronized(moveables)  {
-            collidables.forEach {
-                if (it != sphere) {
-                    if (testCollision(sphere, it)) {
-                        Collision.occur(sphere, it as Sphere, 1.0)
-                        val targetDistance = sphere.radius + it.radius
-                        val overlap = targetDistance - sphere.getDistanceTo(it)
-                        val massMovable = it.status == Status.Movable
-                        val overlap1 = if (massMovable) sphere.mass / (it.mass + sphere.mass) * overlap else 0.0
-                        val overlap2 = if (massMovable) it.mass / (it.mass + sphere.mass) * overlap else overlap
-                        if ((it.positionVector - sphere.positionVector).length != 0.0) {
-                            sphere.set(sphere + it.getDirectionTo(sphere) * overlap2)
-                            it.set(it + sphere.getDirectionTo(it) * overlap1)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun reset() {
         super.reset()
         for (x in 0 until size) {
             for (y in 0 until size) {
                 val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
-                val isOnCorner = !((x != 0 || x != size - 1) && (y != 0 || y != size - 1))
+                val isOnCorner = !(((x != 0) || (x != size - 1)) && ((y != 0) || (y != size - 1)))
                 val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
                 mass.status = if (isOnEdge) Status.Immovable else Status.Movable
                 mass.color = Conf.mass_color + (Vec.random * 20) - 10
@@ -82,8 +59,8 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
                 if (x + 1 < size) {
                     add(
                         ImpulseConnection(
-                            masses[x * size + y],
-                            masses[(x + 1) * size + y],
+                            masses[x * size + y] as PointMass,
+                            masses[(x + 1) * size + y] as PointMass,
                             1.1,
                             1000.0
                         )
@@ -92,8 +69,8 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
                 if (y + 1 < size) {
                     add(
                         ImpulseConnection(
-                            masses[x * size + y],
-                            masses[x * size + y + 1],
+                            masses[x * size + y] as PointMass,
+                            masses[x * size + y + 1] as PointMass,
                             1.1,
                             1000.0
                         )
@@ -104,4 +81,6 @@ class Cloth(size: Int): PhysicsSimulation("Cloth") {
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
         add(sphere)
     }
+
+    override fun calcForces(dt: Seconds) = Unit
 }

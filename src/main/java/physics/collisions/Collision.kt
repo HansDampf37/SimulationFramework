@@ -1,7 +1,8 @@
 package physics.collisions
 
+import framework.interfaces.Mass
 import framework.interfaces.Status
-import physics.Mass
+import physics.PointMass
 import kotlin.math.pow
 
 /**
@@ -12,13 +13,13 @@ class Collision {
         /**
          * Simulates the (inelastic) collision of two masses with k being the coefficient of restitution.
          * **See** [wikipedia](https://en.wikipedia.org/wiki/Inelastic_collision)
-         * @param mass1 the first mass
-         * @param mass2 the second mass
+         * @param mass1 the first [Mass]
+         * @param mass2 the second [Mass]
          * @param k the coefficient of restitution
          * @return energy transmitted in the collision
          */
         fun occur(mass1: Mass, mass2: Mass, k: Double = 1.0): Double {
-            val dir = mass2.positionVector - mass1.positionVector
+            val dir = mass2.position - mass1.position
             if (dir.length == 0.0) return 0.0
             val v1 = mass1.velocity.projectOnto(dir)
             val v2 = mass2.velocity.projectOnto(dir)
