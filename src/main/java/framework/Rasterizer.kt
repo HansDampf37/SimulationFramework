@@ -5,6 +5,8 @@ import algebra.Vec
 import algebra.Vec2
 import algebra.Vec4
 import framework.interfaces.Entity
+import java.awt.GradientPaint
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.util.*
 import kotlin.math.*
@@ -185,7 +187,7 @@ class Rasterizer(val camera: Camera) {
                             .shl(8) or interpolation.color.z.toInt().shl(16)
 
                         if (entity?.outlineRasterization == true && interpolation.inOutline) {
-                            image.setRGB(x, y, 0b111111111111111111111111)
+                            image.setRGB(x, y, Conf.colorScheme.colorOutline.rgb)
                         } else {
                             // Set pixel color in the image buffer
                             image.setRGB(x, y, pixelColor)
@@ -274,7 +276,7 @@ class Rasterizer(val camera: Camera) {
                         val pixelColor = color.x.toInt().shl(16) or color.y.toInt().shl(8) or color.z.toInt()
 
                         if (entity?.outlineRasterization == true && interpolation.inOutline) {
-                            image.setRGB(x, y, 0b111111111111111111111111)
+                            image.setRGB(x, y, Conf.colorScheme.colorOutline.rgb)
                         } else {
                             // Set pixel color in the image buffer
                             image.setRGB(x, y, pixelColor)
@@ -300,11 +302,36 @@ class Rasterizer(val camera: Camera) {
      * Resets the [image] + z-puffer. Furthermore, for each pixel coordinate [getEntityAt] returns null again.
      */
     fun newFrame() {
-        val graphics = image.graphics
+        val graphics = image.graphics as Graphics2D
         graphics.color = Conf.background_color
-        graphics.fillRect(0, 0, image.width, image.height)
+        drawBackgroundGradientBasedOnCameraRotation(graphics)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
         Arrays.fill(entityPuffer, null)
+    }
+
+    private fun drawBackgroundGradientBasedOnCameraRotation(g: Graphics2D) {
+        val alpha = atan(camera.screenHeight * camera.zoom / camera.focalLength)
+        val lowerAngle = max(camera.theta - alpha, 0.0)
+        val upperAngle = min(camera.theta + alpha, PI)
+        // create gradient from color scheme
+        val gradient = Conf.colorScheme.horizon.gradient(0.0, PI)
+        // clip only to visible angle range
+        gradient.clip(lowerAngle, upperAngle)
+        // map from angle range to range from 0 to image height
+        gradient.translateScale(0.0, image.height.toDouble())
+        for (i in 0 until gradient.size - 1) {
+            val fromY = image.height.toFloat() - gradient[i].second
+            val toY = image.height.toFloat() - gradient[i + 1].second
+            // Ensure that fromY is greater than toY
+            val startY = if (fromY < toY) fromY else toY
+            val height = abs(fromY - toY)
+            val gradientPaint = GradientPaint(
+                0f, fromY.toFloat(), gradient[i].first,
+                0f, toY.toFloat() + 1, gradient[i + 1].first
+            )
+            g.paint = gradientPaint
+            g.fillRect(0, startY.toInt(), image.width, height.toInt() + 1)
+        }
     }
 
     /**

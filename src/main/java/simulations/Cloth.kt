@@ -6,6 +6,7 @@ import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
 import physics.*
+import toVec
 import kotlin.math.PI
 
 /**
@@ -56,7 +57,7 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
                     val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
                     val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
                     mass.status = if (isOnEdge) Status.Immovable else Status.Movable
-                    mass.color = Conf.mass_color + (Vec.random * 20) - 10
+                    mass.color = Conf.colorScheme.smallObjectColor.toVec() + (Vec.random * 20) - 10
                     register(mass)
                     points.add(mass)
                 }
@@ -68,17 +69,20 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
             for (y in 0 until size) {
                 if (x + 1 < size) {
                     val link = ImpulseConnection(points[x * size + y], points[(x + 1) * size + y], 1.1, 1000.0)
+                    link.color = Conf.colorScheme.linkColor.toVec()
                     links.add(link)
                     register(link)
                 }
                 if (y + 1 < size) {
                     val link = ImpulseConnection(points[x * size + y], points[x * size + y + 1], 1.6, 1000.0)
+                    link.color = Conf.colorScheme.linkColor.toVec()
                     links.add(link)
                     register(link)
                 }
             }
         }
         sphere = Sphere(0.0, 0.0, 10.0, sphereRadius, 20.0)
+        sphere.color = Conf.colorScheme.bigObjectColor.toVec()
         register(sphere)
     }
 

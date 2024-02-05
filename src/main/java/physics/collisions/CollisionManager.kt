@@ -53,10 +53,10 @@ class CollisionManager {
         }
     }
 
-    /*private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
+    private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
         if (c1 is Sphere && c2 is Sphere) return c1.getDistanceTo(c2) <= c1.radius + c2.radius
         TODO("Not implemented")
-    }*/
+    }
 
     private fun support(c1: Collidable, c2: Collidable, direction: Vec): Vec {
         val support1 = c1.supportFunction(direction)
@@ -173,8 +173,8 @@ class CollisionManager {
         }
     }
 
-    private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
+    /*private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
         // Call the GJK algorithm
         return gjk(c1, c2)
-    }
+    }*/
 }

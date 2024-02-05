@@ -5,14 +5,12 @@ import framework.display.KeyManager
 import framework.display.MouseManager
 import framework.interfaces.ISimulation
 import physics.Seconds
-import physics.collisions.CollisionManager
 import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.RenderingHints
+
 
 /**
  * Simulations run by the [start] and [stop] methods. They implement a [tick] method that updates simulated objects and
- * a [render]-method that displays the objects.The [drawer] and [camera] object can be used in the render method
+ * a [render]-method that displays the objects.The [camera] object can be used in the render method
  * to map the three-dimensional space into the drawing plane.
  */
 abstract class Simulation(title: String, private val renderingFrequency: Double = 25.0) : ISimulation {
@@ -112,7 +110,6 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
             return
         }
         val g = bs.drawGraphics
-        g.clearRect(0, 0, display.canvas.width, display.canvas.height)
         g.color = Color.white
         val canvasWidth = display.canvas.width
         val canvasHeight = display.canvas.height
