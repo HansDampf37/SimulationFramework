@@ -16,6 +16,19 @@ object Conf {
             )
         )
     )
+
+    @Suppress("unused")
+    val colorSchemeDebug = ColorPalette(
+        smallObjectColor = Color(0,0,255),
+        bigObjectColor = Color(0,255,0),
+        linkColor = Color(255,0,0),
+        colorOutline = Color(228,251,193),
+        horizon = ColorPalette.Horizon(
+            listOf(
+                Color(255,0,0)
+            )
+        )
+    )
     @WatchBoolean("shading")
     var shadingOnSpheres: Boolean = true
 

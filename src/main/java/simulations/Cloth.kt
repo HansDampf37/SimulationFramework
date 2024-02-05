@@ -57,7 +57,7 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
                     val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
                     val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
                     mass.status = if (isOnEdge) Status.Immovable else Status.Movable
-                    mass.color = Conf.colorScheme.smallObjectColor.toVec() + (Vec.random * 20) - 10
+                    mass.color = Conf.colorScheme.smallObjectColor.toVec()
                     register(mass)
                     points.add(mass)
                 }
