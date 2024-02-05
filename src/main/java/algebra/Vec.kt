@@ -106,7 +106,7 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
 
     override fun equals(other: Any?): Boolean {
         return if (other is Vec) {
-            (this - other).length < 0.0001
+            x == other.x && y == other.y && z == other.z
         } else false
     }
 
@@ -121,10 +121,10 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
         return result
     }
 
-    fun setToZero() {
-        x = 0.0
-        y = 0.0
-        z = 0.0
+    fun setTo(other: Vec) {
+        this.x = other.x
+        this.y = other.y
+        this.z = other.z
     }
 
     /**
