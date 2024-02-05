@@ -1,6 +1,5 @@
 package framework
 
-import framework.display.Display
 import java.awt.Dimension
 import java.lang.reflect.Field
 import javax.swing.*
@@ -29,7 +28,7 @@ annotation class WatchString(val displayName: String)
 @Target(AnnotationTarget.FIELD)
 annotation class WatchBoolean(val displayName: String)
 
-abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: String, val field: Field, val obj: Any) {
+abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: String, private val field: Field, private val obj: Any) {
 
     class WatchFieldTypeNotMatching(field: Field) : Exception("Field $field is annotated with the wrong Watch annotation. Types dont match.")
 
@@ -43,8 +42,14 @@ abstract class WatchedField<T, C : JComponent, D: JComponent>(val displayName: S
             memberProperty.setter.call(obj, value)
         }
         field.isAccessible = true
-        field.set(obj, value)
+        try {
+            field.set(obj, value)
+        } catch (e: IllegalAccessException) {
+            throw FinalFieldCanNotBeSetException()
+        }
     }
+
+    class FinalFieldCanNotBeSetException() : IllegalAccessError()
 
     @Suppress("UNCHECKED_CAST")
     fun get(): T {
@@ -113,7 +118,7 @@ class WatchedInt(displayName: String, field: Field, obj: Any, min: Int, max: Int
         paintLabels = false
         addChangeListener {
             val newValue = value
-            set(newValue.toInt())
+            set(newValue)
             displayComponent.text = "$newValue"
         }
     }

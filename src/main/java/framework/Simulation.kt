@@ -1,11 +1,15 @@
 package framework
 
+import Conf
 import framework.display.Display
 import framework.display.KeyManager
 import framework.display.MouseManager
 import framework.interfaces.ISimulation
 import physics.Seconds
 import java.awt.Color
+import java.awt.image.BufferedImage
+import java.awt.image.ConvolveOp
+import java.awt.image.Kernel
 
 
 /**
@@ -16,6 +20,8 @@ import java.awt.Color
 abstract class Simulation(title: String, private val renderingFrequency: Double = 25.0) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
     private var speed = 1.0
+    @WatchBoolean("Anti-Aliasing")
+    private var antiAliasing = true
     private var running = false
     protected val keyManager = KeyManager()
     protected val display: Display = Display(title, keyManager = keyManager)
@@ -118,18 +124,26 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
             camera.screenHeight = canvasHeight
             camera.newFrame()
             render()
-            g.drawImage(camera.image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+            val image = if (antiAliasing) applyAntiAliasing(camera.image) else camera.image
+            g.drawImage(image, 0, 0, camera.screenWidth, camera.screenHeight, null)
             g.drawString(camera.cameraSettingsToString(), 10, 10)
         }
         bs.show()
         g.dispose()
     }
 
+    private fun applyAntiAliasing(image: BufferedImage): BufferedImage {
+        val kernelSize = 2
+        val kernel = FloatArray(kernelSize * kernelSize) { 1.0f / (kernelSize * kernelSize) }
+        val op = ConvolveOp(Kernel(kernelSize, kernelSize, kernel), ConvolveOp.EDGE_NO_OP, null)
+        return op.filter(image, null)
+    }
+
     @Synchronized
     override fun start() {
         if (running) return
         running = true
-        val watchedFields = collectWatchedFields(listOf(this, camera))
+        val watchedFields = collectWatchedFields(listOf(this, camera, Conf))
         display.setWatchedFields(watchedFields)
         tickingThread.start()
         renderingThread.start()

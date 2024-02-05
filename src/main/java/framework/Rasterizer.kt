@@ -219,9 +219,13 @@ class Rasterizer(val camera: Camera) {
                 val normal = sphereCenterToSurface.normalize()
 
                 // Simple shading: Use dot product with light direction
-                val lightDirHom = (camera.rotateCameraToWorld * Vec4(0.0, 0.0, -1.0, 1.0))
-                val lightDir = Vec(lightDirHom.x, lightDirHom.y, lightDirHom.z)
-                val shadingFactor = 0.3 + 0.7 * maxOf(0.0, normal * lightDir)
+                val shadingFactor = if (Conf.shadingOnSpheres) {
+                    val lightDirHom = (camera.rotateCameraToWorld * Vec4(0.0, 0.0, -1.0, 1.0))
+                    val lightDir = Vec(lightDirHom.x, lightDirHom.y, lightDirHom.z)
+                    0.3 + 0.7 * maxOf(0.0, normal * lightDir)
+                } else {
+                    1.0
+                }
 
                 InterpolationResult(
                     inPrimitive = true,

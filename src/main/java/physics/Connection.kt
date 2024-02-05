@@ -29,8 +29,8 @@ abstract class Connection(
 
     override fun render(camera: Camera) {
         if (broken) return
-        val v1 = Vertex(m1.positionVector, m1.color ?: Vec.zero, Vec.zero)
-        val v2 = Vertex(m2.positionVector, m2.color ?: Vec.zero, Vec.zero)
+        val v1 = Vertex(m1.positionVector, color ?: Vec.zero, Vec.zero)
+        val v2 = Vertex(m2.positionVector, color ?: Vec.zero, Vec.zero)
         camera.renderLine(v1, v2)
     }
 

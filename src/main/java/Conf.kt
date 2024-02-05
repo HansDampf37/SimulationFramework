@@ -1,3 +1,4 @@
+import framework.WatchBoolean
 import framework.display.ColorPalette
 import java.awt.Color
 
@@ -5,16 +6,18 @@ object Conf {
     val mass_color = Color(204, 117, 85).toVec()
     val background_color: Color = Color(30, 30, 60)
     val colorScheme = ColorPalette(
-        smallObjectColor = Color.decode("#262b33"),
+        smallObjectColor = Color.decode("#4C87C8"),
         bigObjectColor = Color.decode("#E78895"),
         linkColor = Color.decode("#2f343f"),
-        colorOutline = Color.decode("#000000"),
+        colorOutline = Color.decode("#E4FBC1"),
         horizon = ColorPalette.Horizon(
             listOf(
-                Color.decode("#FFF7F1")
+                Color.decode("#262B33")
             )
         )
     )
+    @WatchBoolean("shading")
+    var shadingOnSpheres: Boolean = true
 
     /*val colorScheme1 = ColorPalette(
         listOf(
