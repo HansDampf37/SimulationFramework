@@ -54,6 +54,7 @@ class CollisionManager {
     }
 
     private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
+        return gjk(c1, c2)
         if (c1 is Sphere && c2 is Sphere) return c1.getDistanceTo(c2) <= c1.radius + c2.radius
         TODO("Not implemented")
     }
@@ -167,6 +168,7 @@ class CollisionManager {
             supportVector = support(c1, c2, direction)
             // If the new point is on the same side as the origin, the two shapes do not intersect
             if (supportVector.dotProduct(direction) <= 0) return false
+            if (simplex.contains(supportVector)) return false
             simplex.add(supportVector)
             // Check for intersection
             if (handleSimplex(simplex, direction)) return true

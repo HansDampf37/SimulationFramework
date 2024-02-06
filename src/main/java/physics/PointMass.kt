@@ -8,6 +8,7 @@ import framework.Vertex
 import framework.interfaces.*
 import framework.interfaces.Mass
 import physics.collisions.BoundingBox
+import toVec
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -17,7 +18,7 @@ import kotlin.math.sin
 open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Double = 1.0) : Point3d(x, y, z), Mass {
     // Drawable
     override var outlineRasterization: Boolean = false
-    override var color: Vec? = Conf.mass_color
+    override var color: Vec? = Conf.colorScheme.smallObjectColor.toVec()
 
     // Moveable
     override var velocity: Vec = Vec(0, 0, 0)
@@ -82,16 +83,5 @@ open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Doub
             }
         }
         return vertices
-    }
-
-    fun getBoundingBox(): BoundingBox {
-        x = this.positionVector.x
-        y = this.positionVector.y
-        z = this.positionVector.z
-        return BoundingBox(
-            x - radius, x + radius,
-            y - radius, y + radius,
-            z - radius, z + radius
-        )
     }
 }

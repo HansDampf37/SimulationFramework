@@ -45,8 +45,8 @@ class Camera(
         position.x, position.y, position.z, phi, theta, zoom, focalLength, screenWidth, screenHeight
     )
 
-    @WatchFloat("Speed", 0f, 10f)
-    private val movementSpeed: Double = 5.0
+    @WatchDouble("Speed", 0.0, 40.0)
+    private val movementSpeed: Double = 20.0
     private val turningSpeed: Double = 5.0
 
     /**

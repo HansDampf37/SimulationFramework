@@ -78,7 +78,7 @@ class Rasterizer(val camera: Camera) {
             // Check if the pixel is within the screen bounds
             if (x0 >= 0 && x0 < camera.screenWidth && y0 >= 0 && y0 < camera.screenHeight) {
                 // Interpolate depth
-                val t: Float = if (dx == 0) 0f else (x0 - line.v1.screenPosition!!.x).toFloat() / dx.toFloat()
+                val t: Float = if (dx == 0) 0f else abs(x0 - line.v1.screenPosition!!.x).toFloat() / dx.toFloat()
                 val depth = (1 - t) * line.v1.depth + t * line.v2.depth
                 // Check against z-buffer
                 val index = y0 * camera.screenWidth + x0
@@ -245,6 +245,7 @@ class Rasterizer(val camera: Camera) {
         if (distance < 0) return
 
         val radiusPixels = (circle.radius * camera.focalLength / (distance * camera.zoom)).toInt()
+        if (radiusPixels == 0) return
         val bb = BoundingBox(
             (circle.v1.screenPosition!!.x - radiusPixels).toInt(),
             (circle.v1.screenPosition!!.y - radiusPixels).toInt(),
@@ -307,7 +308,6 @@ class Rasterizer(val camera: Camera) {
      */
     fun newFrame() {
         val graphics = image.graphics as Graphics2D
-        graphics.color = Conf.background_color
         drawBackgroundGradientBasedOnCameraRotation(graphics)
         Arrays.fill(zBuffer, Float.MAX_VALUE) // fill z puffer with maximum value
         Arrays.fill(entityPuffer, null)

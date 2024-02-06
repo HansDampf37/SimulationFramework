@@ -3,16 +3,14 @@ import framework.display.ColorPalette
 import java.awt.Color
 
 object Conf {
-    val mass_color = Color(204, 117, 85).toVec()
-    val background_color: Color = Color(30, 30, 60)
     val colorScheme = ColorPalette(
-        smallObjectColor = Color.decode("#4C87C8"),
-        bigObjectColor = Color.decode("#E78895"),
-        linkColor = Color.decode("#2f343f"),
-        colorOutline = Color.decode("#E4FBC1"),
+        smallObjectColor = Color(76, 135, 200),
+        bigObjectColor = Color(231, 136, 149),
+        linkColor = Color(47, 52, 63),
+        colorOutline = Color(228, 251, 193),
         horizon = ColorPalette.Horizon(
             listOf(
-                Color.decode("#262B33")
+                Color(38, 43, 51)
             )
         )
     )
