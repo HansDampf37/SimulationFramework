@@ -2,19 +2,18 @@ package simulations
 
 import algebra.CartesianCoordinateSystem
 import algebra.Point3d
-import algebra.Vec
+import algebra.Vec3
 import framework.Simulation
 import framework.Vertex
 import framework.physics.Seconds
 import java.awt.Color
-import java.awt.Graphics
 
 @Suppress("unused")
 class Net : Simulation("Net") {
     private val airResist = 0.999
-    private val gravity = Vec(0.0, -100.0, 0.0)
+    private val gravity = Vec3(0.0, -100.0, 0.0)
     private lateinit var points: Array<Array<Point3d>>
-    private lateinit var forces: Array<Array<Vec>>
+    private lateinit var forces: Array<Array<Vec3>>
     private val colors: Array<Array<Color>>
     var cart = CartesianCoordinateSystem(false, 1000, 1000.0, Color.black)
 
@@ -37,7 +36,7 @@ class Net : Simulation("Net") {
     override fun render() {
         points.forEach { it.forEach { point ->
             camera.renderSphere(
-                Vertex(point.positionVector, Vec.ones * 255, Vec.zero),
+                Vertex(point.positionVector, Vec3.ones * 255, Vec3.zero),
                 0.25f,
                 null)
             }
@@ -56,16 +55,16 @@ class Net : Simulation("Net") {
     private val input: Unit
         get() {
             if (keyManager.f) {
-                moveEdge(Vec(0.0, 100.0, 0.0))
+                moveEdge(Vec3(0.0, 100.0, 0.0))
             }
             if (keyManager.g) {
-                moveEdge(Vec(0.0, -100.0, 0.0))
+                moveEdge(Vec3(0.0, -100.0, 0.0))
             }
             if (keyManager.v) {
-                moveEdge(Vec(100.0, 0.0, 0.0))
+                moveEdge(Vec3(100.0, 0.0, 0.0))
             }
             if (keyManager.b) {
-                moveEdge(Vec(-100.0, 0.0, 0.0))
+                moveEdge(Vec3(-100.0, 0.0, 0.0))
             }
         }
 
@@ -84,32 +83,32 @@ class Net : Simulation("Net") {
                     if (points[x][y]
                             .getConnectingVectorTo(points[x][y + 1]).length > 60
                     ) points[x][y]
-                        .getConnectingVectorTo(points[x][y + 1]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
+                        .getConnectingVectorTo(points[x][y + 1]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
                     if (points[x][y]
                             .getConnectingVectorTo(points[x + 1][y]).length > 60
                     ) points[x][y]
-                        .getConnectingVectorTo(points[x + 1][y]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
+                        .getConnectingVectorTo(points[x + 1][y]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
                     if (points[x][y]
                             .getConnectingVectorTo(points[x][y - 1]).length > 60
                     ) points[x][y]
-                        .getConnectingVectorTo(points[x][y - 1]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
+                        .getConnectingVectorTo(points[x][y - 1]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
                     if (points[x][y]
                             .getConnectingVectorTo(points[x - 1][y]).length > 60
                     ) points[x][y]
-                        .getConnectingVectorTo(points[x - 1][y]).scaleInPlace(0.1) else Vec(0.0, 0.0, 0.0)
+                        .getConnectingVectorTo(points[x - 1][y]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].scaleInPlace(0.99)
             }
         }
     }
 
-    private fun moveEdge(delta: Vec) {
+    private fun moveEdge(delta: Vec3) {
         for (i in points.indices) {
             points[0][i].add(delta)
             points[points.size - 1][i].add(delta)
@@ -128,7 +127,7 @@ class Net : Simulation("Net") {
                 distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2
             )
         } }
-        forces = Array(size) { Array(size) { Vec(0.0, 0.0, 0.0) } }
+        forces = Array(size) { Array(size) { Vec3(0.0, 0.0, 0.0) } }
     }
 
     companion object {

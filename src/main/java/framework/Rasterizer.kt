@@ -1,7 +1,7 @@
 package framework
 
 import Conf
-import algebra.Vec
+import algebra.Vec3
 import algebra.Vec2
 import algebra.Vec4
 import framework.interfaces.Entity
@@ -17,15 +17,15 @@ class BoundingBox(var minX: Int, var minY: Int, var maxX: Int, var maxY: Int)
 class InterpolationResult(
     val inPrimitive: Boolean,
     val depth: Float,
-    val color: Vec,
-    val normal: Vec,
+    val color: Vec3,
+    val normal: Vec3,
     val inOutline: Boolean
 )
 
 class Vertex(
-    var position: Vec,
-    var color: Vec,
-    var normal: Vec,
+    var position: Vec3,
+    var color: Vec3,
+    var normal: Vec3,
     var screenPosition: Vec2? = null,
     var depth: Float = -1f,
 )
@@ -88,7 +88,7 @@ class Rasterizer(val camera: Camera) {
                     entityPuffer[index] = entity
                     // interpolate color
                     val lightDirectionHom = (camera.rotateCameraToWorld * Vec4(0.0,0.0,1.0, 1.0))
-                    val lightDirection = Vec(lightDirectionHom.x, lightDirectionHom.y, lightDirectionHom.z)
+                    val lightDirection = Vec3(lightDirectionHom.x, lightDirectionHom.y, lightDirectionHom.z)
                     val shadingFactor = 0.5 + 0.5 * maxOf(0.0, (1 - (line.v1.position - line.v2.position) * lightDirection))
                     val color = ((1 - t) * line.v1.color + t * line.v2.color) * shadingFactor
                     val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.z.toInt().shl(16)
@@ -134,7 +134,7 @@ class Rasterizer(val camera: Camera) {
                     (alpha == 0.0 || alpha == 1.0) && (beta == 0.0 || beta == 1.0) || (gamma == 0.0 || gamma == 1.0)
                 )
             } else {
-                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
+                InterpolationResult(false, -1f, Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, 0.0), false)
             }
         }
 
@@ -215,13 +215,13 @@ class Rasterizer(val camera: Camera) {
                 val depthAdjustment = depthAdjustmentPixels / radiusPixel * radiusWorldCoords
 
                 // Calculate the normal vector by normalizing the vector pointing from the sphere's center to the surface point
-                val sphereCenterToSurface = Vec(dxPixels, dyPixels, depthAdjustmentPixels)
+                val sphereCenterToSurface = Vec3(dxPixels, dyPixels, depthAdjustmentPixels)
                 val normal = sphereCenterToSurface.normalize()
 
                 // Simple shading: Use dot product with light direction
                 val shadingFactor = if (Conf.shadingOnSpheres) {
                     val lightDirHom = (camera.rotateCameraToWorld * Vec4(0.0, 0.0, -1.0, 1.0))
-                    val lightDir = Vec(lightDirHom.x, lightDirHom.y, lightDirHom.z)
+                    val lightDir = Vec3(lightDirHom.x, lightDirHom.y, lightDirHom.z)
                     0.3 + 0.7 * maxOf(0.0, normal * lightDir)
                 } else {
                     1.0
@@ -235,7 +235,7 @@ class Rasterizer(val camera: Camera) {
                     radiusPixel - sqrt(distanceFromCenterSquaredPixels) <= 2
                 )
             } else {
-                InterpolationResult(false, -1f, Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0), false)
+                InterpolationResult(false, -1f, Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, 0.0), false)
             }
         }
         // Convert 3D coordinates to 2D screen space
@@ -395,6 +395,6 @@ class Rasterizer(val camera: Camera) {
     }
 }
 
-operator fun Double.times(v: Vec) = v * this
-operator fun Float.times(v: Vec) = v * this.toDouble()
-operator fun Int.times(v: Vec) = v * this.toDouble()
+operator fun Double.times(v: Vec3) = v * this
+operator fun Float.times(v: Vec3) = v * this.toDouble()
+operator fun Int.times(v: Vec3) = v * this.toDouble()

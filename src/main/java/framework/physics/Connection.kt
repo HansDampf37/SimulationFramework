@@ -1,6 +1,6 @@
 package framework.physics
 
-import algebra.Vec
+import algebra.Vec3
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.Renderable
@@ -23,14 +23,14 @@ abstract class Connection(
     var maxEnergy: Joule,
     var broken: Boolean = false
 ) : Tickable, Renderable {
-    override var color: Vec? = null
+    override var color: Vec3? = null
 
     abstract override fun tick(dt: Seconds)
 
     override fun render(camera: Camera) {
         if (broken) return
-        val v1 = Vertex(m1.positionVector, color ?: Vec.zero, Vec.zero)
-        val v2 = Vertex(m2.positionVector, color ?: Vec.zero, Vec.zero)
+        val v1 = Vertex(m1.positionVector, color ?: Vec3.zero, Vec3.zero)
+        val v2 = Vertex(m2.positionVector, color ?: Vec3.zero, Vec3.zero)
         camera.renderLine(v1, v2)
     }
 

@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import algebra.Vec
+import algebra.Vec3
 
 /**
  * Represents an entity that can be drawn on the canvas.
@@ -14,5 +14,5 @@ interface Drawable {
     /**
      * The color of this Drawable with r,g,b channel
      */
-    var color: Vec?
+    var color: Vec3?
 }

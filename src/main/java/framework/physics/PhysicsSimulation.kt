@@ -1,6 +1,6 @@
 package framework.physics
 
-import algebra.Vec
+import algebra.Vec3
 import framework.Simulation
 import framework.WatchDouble
 import framework.interfaces.*
@@ -21,7 +21,7 @@ import kotlin.collections.ArrayList
 abstract class PhysicsSimulation(title: String) : Simulation(title) {
     @WatchDouble("g", 0.0, 15.0)
     private var g: MetersPerSecondPerSecond = 9.81
-    private val gravity get() = Vec(0.0, 0.0, -g)
+    private val gravity get() = Vec3(0.0, 0.0, -g)
     //private var frictionPerSecond: Double = 0.02
     private val tickables: MutableList<Tickable> = ArrayList()
     private val renderables: MutableList<Renderable> = ArrayList()
