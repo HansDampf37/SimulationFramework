@@ -8,9 +8,9 @@ class MatrixTest {
     @Test
     fun column() {
         val m = Matrix3x3(1, 2, 3, 4, 5, 6 ,7 ,8 ,9)
-        assertEquals(m.column(0), Vec3BLablabla(1, 4, 7))
-        assertEquals(m.column(1), Vec3BLablabla(2, 5, 8))
-        assertEquals(m.column(2), Vec3BLablabla(3, 6, 9))
+        assertEquals(m.column(0), Vec3(1, 4, 7))
+        assertEquals(m.column(1), Vec3(2, 5, 8))
+        assertEquals(m.column(2), Vec3(3, 6, 9))
     }
 
     @Test
@@ -19,10 +19,10 @@ class MatrixTest {
         val e = Matrix3x3.ONE
         val o = Matrix3x3.ZERO
 
-        assertEquals(m.column(0), m * Vec3BLablabla(1, 0, 0))
-        assertEquals(m.column(1), m * Vec3BLablabla(0, 1, 0))
-        assertEquals(m.column(2), m * Vec3BLablabla(0, 0, 1))
-        assertEquals(Vec3BLablabla.zero, m * Vec3BLablabla.zero)
+        assertEquals(m.column(0), m * Vec3(1, 0, 0))
+        assertEquals(m.column(1), m * Vec3(0, 1, 0))
+        assertEquals(m.column(2), m * Vec3(0, 0, 1))
+        assertEquals(Vec3.zero, m * Vec3.zero)
 
         assertEquals(m, m * e)
         assertEquals(o, m * o)

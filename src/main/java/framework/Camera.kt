@@ -37,7 +37,7 @@ class Camera(
 ) : Point3d(x, y, z) {
 
     constructor(
-        position: Vec3BLablabla,
+        position: Vec3,
         phi: Double = 0.0, theta: Double = 0.0,
         zoom: Double, focalLength: Double,
         screenWidth: Int, screenHeight: Int
@@ -123,20 +123,20 @@ class Camera(
             field = value
         }
 
-    val lookingDirection: Vec3BLablabla
+    val lookingDirection: Vec3
         get() {
             val v: Vec4 = (matrixThetaInv * (matrixPhiInv * Vec4(0.0, 0.0, 1.0, 1.0)))
-            return Vec3BLablabla(v.x, v.y, v.z).normalize()
+            return Vec3(v.x, v.y, v.z).normalize()
         }
 
-    val up: Vec3BLablabla
+    val up: Vec3
         get() {
             val v: Vec4 = (matrixThetaInv * (matrixPhiInv * Vec4(0.0, 1.0, 0.0, 1.0)))
-            return Vec3BLablabla(v.x, v.y, v.z).normalize()
+            return Vec3(v.x, v.y, v.z).normalize()
         }
 
-    val left: Vec3BLablabla
-        get() = Vec3BLablabla(cos(phi), sin(phi), 0)
+    val left: Vec3
+        get() = Vec3(cos(phi), sin(phi), 0)
 
     var zoom: Double
         get() = zoomX
@@ -261,7 +261,7 @@ class Camera(
     fun moveDown(dt: Double = 1.0) = move(-up, dt)
     fun moveLeft(dt: Double = 1.0) = move(left, dt)
     fun moveRight(dt: Double = 1.0) = move(-left, dt)
-    private fun move(direction: Vec3BLablabla, dt: Double) {
+    private fun move(direction: Vec3, dt: Double) {
         add(direction.normalize() * movementSpeed * dt)
     }
 
@@ -287,7 +287,7 @@ class Camera(
      * @param v the 3-dimensional vector
      * @return pair containing the pixel coordinate and the distance from the camera
      */
-    fun project(v: Vec3BLablabla): Pair<Vec2, Meters> {
+    fun project(v: Vec3): Pair<Vec2, Meters> {
         if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
             val filmCoords = projectionMatrix * vHom

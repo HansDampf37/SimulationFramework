@@ -5,8 +5,8 @@ class Matrix3x4(
     var e: Double, var f: Double, var g: Double, var h: Double,
     var i: Double, var j: Double, var k: Double, var l: Double
 ) {
-    operator fun times(v: Vec4): Vec3BLablabla {
-        return Vec3BLablabla(
+    operator fun times(v: Vec4): Vec3 {
+        return Vec3(
             v.x * a + v.y * b + v.z * c + v.w * d,
             v.x * e + v.y * f + v.z * g + v.w * h,
             v.x * i + v.y * j + v.z * k + v.w * l

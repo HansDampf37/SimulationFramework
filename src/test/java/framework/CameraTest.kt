@@ -1,6 +1,6 @@
 package framework
 
-import algebra.Vec3BLablabla
+import algebra.Vec3
 import algebra.Vec2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -20,17 +20,17 @@ class CameraTest {
 
     @Test
     fun project() {
-        assertEquals(Vec3BLablabla(0.0,0.0,1.0), camera.lookingDirection)
+        assertEquals(Vec3(0.0,0.0,1.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(0.0, 0.0, 1.0))
+        val (v, dist) = camera.project(Vec3(0.0, 0.0, 1.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(0.0, 0.0, 5.0))
+        val (v1, dist1) = camera.project(Vec3(0.0, 0.0, 5.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(0.0, 0.0, -1.0))
+        val (_, dist2) = camera.project(Vec3(0.0, 0.0, -1.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -38,17 +38,17 @@ class CameraTest {
     fun project2() {
         camera.phi = Math.PI / 2
         camera.theta = 0.0
-        assertEquals(Vec3BLablabla(-1.0,0.0,0.0), camera.lookingDirection)
+        assertEquals(Vec3(-1.0,0.0,0.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(-1.0, 0.0, 0.0))
+        val (v, dist) = camera.project(Vec3(-1.0, 0.0, 0.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(-5.0, 0.0, 0.0))
+        val (v1, dist1) = camera.project(Vec3(-5.0, 0.0, 0.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(1.0, 0.0, 0.0))
+        val (_, dist2) = camera.project(Vec3(1.0, 0.0, 0.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -56,17 +56,17 @@ class CameraTest {
     fun project3() {
         camera.phi = Math.PI
         camera.theta = 0.0
-        assertEquals(Vec3BLablabla(0.0,0.0,-1.0), camera.lookingDirection)
+        assertEquals(Vec3(0.0,0.0,-1.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(0.0, 0.0, -1.0))
+        val (v, dist) = camera.project(Vec3(0.0, 0.0, -1.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(0.0, 0.0, -5.0))
+        val (v1, dist1) = camera.project(Vec3(0.0, 0.0, -5.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(0.0, 0.0, 1.0))
+        val (_, dist2) = camera.project(Vec3(0.0, 0.0, 1.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -74,17 +74,17 @@ class CameraTest {
     fun project4() {
         camera.phi = 3 * Math.PI / 2
         camera.theta = 0.0
-        assertEquals(Vec3BLablabla(1.0,0.0,0.0), camera.lookingDirection)
+        assertEquals(Vec3(1.0,0.0,0.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(1.0, 0.0, 0.0))
+        val (v, dist) = camera.project(Vec3(1.0, 0.0, 0.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(5.0, 0.0, 0.0))
+        val (v1, dist1) = camera.project(Vec3(5.0, 0.0, 0.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(-1.0, 0.0, 0.0))
+        val (_, dist2) = camera.project(Vec3(-1.0, 0.0, 0.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -92,17 +92,17 @@ class CameraTest {
     fun project5() {
         camera.phi = 0.0
         camera.theta = Math.PI / 2
-        assertEquals(Vec3BLablabla(0.0,1.0,0.0), camera.lookingDirection)
+        assertEquals(Vec3(0.0,1.0,0.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(0.0, 1.0, 0.0))
+        val (v, dist) = camera.project(Vec3(0.0, 1.0, 0.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(0.0, 5.0, 0.0))
+        val (v1, dist1) = camera.project(Vec3(0.0, 5.0, 0.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(0.0, -1.0, 0.0))
+        val (_, dist2) = camera.project(Vec3(0.0, -1.0, 0.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -110,17 +110,17 @@ class CameraTest {
     fun project6() {
         camera.phi = 0.0
         camera.theta = -Math.PI / 2
-        assertEquals(Vec3BLablabla(0.0,0.0,1.0), camera.lookingDirection)
+        assertEquals(Vec3(0.0,0.0,1.0), camera.lookingDirection)
 
-        val (v, dist) = camera.project(Vec3BLablabla(0.0, 0.0, 1.0))
+        val (v, dist) = camera.project(Vec3(0.0, 0.0, 1.0))
         assertEquals(1.0, dist)
         assertEquals(Vec2(50.0, 50.0), v)
 
-        val (v1, dist1) = camera.project(Vec3BLablabla(0.0, 0.0, 5.0))
+        val (v1, dist1) = camera.project(Vec3(0.0, 0.0, 5.0))
         assertEquals(5.0, dist1)
         assertEquals(Vec2(50.0, 50.0), v1)
 
-        val (_, dist2) = camera.project(Vec3BLablabla(0.0, 0.0, -1.0))
+        val (_, dist2) = camera.project(Vec3(0.0, 0.0, -1.0))
         assertEquals(Double.NEGATIVE_INFINITY, dist2)
     }
 
@@ -128,18 +128,18 @@ class CameraTest {
     fun `test looking directions 1`() {
         camera.phi = Math.PI
         camera.theta = 0.0
-        assertEquals(Vec3BLablabla(0,0,-1), camera.lookingDirection)
-        assertEquals(Vec3BLablabla(0,1,0), camera.up)
-        assertEquals(Vec3BLablabla(-1,0,0), camera.left)
+        assertEquals(Vec3(0,0,-1), camera.lookingDirection)
+        assertEquals(Vec3(0,1,0), camera.up)
+        assertEquals(Vec3(-1,0,0), camera.left)
     }
 
     @Test
     fun `test looking directions 2`() {
         camera.phi = 0.0
         camera.theta = Math.PI / 2
-        assertEquals(Vec3BLablabla(0,1,0), camera.lookingDirection)
-        assertEquals(Vec3BLablabla(0,0,-1), camera.up)
-        assertEquals(Vec3BLablabla(1,0,0), camera.left)
+        assertEquals(Vec3(0,1,0), camera.lookingDirection)
+        assertEquals(Vec3(0,0,-1), camera.up)
+        assertEquals(Vec3(1,0,0), camera.left)
     }
 
     @Suppress("unused")

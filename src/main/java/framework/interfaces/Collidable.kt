@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import algebra.Vec3BLablabla
+import algebra.Vec3
 import framework.physics.collisions.CollisionManager
 
 
@@ -15,5 +15,5 @@ interface Collidable: Mass {
      * This function should return the point on the collidables surface that is furthest away from
      * the center and that lays in the specified [direction] in world coordinates (dot-product > 0).
      */
-    fun supportFunction(direction: Vec3BLablabla): Vec3BLablabla
+    fun supportFunction(direction: Vec3): Vec3
 }

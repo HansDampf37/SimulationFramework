@@ -1,7 +1,7 @@
 package framework
 
 import algebra.Point3d
-import algebra.Vec3BLablabla
+import algebra.Vec3
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos
@@ -92,7 +92,7 @@ class Graphics3d(
         fillTriangle(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z, color, g)
     }
 
-    fun fillParallelogram(a: Point3d, delta1: Vec3BLablabla, delta2: Vec3BLablabla, color: Color?, g: Graphics) {
+    fun fillParallelogram(a: Point3d, delta1: Vec3, delta2: Vec3, color: Color?, g: Graphics) {
         fillParallelogram(
             a.x,
             a.y,

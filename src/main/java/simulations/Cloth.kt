@@ -1,6 +1,6 @@
 package simulations
 
-import algebra.Vec3BLablabla
+import algebra.Vec3
 import framework.physics.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
@@ -59,7 +59,7 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
                     val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
                     val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
                     mass.status = if (isOnEdge) Status.Immovable else Status.Movable
-                    mass.color = Conf.colorScheme.smallObjectColor.toVec() + (Vec3BLablabla.random * 20) - 10
+                    mass.color = Conf.colorScheme.smallObjectColor.toVec() + (Vec3.random * 20) - 10
                     register(mass)
                     points.add(mass)
                 }
@@ -90,8 +90,8 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
 
     override fun calcForces() {
         synchronized(points) {
-            for (clothPoint in points) clothPoint.acceleration = Vec3BLablabla.zero
-            sphere.acceleration = Vec3BLablabla.zero
+            for (clothPoint in points) clothPoint.acceleration = Vec3.zero
+            sphere.acceleration = Vec3.zero
             applyGravity(points + sphere)
         }
     }

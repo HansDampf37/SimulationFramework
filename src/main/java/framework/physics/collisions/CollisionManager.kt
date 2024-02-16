@@ -1,6 +1,6 @@
 package framework.physics.collisions
 
-import algebra.Vec3BLablabla
+import algebra.Vec3
 import framework.interfaces.Collidable
 import framework.interfaces.Status
 import framework.physics.Sphere
@@ -58,23 +58,23 @@ class CollisionManager {
         TODO("Not implemented")
     }
 
-    private fun support(c1: Collidable, c2: Collidable, direction: Vec3BLablabla): Vec3BLablabla {
+    private fun support(c1: Collidable, c2: Collidable, direction: Vec3): Vec3 {
         val support1 = c1.supportFunction(direction)
         val support2 = c2.supportFunction(-direction)
         return support1 - support2
     }
 
-    private fun tripleProduct(a: Vec3BLablabla, b: Vec3BLablabla, c: Vec3BLablabla): Vec3BLablabla {
+    private fun tripleProduct(a: Vec3, b: Vec3, c: Vec3): Vec3 {
         // (a x b) x c = b * (a · c) - a * (b · c)
         val crossAB = a.crossProduct(b)
-        return Vec3BLablabla(
+        return Vec3(
             crossAB.x * c.x - crossAB.y * c.y,
             crossAB.x * c.y + crossAB.y * c.x - crossAB.z * c.z,
             crossAB.x * c.z + crossAB.z * c.x + crossAB.y * c.y
         )
     }
 
-    private fun handleSimplex(simplex: MutableList<Vec3BLablabla>, direction: Vec3BLablabla): Boolean {
+    private fun handleSimplex(simplex: MutableList<Vec3>, direction: Vec3): Boolean {
         when (simplex.size) {
             2 -> {
                 val b = simplex[0]
@@ -157,7 +157,7 @@ class CollisionManager {
     }
 
     private fun gjk(c1: Collidable, c2: Collidable): Boolean {
-        val simplex: MutableList<Vec3BLablabla> = mutableListOf()
+        val simplex: MutableList<Vec3> = mutableListOf()
         if (c1.position == c2.position) return true
         val initialDirection = (c1.position - c2.position).normalize()
         var supportVector = support(c1, c2, initialDirection)

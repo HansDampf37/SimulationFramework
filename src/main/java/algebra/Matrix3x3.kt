@@ -5,8 +5,8 @@ class Matrix3x3(
     var d: Double, var e: Double, var f: Double,
     var g: Double, var h: Double, var i: Double
 ) {
-    operator fun times(v: Vec3BLablabla): Vec3BLablabla {
-        return Vec3BLablabla(
+    operator fun times(v: Vec3): Vec3 {
+        return Vec3(
             v.x * a + v.y * b + v.z * c,
             v.x * d + v.y * e + v.z * f,
             v.x * g + v.y * h + v.z * i
@@ -61,9 +61,9 @@ class Matrix3x3(
     )
 
     fun column(j: Int) = when (j) {
-        0 -> Vec3BLablabla(a, d, g)
-        1 -> Vec3BLablabla(b, e, h)
-        2 -> Vec3BLablabla(c, f, i)
+        0 -> Vec3(a, d, g)
+        1 -> Vec3(b, e, h)
+        2 -> Vec3(c, f, i)
         else -> throw IndexOutOfBoundsException()
     }
 
