@@ -1,7 +1,7 @@
 package framework.interfaces
 
 import algebra.Vec
-import physics.Kg
+import framework.physics.Kg
 
 /**
  * An [Entity] with mass.

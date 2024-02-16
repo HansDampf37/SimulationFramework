@@ -1,8 +1,8 @@
 package simulations
 
 import framework.Simulation
-import physics.Seconds
-import physics.Sphere
+import framework.physics.Seconds
+import framework.physics.Sphere
 import kotlin.math.PI
 
 @Suppress("unused")

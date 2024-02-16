@@ -1,4 +1,4 @@
-package physics
+package framework.physics
 
 import Conf
 import algebra.Point3d
@@ -7,7 +7,7 @@ import framework.Camera
 import framework.Vertex
 import framework.interfaces.*
 import framework.interfaces.Mass
-import physics.collisions.BoundingBox
+import framework.physics.collisions.BoundingBox
 import kotlin.math.cos
 import kotlin.math.sin
 

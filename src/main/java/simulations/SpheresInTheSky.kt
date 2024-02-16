@@ -2,8 +2,8 @@ package simulations
 
 import algebra.Vec
 import framework.*
-import physics.Seconds
-import physics.Sphere
+import framework.physics.Seconds
+import framework.physics.Sphere
 import kotlin.math.cos
 import kotlin.math.sin
 

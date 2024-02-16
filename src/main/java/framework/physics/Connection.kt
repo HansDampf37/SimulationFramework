@@ -1,4 +1,4 @@
-package physics
+package framework.physics
 
 import algebra.Vec
 import framework.Camera
@@ -6,7 +6,7 @@ import framework.Vertex
 import framework.interfaces.Renderable
 import framework.interfaces.Status
 import framework.interfaces.Tickable
-import physics.collisions.Collision.Companion.occur
+import framework.physics.collisions.Collision.Companion.occur
 import kotlin.math.pow
 
 /**

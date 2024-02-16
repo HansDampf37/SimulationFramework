@@ -1,11 +1,13 @@
 package simulations
 
 import algebra.Vec
-import physics.PhysicsSimulation
+import framework.physics.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
-import physics.*
+import framework.physics.ImpulseConnection
+import framework.physics.Sphere
+import framework.physics.*
 import toVec
 import kotlin.math.PI
 

@@ -1,9 +1,9 @@
-package physics.collisions
+package framework.physics.collisions
 
 import algebra.Vec
 import framework.interfaces.Collidable
 import framework.interfaces.Status
-import physics.Sphere
+import framework.physics.Sphere
 import java.lang.IllegalStateException
 
 /**

@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import physics.Seconds
+import framework.physics.Seconds
 import framework.Camera
 import framework.Graphics3d
 

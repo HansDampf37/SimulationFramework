@@ -1,7 +1,7 @@
 package framework.interfaces
 
 import algebra.Vec
-import physics.Seconds
+import framework.physics.Seconds
 
 /**
  * An entity in the 3-dimensional [ISimulation] has a [position], a [velocity], and a [acceleration].

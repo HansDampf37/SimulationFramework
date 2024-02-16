@@ -1,7 +1,7 @@
 package framework.interfaces
 
 import algebra.Vec
-import physics.collisions.CollisionManager
+import framework.physics.collisions.CollisionManager
 
 
 /**

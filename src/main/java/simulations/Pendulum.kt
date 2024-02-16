@@ -4,7 +4,7 @@ import algebra.CartesianCoordinateSystem
 import algebra.Point3d
 import algebra.Vec
 import framework.Simulation
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 

@@ -2,7 +2,7 @@ package framework
 
 import algebra.*
 import framework.interfaces.Entity
-import physics.Meters
+import framework.physics.Meters
 import java.awt.image.BufferedImage
 import java.lang.Math.PI
 import kotlin.math.cos

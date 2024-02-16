@@ -1,4 +1,4 @@
-package physics
+package framework.physics
 
 import algebra.Vec
 import framework.interfaces.Collidable

@@ -5,9 +5,9 @@ import algebra.Vec
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
-import physics.ImpulseConnection
-import physics.PhysicsSimulation
-import physics.PointMass
+import framework.physics.ImpulseConnection
+import framework.physics.PhysicsSimulation
+import framework.physics.PointMass
 import kotlin.math.PI
 
 @Suppress("unused")

@@ -2,7 +2,7 @@ package simulations
 
 import framework.Simulation
 import algebra.Point3d
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 import kotlin.math.cos

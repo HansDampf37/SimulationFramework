@@ -1,11 +1,11 @@
-package physics
+package framework.physics
 
 import algebra.Vec
 import framework.Simulation
 import framework.WatchDouble
 import framework.interfaces.*
 import framework.interfaces.Collidable
-import physics.collisions.CollisionManager
+import framework.physics.collisions.CollisionManager
 import randomOrder
 import java.lang.IllegalArgumentException
 import kotlin.collections.ArrayList

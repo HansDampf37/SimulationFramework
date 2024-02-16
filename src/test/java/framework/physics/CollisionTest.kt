@@ -2,8 +2,8 @@ package framework.physics
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import physics.collisions.Collision
-import physics.PointMass
+import framework.physics.collisions.Collision
+import framework.physics.PointMass
 import algebra.Vec
 
 class CollisionTest {

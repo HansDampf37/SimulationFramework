@@ -3,7 +3,7 @@ package simulations
 import algebra.Vec
 import framework.Simulation
 import framework.Vertex
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 

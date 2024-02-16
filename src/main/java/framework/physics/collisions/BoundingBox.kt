@@ -1,4 +1,4 @@
-package physics.collisions
+package framework.physics.collisions
 
 class BoundingBox(
     val minX: Double,

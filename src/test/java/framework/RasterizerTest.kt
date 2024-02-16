@@ -6,7 +6,7 @@ import framework.interfaces.Moveable
 import framework.interfaces.Status
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.FlowLayout
 import java.awt.image.BufferedImage
 import java.lang.Thread.sleep
