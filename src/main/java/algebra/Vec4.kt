@@ -2,7 +2,7 @@ package algebra
 
 import kotlin.math.sqrt
 
-class Vec4(x: Double, y: Double, z: Double, var w: Double) : Vec3(x, y, z) {
+class Vec4(x: Double, y: Double, z: Double, var w: Double) : Vec3BLablabla(x, y, z) {
     override fun toString(): String {
         return "($x, $y, $z, $w)"
     }

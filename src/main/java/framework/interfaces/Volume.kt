@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import algebra.Vec3
+import algebra.Vec3BLablabla
 import framework.Camera
 import framework.Vertex
 
@@ -19,7 +19,7 @@ interface Volume: Entity {
     /**
      * The mesh of the volume in the object coordinate system
      */
-    val meshObjCoords: List<Vec3>
+    val meshObjCoords: List<Vec3BLablabla>
     var yaw: Double
     var pitch: Double
     var roll: Double

@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import algebra.Vec3
+import algebra.Vec3BLablabla
 import framework.physics.Kg
 
 /**
@@ -9,7 +9,7 @@ import framework.physics.Kg
 interface Mass: Entity {
     val mass: Kg
 
-    fun applyForce(force: Vec3) {
+    fun applyForce(force: Vec3BLablabla) {
         if (status == Status.Movable) acceleration.addInPlace(force / mass)
     }
 }

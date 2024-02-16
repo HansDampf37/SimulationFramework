@@ -1,7 +1,7 @@
 package simulations
 
 import algebra.Point3d
-import algebra.Vec3
+import algebra.Vec3BLablabla
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
@@ -106,7 +106,7 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
 
     override fun calcForces() {
         synchronized(masses) {
-            for (clothPoint in masses) clothPoint.acceleration = Vec3.zero
+            for (clothPoint in masses) clothPoint.acceleration = Vec3BLablabla.zero
             applyGravity(masses)
         }
     }

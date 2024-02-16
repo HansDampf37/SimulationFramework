@@ -1,6 +1,6 @@
 package simulations
 
-import algebra.Vec3
+import algebra.Vec3BLablabla
 import framework.*
 import framework.physics.Seconds
 import framework.physics.Sphere
@@ -45,7 +45,7 @@ class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
     private fun drawLookingDirection() {
         val p1 = camera.positionVector - camera.up + camera.lookingDirection * 0.1
         val p2 = camera.positionVector - camera.up + camera.lookingDirection * 10
-        camera.renderLine(Vertex(p1, 255 * Vec3.ones, Vec3.zero), Vertex(p2, Vec3.ones, Vec3.zero))
+        camera.renderLine(Vertex(p1, 255 * Vec3BLablabla.ones, Vec3BLablabla.zero), Vertex(p2, Vec3BLablabla.ones, Vec3BLablabla.zero))
     }
 
     override fun reset() {

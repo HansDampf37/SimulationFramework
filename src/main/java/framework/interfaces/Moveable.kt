@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import algebra.Vec3
+import algebra.Vec3BLablabla
 import framework.physics.Seconds
 
 /**
@@ -12,17 +12,17 @@ interface Moveable : Tickable {
     /**
      * The entities anchor position
      */
-    var position: Vec3
+    var position: Vec3BLablabla
 
     /**
      * The velocity as difference in position per second
      */
-    var velocity: Vec3
+    var velocity: Vec3BLablabla
 
     /**
      * The acceleration as difference in velocity per second
      */
-    var acceleration: Vec3
+    var acceleration: Vec3BLablabla
 
     /**
      * Status making it possible to turn of
