@@ -7,6 +7,8 @@ import kotlin.math.max
 
 fun Color.toVec() = Vec3(this.red, this.green, this.blue)
 fun Vec3.toColor() = Color(this.x.toInt(), this.y.toInt(), this.z.toInt())
+
+inline fun Vec3.toIntColor() = x.toInt() or y.toInt().shl(8) or z.toInt().shl(16)
 fun randomOrder(endExcl: Int) = randomOrder(0, endExcl)
 fun randomOrder(start: Int, endExcl: Int) = IntRange(start, endExcl - 1).toList().shuffled()
 

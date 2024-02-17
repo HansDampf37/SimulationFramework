@@ -5,6 +5,9 @@ import algebra.Vec3
 import algebra.Vec2
 import algebra.Vec4
 import framework.interfaces.Entity
+import times
+import toColor
+import toIntColor
 import java.awt.GradientPaint
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
@@ -91,9 +94,8 @@ class Rasterizer(val camera: Camera) {
                     val lightDirection = Vec3(lightDirectionHom.x, lightDirectionHom.y, lightDirectionHom.z)
                     val shadingFactor = 0.5 + 0.5 * maxOf(0.0, (1 - (line.v1.position - line.v2.position) * lightDirection))
                     val color = ((1 - t) * line.v1.color + t * line.v2.color) * shadingFactor
-                    val pixelColor = color.x.toInt() or color.y.toInt().shl(8) or color.z.toInt().shl(16)
                     // Set pixel color in the image buffer (using line color or other criteria)
-                    image.setRGB(x0, y0, pixelColor)
+                    image.setRGB(x0, y0, color.toIntColor())
                 }
             }
 
@@ -182,15 +184,11 @@ class Rasterizer(val camera: Camera) {
                         zBuffer[index] = depth
                         entityPuffer[index] = entity
 
-                        // Interpolate color
-                        val pixelColor = interpolation.color.x.toInt() or interpolation.color.y.toInt()
-                            .shl(8) or interpolation.color.z.toInt().shl(16)
-
                         if (entity?.outlineRasterization == true && interpolation.inOutline) {
                             image.setRGB(x, y, Conf.colorScheme.colorOutline.rgb)
                         } else {
                             // Set pixel color in the image buffer
-                            image.setRGB(x, y, pixelColor)
+                            image.setRGB(x, y, interpolation.color.toIntColor())
                         }
                     }
                 }
@@ -277,13 +275,12 @@ class Rasterizer(val camera: Camera) {
                         zBuffer[index] = interpolation.depth
                         entityPuffer[index] = entity
                         val color = interpolation.color
-                        val pixelColor = color.x.toInt().shl(16) or color.y.toInt().shl(8) or color.z.toInt()
 
                         if (entity?.outlineRasterization == true && interpolation.inOutline) {
                             image.setRGB(x, y, Conf.colorScheme.colorOutline.rgb)
                         } else {
                             // Set pixel color in the image buffer
-                            image.setRGB(x, y, pixelColor)
+                            image.setRGB(x, y, color.toIntColor())
                         }
                     }
                 }
@@ -299,6 +296,21 @@ class Rasterizer(val camera: Camera) {
             val v3 = triangleStrip.vertices[i + 2]
 
             rasterizeTriangle(Triangle(v1, v2, v3), entity)
+        }
+    }
+
+    fun rasterizePixel(point: Vec3, color: Vec3, entity: Entity?) {
+        val (screenPosition, depth) = camera.project(point)
+        if (depth < 0) return
+        val x = screenPosition.x.toInt()
+        val y = screenPosition.y.toInt()
+        if (x < 0 || x >= image.width) return
+        if (y < 0 || y >= image.height) return
+        val index = y * image.width + x
+        if (depth <= zBuffer[index]) {
+            image.setRGB(x, y, color.toIntColor())
+            entityPuffer[index] = entity
+            zBuffer[index] = depth.toFloat()
         }
     }
 
@@ -338,6 +350,7 @@ class Rasterizer(val camera: Camera) {
         }
     }
 
+
     /**
      * When called the [image] and additional internal variables are resized to match the [camera]'s
      * screen's width and height.
@@ -347,7 +360,6 @@ class Rasterizer(val camera: Camera) {
         zBuffer = FloatArray(camera.screenWidth * camera.screenHeight) { Float.MAX_VALUE }
         entityPuffer = arrayOfNulls(camera.screenWidth * camera.screenHeight)
     }
-
 
     /**
      * Returns the [Entity] drawn at the specified coordinates. If no entity is drawn at the specified location,
@@ -394,7 +406,3 @@ class Rasterizer(val camera: Camera) {
         return maskImage
     }
 }
-
-operator fun Double.times(v: Vec3) = v * this
-operator fun Float.times(v: Vec3) = v * this.toDouble()
-operator fun Int.times(v: Vec3) = v * this.toDouble()

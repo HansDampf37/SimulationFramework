@@ -19,7 +19,7 @@ import java.awt.image.Kernel
  */
 abstract class Simulation(title: String, private val renderingFrequency: Double = 25.0) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
-    private var speed = 1.0
+    protected var speed = 1.0
     @WatchBoolean("Anti-Aliasing")
     private var antiAliasing = true
     private var running = false
@@ -49,7 +49,7 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
             val dt: Seconds = (now - lastTime) / 1000.0
-            tick(dt * speed)
+            if (display.isInitialized()) tick(dt * speed)
             lastTime = now
         }
         stop()
@@ -62,7 +62,6 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
 
-            // always tick
             val dt: Seconds = (now - lastTime) / 1000.0
             delta += (now - lastTime) / msPerTick
             // render to reach fps goal
@@ -70,10 +69,9 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
                 keyManager.tick()
                 mouseManager.tick(dt)
                 listenForInput(dt)
-                initializeRendering()
+                if (display.isInitialized()) initializeRendering()
                 delta--
                 lastTime = now
-                //println("running")
             }
         }
         stop()
@@ -119,15 +117,13 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         g.color = Color.white
         val canvasWidth = display.canvas.width
         val canvasHeight = display.canvas.height
-        if (canvasWidth > 0 && canvasHeight > 0) {
-            camera.screenWidth = canvasWidth
-            camera.screenHeight = canvasHeight
-            camera.newFrame()
-            render()
-            val image = if (antiAliasing) applyAntiAliasing(camera.image) else camera.image
-            g.drawImage(image, 0, 0, camera.screenWidth, camera.screenHeight, null)
-            g.drawString(camera.cameraSettingsToString(), 10, 10)
-        }
+        camera.screenWidth = canvasWidth
+        camera.screenHeight = canvasHeight
+        camera.newFrame()
+        render()
+        val image = if (antiAliasing) applyAntiAliasing(camera.image) else camera.image
+        g.drawImage(image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+        g.drawString(camera.cameraSettingsToString(), 10, 10)
         bs.show()
         g.dispose()
     }

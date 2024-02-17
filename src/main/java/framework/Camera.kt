@@ -347,6 +347,16 @@ class Camera(
         rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
 
     /**
+     * Draws a single Pixel on the [image] and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param v the pixel in world coordinates
+     * @param color the color of the pixel
+     * @param entity the entity to register on each of the drawn pixels
+     */
+    fun renderPixel(v: Vec3, color: Vec3, entity: Entity? = null) =
+        rasterizer.rasterizePixel(v, color, entity)
+
+    /**
      * Returns the [Entity] drawn at the specified coordinates. If no entity is drawn at the specified location,
      * null is returned. In order to associate drawn pixels with entities the entities must be passed via the
      * rendering methods. If an entity is drawn at the specified coordinates, but it was not passed as an argument

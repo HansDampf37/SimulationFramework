@@ -64,7 +64,8 @@ class Display(
         val columnNameFont = Font("", Font.BOLD, 14)
         val entryFont = Font("", Font.PLAIN, 11)
         val subsectionFont = Font("Hack", Font.ITALIC, 8)
-
     }
+
+    fun isInitialized() = canvas.width != 0 && canvas.height != 0
 }
 

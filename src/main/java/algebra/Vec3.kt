@@ -9,7 +9,7 @@ import kotlin.math.sqrt
  * @param y y value
  * @param z z value
  */
-open class Vec3(var x: Double, var y: Double, var z: Double) {
+open class Vec3(var x: Double, var y: Double, var z: Double): IVec() {
 
     constructor(x: Number, y: Number, z: Number) : this(x.toDouble(), y.toDouble(), z.toDouble())
     /**
@@ -120,10 +120,6 @@ open class Vec3(var x: Double, var y: Double, var z: Double) {
         } else false
     }
 
-    override fun toString(): String {
-        return "($x, $y, $z)"
-    }
-
     override fun hashCode(): Int {
         var result = x.hashCode()
         result = 31 * result + y.hashCode()
@@ -185,6 +181,30 @@ open class Vec3(var x: Double, var y: Double, var z: Double) {
     fun removeComponentParallelTo(direction: Vec3): Vec3 {
         return this - projectOnto(direction)
     }
+
+    override fun iterator(): Iterator<Double> {
+        return listOf(x, y, z).iterator()
+    }
+
+    override fun get(i: Int): Double {
+        return when (i) {
+            0 -> x
+            1 -> y
+            2 -> z
+            else -> throw IndexOutOfBoundsException()
+        }
+    }
+
+    override fun set(i: Int, value: Double) {
+        when (i) {
+            0 -> x = value
+            1 -> y = value
+            2 -> z = value
+            else -> throw IndexOutOfBoundsException()
+        }
+    }
+
+    override val height: Int = 3
 
     companion object{
         val ones = Vec3(1.0, 1.0, 1.0)

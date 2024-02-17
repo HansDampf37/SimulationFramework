@@ -1,6 +1,7 @@
 package framework.display
 
 import algebra.Vec2
+import algebra.Vec3
 import algebra.Vec4
 import framework.Camera
 import framework.interfaces.Entity
@@ -81,8 +82,9 @@ class MouseManager(val camera: Camera) : MouseMotionListener, MouseListener {
                 val s = camera.zoom / (camera.focalLength) * z
                 val v = Vec4(dx.toDouble() * s, dy.toDouble() * s, 0.0, 1.0)
                 val w = camera.rotateCameraToWorld * v
-                ent.position += w
-                ent.velocity = w * dt
+                val w3 = Vec3(w.x, w.y, w.z)
+                ent.position += w3
+                ent.velocity = w3 * dt
                 lastDragX = e.x
                 lastDragY = e.y
             }

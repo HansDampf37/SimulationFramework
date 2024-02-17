@@ -118,3 +118,7 @@ class EmptySimulation: Simulation("Test") {
         g.fillPolygon(xPoints, yPoints, 4)
     }
 }
+
+fun main() {
+    EmptySimulation().start()
+}

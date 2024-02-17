@@ -4,7 +4,7 @@ class Matrix3x3(
     var a: Double, var b: Double, var c: Double,
     var d: Double, var e: Double, var f: Double,
     var g: Double, var h: Double, var i: Double
-) {
+): IMatrix<Vec3, Vec3>() {
     operator fun times(v: Vec3): Vec3 {
         return Vec3(
             v.x * a + v.y * b + v.z * c,
@@ -44,12 +44,6 @@ class Matrix3x3(
         )
     }
 
-    override fun toString(): String {
-        return "| $a, $b, $c |\n" +
-                "| $d, $e, $f |\n" +
-                "| $g, $h, $i |"
-    }
-
     constructor(
         a: Number, b: Number, c: Number,
         d: Number, e: Number, f: Number,
@@ -60,11 +54,32 @@ class Matrix3x3(
         g.toDouble(), h.toDouble(), i.toDouble()
     )
 
-    fun column(j: Int) = when (j) {
+    override fun getColumn(j: Int) = when (j) {
         0 -> Vec3(a, d, g)
         1 -> Vec3(b, e, h)
         2 -> Vec3(c, f, i)
         else -> throw IndexOutOfBoundsException()
+    }
+
+    override fun getRow(i: Int): Vec3 = when (i) {
+        0 -> Vec3(a, b, c)
+        1 -> Vec3(d, e, f)
+        2 -> Vec3(g, h, i)
+        else -> throw IndexOutOfBoundsException()
+    }
+
+    override val width: Int = 3
+    override val height: Int = 3
+
+    override fun get(i: Int, j: Int) = when (i) {
+        0 -> Vec3(a, b, c)[j]
+        1 -> Vec3(d, e, f)[j]
+        2 -> Vec3(g, h, i)[j]
+        else -> throw IndexOutOfBoundsException()
+    }
+
+    override fun set(i: Int, j: Int, value: Double) {
+        getRow(i)[j] = value
     }
 
     companion object {

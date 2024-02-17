@@ -1,6 +1,6 @@
 package framework.display
 
-import framework.times
+import times
 import toColor
 import toVec
 import java.awt.Color
