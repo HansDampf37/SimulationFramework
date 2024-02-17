@@ -49,6 +49,7 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
             val dt: Seconds = (now - lastTime) / 1000.0
+            listenForInput(dt)
             if (display.isInitialized()) tick(dt * speed)
             lastTime = now
         }
@@ -68,7 +69,6 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
             if (delta >= 1) {
                 keyManager.tick()
                 mouseManager.tick(dt)
-                listenForInput(dt)
                 if (display.isInitialized()) initializeRendering()
                 delta--
                 lastTime = now

@@ -6,6 +6,8 @@ import framework.WatchDouble
 import framework.interfaces.*
 import framework.physics.collisions.CollisionManager
 import randomOrder
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.math.max
 import kotlin.math.min
 
@@ -19,9 +21,10 @@ import kotlin.math.min
 @Suppress("KotlinConstantConditions")
 abstract class PhysicsSimulation(title: String) : Simulation(title) {
     @WatchDouble("g", 0.0, 15.0)
-    private var g: MetersPerSecondPerSecond = 9.81
+    protected var g: MetersPerSecondPerSecond = 9.81
+
     @WatchDouble("friction per second", 0.0, 1.0)
-    private var frictionPerSecond: Double = 0.02
+    protected var frictionPerSecond: Double = 0.02
 
     private val gravity get() = Vec3(0.0, 0.0, -g)
     private val tickables: MutableList<Tickable> = ArrayList()
@@ -29,6 +32,8 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
     private val moveables: MutableList<Moveable> = ArrayList()
 
     private var collisionManager: CollisionManager = CollisionManager()
+
+    private val drawLock = ReentrantLock()
 
     /**
      * Registers a [Tickable], [Renderable], or [Collidable] at this Simulation.
@@ -75,16 +80,21 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
             }
         }
         calcForces()
-        collisionManager.calculateCollisions()
-        synchronized(tickables) {
-            val order = randomOrder(tickables.size)
-            for (index in order) tickables[index].tick(dt)
+        drawLock.withLock {
+            collisionManager.calculateCollisions()
+            synchronized(tickables) {
+                val order = randomOrder(tickables.size)
+                for (index in order) tickables[index].tick(dt)
+            }
+            correctState()
         }
-        correctState()
+
     }
 
     override fun render() {
-        synchronized(renderables) { renderables.forEach { it.render(camera) } }
+        drawLock.withLock {
+            synchronized(renderables) { renderables.forEach { it.render(camera) } }
+        }
     }
 
     /**

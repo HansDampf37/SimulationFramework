@@ -90,10 +90,7 @@ class Rasterizer(val camera: Camera) {
                     zBuffer[index] = depth
                     entityPuffer[index] = entity
                     // interpolate color
-                    val lightDirectionHom = (camera.rotateCameraToWorld * Vec4(0.0,0.0,1.0, 1.0))
-                    val lightDirection = Vec3(lightDirectionHom.x, lightDirectionHom.y, lightDirectionHom.z)
-                    val shadingFactor = 0.5 + 0.5 * maxOf(0.0, (1 - (line.v1.position - line.v2.position) * lightDirection))
-                    val color = ((1 - t) * line.v1.color + t * line.v2.color) * shadingFactor
+                    val color = ((1 - t) * line.v1.color + t * line.v2.color)
                     // Set pixel color in the image buffer (using line color or other criteria)
                     image.setRGB(x0, y0, color.toIntColor())
                 }
