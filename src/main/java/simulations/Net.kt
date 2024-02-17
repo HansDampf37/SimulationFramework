@@ -6,48 +6,61 @@ import algebra.Vec3
 import framework.Simulation
 import framework.Vertex
 import framework.physics.Seconds
+import framework.physics.Sphere
+import toVec
 import java.awt.Color
+import kotlin.math.pow
 
 @Suppress("unused")
 class Net : Simulation("Net") {
-    private val airResist = 0.999
-    private val gravity = Vec3(0.0, -100.0, 0.0)
-    private lateinit var points: Array<Array<Point3d>>
+    private val airResist = 0.9
+    private val gravity = Vec3(0.0, 0.0, -9.81)
+    private lateinit var points: Array<Array<Vec3>>
     private lateinit var forces: Array<Array<Vec3>>
-    private val colors: Array<Array<Color>>
-    var cart = CartesianCoordinateSystem(false, 1000, 1000.0, Color.black)
 
     init {
         reset()
-        colors = Array(size) { Array(size) { Color(
-            (163 + 40 * Math.random() - 20).toInt(),
-            (153 + 40 * Math.random() - 20).toInt(),
-            (239 + 20 * Math.random() - 10).toInt()
-        ) } }
+        speed = 0.0
     }
 
     override fun tick(dt: Seconds) {
         input
-        calcNetForces()
-        airResist()
-        movePoints()
+        calcNetForces(dt)
+        airResist(dt)
+        movePoints(dt)
     }
 
     override fun render() {
-        points.forEach { it.forEach { point ->
-            camera.renderSphere(
-                Vertex(point.positionVector, Vec3.ones * 255, Vec3.zero),
-                0.25f,
-                null)
+        points.forEach {
+            it.forEach { point ->
+                camera.renderSphere(
+                    Vertex(point, Conf.colorScheme.smallObjectColor.toVec(), Vec3.zero),
+                    25f,
+                    null
+                )
+            }
+        }
+        for (x in 1 until points.size - 1) {
+            for (y in 1 until points[x].size - 1) {
+                val point1 = points[x][y]
+                val neighbor1 = points[x][y + 1]
+                val neighbor2 = points[x][y - 1]
+                val neighbor3 = points[x + 1][y]
+                val neighbor4 = points[x - 1][y]
+                for (neighbor in listOf(neighbor1, neighbor2, neighbor3, neighbor4)) {
+                    camera.renderLine(
+                        Vertex(point1, Conf.colorScheme.smallObjectColor.toVec(), Vec3.zero),
+                        Vertex(neighbor, Conf.colorScheme.smallObjectColor.toVec(), Vec3.zero)
+                    )
+                }
             }
         }
     }
 
-    private fun movePoints() {
+    private fun movePoints(dt: Seconds) {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
-                points[x][y].add(forces[x][y])
-                points[x][y].add(gravity)
+                points[x][y].addInPlace(forces[x][y])
             }
         }
     }
@@ -68,65 +81,63 @@ class Net : Simulation("Net") {
             }
         }
 
-    private fun airResist() {
+    private fun airResist(dt: Seconds) {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
-                forces[x][y].scaleInPlace(airResist)
+                forces[x][y].scaleInPlace(airResist.pow(dt))
             }
         }
     }
 
-    private fun calcNetForces() {
+    private fun calcNetForces(dt: Seconds) {
         for (x in 1 until points.size - 1) {
             for (y in 1 until points[x].size - 1) {
                 forces[x][y].addInPlace(
-                    if (points[x][y]
-                            .getConnectingVectorTo(points[x][y + 1]).length > 60
-                    ) points[x][y]
-                        .getConnectingVectorTo(points[x][y + 1]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
+                    if ((points[x][y + 1] - points[x][y]).length > 60) {
+                        (points[x][y + 1] - points[x][y]).scaleInPlace(0.1) * dt
+                    } else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
-                    if (points[x][y]
-                            .getConnectingVectorTo(points[x + 1][y]).length > 60
-                    ) points[x][y]
-                        .getConnectingVectorTo(points[x + 1][y]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
+                    if ((points[x + 1][y] - points[x][y]).length > 60) {
+                        (points[x + 1][y] - points[x][y]).scaleInPlace(0.1) * dt
+                    } else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
-                    if (points[x][y]
-                            .getConnectingVectorTo(points[x][y - 1]).length > 60
-                    ) points[x][y]
-                        .getConnectingVectorTo(points[x][y - 1]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
+                    if ((points[x][y - 1] - points[x][y]).length > 60) {
+                        (points[x][y - 1] - points[x][y]).scaleInPlace(0.1) * dt
+                    } else Vec3(0.0, 0.0, 0.0)
                 )
                 forces[x][y].addInPlace(
-                    if (points[x][y]
-                            .getConnectingVectorTo(points[x - 1][y]).length > 60
-                    ) points[x][y]
-                        .getConnectingVectorTo(points[x - 1][y]).scaleInPlace(0.1) else Vec3(0.0, 0.0, 0.0)
+                    if ((points[x - 1][y] - points[x][y]).length > 60) {
+                        (points[x - 1][y] - points[x][y]).scaleInPlace(0.1) * dt
+                    } else Vec3(0.0, 0.0, 0.0)
                 )
-                forces[x][y].scaleInPlace(0.99)
+                forces[x][y].addInPlace(gravity * dt)
             }
         }
     }
 
     private fun moveEdge(delta: Vec3) {
         for (i in points.indices) {
-            points[0][i].add(delta)
-            points[points.size - 1][i].add(delta)
+            points[0][i].addInPlace(delta)
+            points[points.size - 1][i].addInPlace(delta)
         }
         for (i in 1 until points.size - 1) {
-            points[i][0].add(delta)
-            points[i][points.size - 1].add(delta)
+            points[i][0].addInPlace(delta)
+            points[i][points.size - 1].addInPlace(delta)
         }
     }
 
     override fun reset() {
-        points = Array(size) { x -> Array(size) { y ->
-            Point3d(
-                distBetweenPoints * (x + Math.random() - 0.5) - distBetweenPoints * size / 2,
-                distBetweenPoints * (Math.random() - 0.5) - 50,
-                distBetweenPoints * (y + Math.random() - 0.5) - distBetweenPoints * size / 2
-            )
-        } }
+        points = Array(size) { x ->
+            Array(size) { y ->
+                Vec3(
+                    distBetweenPoints * (x.toDouble() - size / 2),
+                    distBetweenPoints * (y.toDouble() - size / 2),
+                    0.0,
+                )
+            }
+        }
         forces = Array(size) { Array(size) { Vec3(0.0, 0.0, 0.0) } }
     }
 
@@ -135,3 +146,5 @@ class Net : Simulation("Net") {
         private const val distBetweenPoints = 300
     }
 }
+
+fun main() = Net().start()

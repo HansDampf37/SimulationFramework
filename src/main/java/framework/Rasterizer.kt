@@ -200,6 +200,7 @@ class Rasterizer(val camera: Camera) {
         fun interpolateDepthColorNormal(
             v1: Vertex, pixel: Vec2, radiusPixel: Int, radiusWorldCoords: Float
         ): InterpolationResult {
+            if (radiusPixel == 0) return InterpolationResult(false, -1f, Vec3.zero, Vec3.zero, false)
             // Check if the point is inside the sphere
             val dxPixels = pixel.x.toFloat() - v1.screenPosition!!.x.toFloat()
             val dyPixels = pixel.y.toFloat() - v1.screenPosition!!.y.toFloat()

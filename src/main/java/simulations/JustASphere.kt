@@ -32,3 +32,7 @@ class JustASphere: Simulation("Sphere") {
         camera.zoom = 0.001
     }
 }
+
+fun main() {
+    JustASphere().start()
+}
