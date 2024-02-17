@@ -1,14 +1,13 @@
-package physics
+package framework.physics
 
 import Conf
 import algebra.Point3d
-import algebra.Vec
+import algebra.Vec3
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.*
 import framework.interfaces.Mass
-import physics.collisions.BoundingBox
-import toVec
+import framework.physics.collisions.BoundingBox
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -18,13 +17,13 @@ import kotlin.math.sin
 open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Double = 1.0) : Point3d(x, y, z), Mass {
     // Drawable
     override var outlineRasterization: Boolean = false
-    override var color: Vec? = Conf.colorScheme.smallObjectColor.toVec()
+    override var color: Vec3? = Conf.colorScheme.smallObjectColor.toVec()
 
     // Moveable
-    override var velocity: Vec = Vec(0, 0, 0)
-    override var acceleration: Vec = Vec(0, 0, 0)
+    override var velocity: Vec3 = Vec3(0, 0, 0)
+    override var acceleration: Vec3 = Vec3(0, 0, 0)
     override var status = Status.Movable
-    override var position: Vec
+    override var position: Vec3
         get() = positionVector
         set(value) {
             x = value.x
@@ -39,10 +38,10 @@ open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Doub
         require(mass != 0.0) { "Mass can't be equal to 0" }
     }
 
-    constructor(mass: Double, positionVector: Vec, radius: Double = 1.0) : this(mass, positionVector.x, positionVector.y, positionVector.z, radius)
+    constructor(mass: Double, positionVector: Vec3, radius: Double = 1.0) : this(mass, positionVector.x, positionVector.y, positionVector.z, radius)
 
     override fun render(camera: Camera) {
-        camera.renderSphere(Vertex(this.positionVector, color ?: Vec.zero, Vec.zero), radius.toFloat(), this)
+        camera.renderSphere(Vertex(this.positionVector, color ?: Vec3.zero, Vec3.zero), radius.toFloat(), this)
     }
 
     @Suppress("unused")
@@ -63,14 +62,14 @@ open class PointMass(mass: Kg, x: Double, y: Double, z: Double, var radius: Doub
                     listOf(Pair(theta1, phi1), Pair(theta2, phi1), Pair(theta1, phi2), Pair(theta2, phi2))
                 val tempVertices = Array(4) { i ->
                     val (theta, phi) = angleCombinationsForVertex[i]
-                    val v1 = Vec(
+                    val v1 = Vec3(
                         x + radius * sin(theta) * cos(phi),
                         y + radius * sin(theta) * sin(phi),
                         z + radius * cos(theta)
                     )
                     val n1 = v1 - this.positionVector
-                    val shadingFactor1 = maxOf(0.0, n1 * Vec(0.0, 0.0, 1.0))
-                    Vertex(v1, (color ?: Vec.zero) * shadingFactor1, n1)
+                    val shadingFactor1 = maxOf(0.0, n1 * Vec3(0.0, 0.0, 1.0))
+                    Vertex(v1, (color ?: Vec3.zero) * shadingFactor1, n1)
                 }
 
                 vertices.add(tempVertices[0])

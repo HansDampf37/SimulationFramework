@@ -1,4 +1,4 @@
-package physics.collisions
+package framework.physics.collisions
 
 import framework.interfaces.Mass
 import framework.interfaces.Status

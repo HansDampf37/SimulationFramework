@@ -1,9 +1,10 @@
 package simulations
 
-import algebra.Vec
+import algebra.Vec3
 import framework.*
-import physics.Seconds
-import physics.Sphere
+import framework.physics.Seconds
+import framework.physics.Sphere
+import times
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -45,7 +46,7 @@ class SpheresInTheSky(numDivisions: Int): Simulation("Spheres in the sky") {
     private fun drawLookingDirection() {
         val p1 = camera.positionVector - camera.up + camera.lookingDirection * 0.1
         val p2 = camera.positionVector - camera.up + camera.lookingDirection * 10
-        camera.renderLine(Vertex(p1, 255 * Vec.ones, Vec.zero), Vertex(p2, Vec.ones, Vec.zero))
+        camera.renderLine(Vertex(p1, 255 * Vec3.ones, Vec3.zero), Vertex(p2, Vec3.ones, Vec3.zero))
     }
 
     override fun reset() {

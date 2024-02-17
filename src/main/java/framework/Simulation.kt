@@ -5,7 +5,7 @@ import framework.display.Display
 import framework.display.KeyManager
 import framework.display.MouseManager
 import framework.interfaces.ISimulation
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.awt.image.ConvolveOp
@@ -19,9 +19,9 @@ import java.awt.image.Kernel
  */
 abstract class Simulation(title: String, private val renderingFrequency: Double = 25.0) : ISimulation {
     @WatchDouble("Speed",0.0, 2.0)
-    private var speed = 1.0
+    protected var speed = 1.0
     @WatchBoolean("Anti-Aliasing")
-    private var antiAliasing = true
+    private var antiAliasing = false
     private var running = false
     protected val keyManager = KeyManager()
     protected val display: Display = Display(title, keyManager = keyManager)
@@ -49,7 +49,10 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
             val dt: Seconds = (now - lastTime) / 1000.0
-            tick(dt * speed)
+            if (display.isInitialized()) {
+                listenForInput(dt)
+                tick(dt * speed)
+            }
             lastTime = now
         }
         stop()
@@ -62,18 +65,15 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
 
-            // always tick
             val dt: Seconds = (now - lastTime) / 1000.0
             delta += (now - lastTime) / msPerTick
             // render to reach fps goal
             if (delta >= 1) {
                 keyManager.tick()
                 mouseManager.tick(dt)
-                listenForInput(dt)
-                initializeRendering()
+                if (display.isInitialized()) initializeRendering()
                 delta--
                 lastTime = now
-                //println("running")
             }
         }
         stop()
@@ -119,15 +119,13 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         g.color = Color.white
         val canvasWidth = display.canvas.width
         val canvasHeight = display.canvas.height
-        if (canvasWidth > 0 && canvasHeight > 0) {
-            camera.screenWidth = canvasWidth
-            camera.screenHeight = canvasHeight
-            camera.newFrame()
-            render()
-            val image = if (antiAliasing) applyAntiAliasing(camera.image) else camera.image
-            g.drawImage(image, 0, 0, camera.screenWidth, camera.screenHeight, null)
-            g.drawString(camera.cameraSettingsToString(), 10, 10)
-        }
+        camera.screenWidth = canvasWidth
+        camera.screenHeight = canvasHeight
+        camera.newFrame()
+        render()
+        val image = if (antiAliasing) applyAntiAliasing(camera.image) else camera.image
+        g.drawImage(image, 0, 0, camera.screenWidth, camera.screenHeight, null)
+        g.drawString(camera.cameraSettingsToString(), 10, 10)
         bs.show()
         g.dispose()
     }

@@ -1,60 +1,111 @@
 package algebra
 
+import format
+import java.lang.Math.random
+import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.sqrt
 
-/**
- * Represents a Vector in 3d space.
- * @param x x value
- * @param y y value
- * @param z z value
- */
-open class Vec(var x: Double, var y: Double, var z: Double) {
+class Vec(private val entries: Array<Double>): Iterable<Double> {
+    init {
+        if (entries.isEmpty()) throw IllegalArgumentException("Empty Vectors are not allowed")
+    }
 
-    constructor(x: Number, y: Number, z: Number) : this(x.toDouble(), y.toDouble(), z.toDouble())
+    operator fun get(i: Int) = entries[i]
+    operator fun set(i: Int, value: Number) {
+        entries[i] = value.toDouble()
+    }
+
     /**
      * Returns the result of the vector addition v + w. The returned vector is safe to use.
      *
-     * @param w other vector
+     * @param other other vector
      * @return v + w
      */
-    operator fun plus(w: Vec): Vec {
-        return Vec(x + w.x, y + w.y, z + w.z)
+    operator fun plus(other: Vec): Vec {
+        return if (other.height == this.height) {
+            Vec(Array(height) { i -> entries[i] + other.entries[i] })
+        } else {
+            throw DimensionException("Can not add $this and $other")
+        }
     }
 
     /**
      * Returns the result of the vector subtraction v - w. The returned vector is safe to use.
      *
-     * @param w other vector
+     * @param other other vector
      * @return v - w
      */
-    operator fun minus(w: Vec): Vec {
-        return Vec(x - w.x, y - w.y, z - w.z)
+    operator fun minus(other: Vec): Vec {
+        return if (other.height == this.height) {
+            Vec(Array(height) { i -> this.entries[i] - other.entries[i] })
+        } else {
+            throw DimensionException("Cannot subtract $this and $other")
+        }
+    }
+
+    operator fun unaryMinus(): Vec {
+        return Vec(Array(height) { i -> -entries[i] })
     }
 
     /**
-     * Returns the result of the subtraction v - s. The returned vector is safe to use.
-     *
-     * @param s other vector
-     * @return v - s
+     * Returns the standard dot product (fundamental matrix = unit matrix) with the given vector.
      */
-    operator fun minus(s: Number): Vec {
-        return Vec(x - s.toFloat(), y - s.toFloat(), z - s.toFloat())
+    operator fun times(other: Vec): Double {
+        return entries.foldIndexed(0.0) { i, acc, _ -> acc + other.entries[i] * this.entries[i] }
     }
 
+    fun dotProduct(other: Vec): Double = times(other)
+
     /**
-     * Returns the result of the scalar multiplication v * scalar without changing v. The returned vector is safe to use.
+     * Returns the result of the scalar multiplication v * scalar. The returned vector is safe to use.
      * @param scalar factor
      * @return the result of the scalar multiplication v * scalar
      */
-    operator fun times(scalar: Double): Vec {
-        return Vec(x * scalar, y * scalar, z * scalar)
+    operator fun times(scalar: Number): Vec {
+        return Vec(Array(height) { i -> entries[i] * scalar.toDouble() })
     }
 
-    operator fun times(other: Vec) = dotProduct(other)
-    operator fun div(scalar: Number) = this * (1.0 / scalar.toDouble())
+    operator fun div(scalar: Number): Vec {
+        return Vec(Array(height) { i -> entries[i] / scalar.toDouble() })
+    }
 
-    operator fun unaryMinus(): Vec = Vec(-x, -y, -z)
+    operator fun plus(scalar: Number): Vec {
+        return Vec(Array(height) { i -> entries[i] + scalar.toDouble() })
+    }
+
+    /**
+     * Returns the result of the subtraction v - scalar. The returned vector is safe to use.
+     *
+     * @param scalar some number
+     * @return v - s
+     */
+    operator fun minus(scalar: Number): Vec {
+        return Vec(Array(height) { i -> entries[i] - scalar.toDouble() })
+    }
+
+    /**
+     * adds the given Vector to this Vector and returns this instance with updated values
+     *
+     * @param other other vector
+     * @return the result of the vector addition with this vector and v
+     */
+    fun addInPlace(other: Vec): Vec {
+        for (i in entries.indices) entries[i] += other.entries[i]
+        return this
+    }
+
+    /**
+     * scales this Vector and returns this instance with updated values
+     *
+     * @param scalar the scalar
+     * @return the result of the scalar multiplication with this vector and the scalar
+     */
+    fun scaleInPlace(scalar: Double): Vec {
+        for (i in entries.indices) entries[i] *= scalar
+        return this
+    }
 
     /**
      * Returns a vector with the same direction as the given one, but length 1. The returned vector is safe to use.
@@ -62,34 +113,27 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
      * @return a vector with the same direction as the given one, but length 1.
      */
     fun normalize(): Vec {
-        if (length == 0.0) throw ArithmeticException("Division by zero")
-        return Vec(x / length, y / length, z / length)
+        val len = length
+        if (len == 0.0) throw ArithmeticException("Division by zero")
+        return this / len
     }
 
+    val indices = entries.indices
+    val x get() = entries[0]
+    val y get() = if (entries.size >= 2) entries[1] else throw DimensionException("Vector $this does not have a y coordinate")
+    val z get() = if (entries.size >= 3) entries[2] else throw DimensionException("Vector $this does not have a z coordinate")
+    val w get() = if (entries.size >= 4) entries[3] else throw DimensionException("Vector $this does not have a w coordinate")
 
+    /**
+     * Returns the length of this vector
+     */
     val length: Double
-        /**
-         * Returns the length of this vector
-         *
-         * @return length
-         */
-        get() = sqrt(x * x + y * y + z * z)
+        get() = sqrt(this * this)
 
-    /**
-     * Returns the standard dot product (fundamental matrix = unit matrix)with the given vector.
-     */
-    fun dotProduct(v: Vec): Double {
-        return x * v.x + y * v.y + z * v.z
+    fun crossProduct(other: Vec): Vec {
+        if (this.height != 3 || other.height != 3) throw DimensionException("Cannot calculate cross product between $this and $other")
+        return Vec(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x)
     }
-
-    /**
-     * Returns true if the angle between this vector and the given one is smaller than 90°. Otherwise, returns false.
-     */
-    fun hasSharpAngleTo(v: Vec): Boolean {
-        val w = projectOnto(v)
-        return w.x * v.x > 0 || w.y * v.y > 0 || w.z * v.z > 0
-    }
-
 
     /**
      * Returns the part of this vector that is parallel to the given vector.
@@ -99,86 +143,57 @@ open class Vec(var x: Double, var y: Double, var z: Double) {
      * @return the part of this vector that is parallel to the given vector
      */
     fun projectOnto(ontoThisOne: Vec): Vec {
-        var w = Vec(ontoThisOne.x, ontoThisOne.y, ontoThisOne.z)
-        w *= (this * (w) / (w * w))
-        return w
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return if (other is Vec) {
-            x == other.x && y == other.y && z == other.z
-        } else false
-    }
-
-    override fun toString(): String {
-        return "($x, $y, $z)"
-    }
-
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        result = 31 * result + z.hashCode()
-        return result
+        return ontoThisOne * (this * ontoThisOne) / (ontoThisOne * ontoThisOne)
     }
 
     fun setTo(other: Vec) {
-        this.x = other.x
-        this.y = other.y
-        this.z = other.z
+        if (height != other.height) throw DimensionException("$this can not be set to $other")
+        for (i in entries.indices) {
+            this[i] = other[i]
+        }
+    }
+
+    fun angleWith(other: Vec): Double {
+        return acos(other * this / (other.length * this.length))
     }
 
     /**
-     * adds the given Vector to this Vector and returns this instance with updated values
-     *
-     * @param vec other vector
-     * @return the result o the vector addition with this vector and v
+     * Returns true if the angle between this vector and the given one is smaller than 90°. Otherwise, returns false.
      */
-    fun addInPlace(vec: Vec): Vec {
-        x += vec.x
-        y += vec.y
-        z += vec.z
-        return this
+    fun hasSharpAngleTo(other: Vec): Boolean = abs(angleWith(other)) < PI / 2
+
+    val height get() = entries.size
+
+    override fun iterator(): Iterator<Double> = entries.iterator()
+
+    fun isEmpty() = entries.isEmpty()
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Vec) return false
+        if (other.height != this.height) return false
+        return (this - other).entries.all { abs(it) < 0.00001 }
     }
 
-    fun scaleInPlace(scalar: Double): Vec {
-        x *= scalar
-        y *= scalar
-        z *= scalar
-        return this
+    override fun toString(): String {
+        return entries.joinToString(
+            prefix = "(",
+            postfix = ")",
+            separator = ", "
+        ) { it.format(digitsAfterComma = 2).removeSuffix(".00") }
     }
 
-    /**
-     * subtracts the given Vector from this Vector and returns this instance with updated values
-     *
-     * @param vec other vector
-     * @return the result o the vector subtraction with this vector and v
-     */
-    fun subInPlace(vec: Vec): Vec {
-        x -= vec.x
-        y -= vec.y
-        z -= vec.z
-        return this
+    override fun hashCode(): Int {
+        return entries.contentHashCode()
     }
 
-    fun crossProduct(vec: Vec): Vec {
-        return Vec(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x)
-    }
+    constructor(vararg entries: Number) : this(entries.toList().map { it.toDouble() }.toTypedArray())
+    constructor(size: Int, operation: (i: Int) -> Number) : this(Array(size) { operation(it).toDouble() })
 
-    operator fun times(x: Int): Vec {
-        return times(x.toDouble())
-    }
-
-    fun angleWith(vec: Vec): Double {
-        return acos(vec * this / (vec.length * this.length))
-    }
-
-    fun removeComponentParallelTo(direction: Vec): Vec {
-        return this - projectOnto(direction)
-    }
-
-    companion object{
-        val ones = Vec(1.0, 1.0, 1.0)
-        val zero = Vec(0.0,0.0,0.0)
-        val random get() = Vec(Math.random(), Math.random(), Math.random())
+    companion object {
+        val ZERO_3 = Vec(0, 0, 0)
+        val ones_3 = Vec(1, 1, 1)
+        fun random(size: Int) = Vec(size) { random() }
+        fun zero(size: Int) = Vec(size) { _ -> 0 }
+        fun ones(size: Int) = Vec(size) { _ -> 1 }
     }
 }

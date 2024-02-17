@@ -1,13 +1,14 @@
 package simulations
 
+import Conf
 import algebra.Point3d
-import algebra.Vec
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
-import physics.ImpulseConnection
-import physics.PhysicsSimulation
-import physics.PointMass
+import framework.physics.ImpulseConnection
+import framework.physics.PhysicsSimulation
+import framework.physics.PointMass
+import toVec
 import kotlin.math.PI
 
 @Suppress("unused")
@@ -52,6 +53,7 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
                                 lastMass.position.z - maxRopeSegmentLength * 0.8,
                                 radius,
                             )
+                            mass.color = Conf.colorScheme.smallObjectColor.toVec()
                             masses.add(mass)
                             register(mass)
                             val link = ImpulseConnection(lastMass, mass, maxRopeSegmentLength, maxEnergy)
@@ -74,6 +76,8 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
         synchronized(links) { links.filter { !it.broken }.forEach { it.render(camera) } }
     }
 
+    override fun calcForces() = Unit
+
     override fun reset() {
         super.reset()
         synchronized(masses) {
@@ -82,6 +86,7 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
                 val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
                 val mass = PointMass(1.0, pos.x, pos.y, pos.z, radius)
                 if (i == 0) mass.status = Status.Immovable
+                mass.color = Conf.colorScheme.smallObjectColor.toVec()
                 masses.add(mass)
                 register(mass)
             }
@@ -103,11 +108,8 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
         camera.focalLength = 10.0
         camera.zoom = 0.001
     }
+}
 
-    override fun calcForces() {
-        synchronized(masses) {
-            for (clothPoint in masses) clothPoint.acceleration = Vec.zero
-            applyGravity(masses)
-        }
-    }
+fun main() {
+    Pend(10, 2.0).start()
 }

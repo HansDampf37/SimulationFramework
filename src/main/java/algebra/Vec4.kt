@@ -2,11 +2,7 @@ package algebra
 
 import kotlin.math.sqrt
 
-class Vec4(x: Double, y: Double, z: Double, var w: Double) : Vec(x, y, z) {
-    override fun toString(): String {
-        return "($x, $y, $z, $w)"
-    }
-
+class Vec4(var x: Double, var y: Double, var z: Double, var w: Double) : IVec() {
     override fun equals(other: Any?): Boolean {
         return if (other is Vec4) {
             (this - other).length() < 0.0001
@@ -19,46 +15,33 @@ class Vec4(x: Double, y: Double, z: Double, var w: Double) : Vec(x, y, z) {
 
     operator fun minus(other: Vec4) = Vec4(x - other.x, y - other.y, z - other.z, w - other.w)
 
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + w.hashCode()
-        return result
-    }
-}
 
-class Vec2(var x: Double, var y: Double) {
-
-    constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
-    override fun toString(): String {
-        return "($x, $y)"
+    override fun iterator(): Iterator<Double> {
+        return listOf(x, y, z, w).iterator()
     }
 
-    override fun equals(other: Any?): Boolean {
-        return if (other is Vec2) {
-            (this - other).length() < 0.0001
-        } else {
-            false
+    override fun get(i: Int): Double {
+        return when (i) {
+            0 -> x
+            1 -> y
+            2 -> z
+            3 -> w
+            else -> throw IndexOutOfBoundsException()
         }
     }
 
-    fun length() = sqrt(x * x + y * y)
-
-    operator fun minus(other: Vec2) = Vec2(x - other.x, y - other.y)
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        return result
+    override fun set(i: Int, value: Double) {
+        when (i) {
+            0 -> x = value
+            1 -> y = value
+            2 -> z = value
+            3 -> w = value
+            else -> throw IndexOutOfBoundsException()
+        }
     }
 
-    fun normalize(): Vec2 {
-        return this * (1 / length())
-    }
+    override val height: Int = 4
 
-    operator fun times(d: Double): Vec2 {
-        return Vec2(x * d, y * d)
-    }
-
-    operator fun times(v: Vec2): Double {
-        return this.x * v.x + this.y * v.y
-    }
+    constructor(x: Number, y: Number, z: Number, w: Number) : this(x.toDouble(), y.toDouble(), z.toDouble(), w.toDouble())
 }
+

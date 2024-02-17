@@ -5,6 +5,7 @@ import framework.Graphics3d
 import java.awt.Color
 import java.awt.Graphics
 
+@Deprecated("TODO implement rendering with camera")
 class CartesianCoordinateSystem(
     private val negative: Boolean, private val axisLength: Int, private val scaleSize: Double, private val color: Color
 ) {

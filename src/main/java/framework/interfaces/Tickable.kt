@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import physics.Seconds
+import framework.physics.Seconds
 
 /**
  * A member of this class updates its inner state regularly when [tick] is called.

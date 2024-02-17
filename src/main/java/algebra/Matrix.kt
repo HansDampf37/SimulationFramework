@@ -1,164 +1,121 @@
 package algebra
 
-class Matrix4X4(
-    var a: Double, var b: Double, var c: Double, var d: Double,
-    var e: Double, var f: Double, var g: Double, var h: Double,
-    var i: Double, var j: Double, var k: Double, var l: Double,
-    var m: Double, var n: Double, var o: Double, var p: Double
-) {
-    operator fun times(v: Vec4): Vec4 {
-        return Vec4(
-            v.x * a + v.y * b + v.z * c + v.w * d,
-            v.x * e + v.y * f + v.z * g + v.w * h,
-            v.x * i + v.y * j + v.z * k + v.w * l,
-            v.x * m + v.y * n + v.z * o + v.w * p
-        )
+import digitsAfterComma
+import digitsBeforeComma
+import format
+import kotlin.math.abs
+import kotlin.math.min
+
+class Matrix(private val rows: Array<Vec>) : Iterable<Double> {
+    init {
+        if (rows.isEmpty() || rows.any { it.isEmpty() }) throw IllegalArgumentException("Empty rows/columns are not allowed")
+        if (rows.any { it.height != rows[0].height }) throw IllegalArgumentException("Rows are not equally long")
     }
 
-    operator fun times(m: Matrix4X4): Matrix4X4 {
-        return Matrix4X4(
-            m.a * a + m.e * b + m.i * c + m.m * d,
-            m.b * a + m.f * b + m.j * c + m.n * d,
-            m.c * a + m.g * b + m.k * c + m.o * d,
-            m.d * a + m.h * b + m.l * c + m.p * d,
-            m.a * e + m.e * f + m.i * g + m.m * h,
-            m.b * e + m.f * f + m.j * g + m.n * h,
-            m.c * e + m.g * f + m.k * g + m.o * h,
-            m.d * e + m.h * f + m.l * g + m.p * h,
-            m.a * i + m.e * j + m.i * k + m.m * l,
-            m.b * i + m.f * j + m.j * k + m.n * l,
-            m.c * i + m.g * j + m.k * k + m.o * l,
-            m.d * i + m.h * j + m.l * k + m.p * l,
-            m.a * this.m + m.e * n + m.i * o + m.m * p,
-            m.b * this.m + m.f * n + m.j * o + m.n * p,
-            m.c * this.m + m.g * n + m.k * o + m.o * p,
-            m.d * this.m + m.h * n + m.l * o + m.p * p
-        )
+    operator fun get(i: Int) = rows[i]
+    fun column(j: Int): Vec = Vec(Array(height) { i -> rows[i][j] })
+    val height = rows.size
+    val width = rows[0].height
+    operator fun times(v: Vec): Vec {
+        if (v.height != this.width) throw DimensionException("Can not multiply $this with $v")
+        return Vec(Array(height) { i -> rows[i] * v })
     }
 
-    operator fun times(scalar: Number): Matrix4X4 {
-        return Matrix4X4(
-            a * scalar.toDouble(), b * scalar.toDouble(), c * scalar.toDouble(), d * scalar.toDouble(),
-            e * scalar.toDouble(), f * scalar.toDouble(), g * scalar.toDouble(), h * scalar.toDouble(),
-            i * scalar.toDouble(), j * scalar.toDouble(), k * scalar.toDouble(), l * scalar.toDouble(),
-            m * scalar.toDouble(), n * scalar.toDouble(), o * scalar.toDouble(), p * scalar.toDouble(),
-        )
+    operator fun times(other: Matrix): Matrix {
+        if (other.height != this.width) throw DimensionException("Can not multiply $this with $other")
+        return Matrix(Array(this.height) { i ->
+            Vec(Array(other.width) { j ->
+                rows[i] * other.column(j)
+            })
+        })
     }
 
-    operator fun plus(mat: Matrix4X4): Matrix4X4 {
-        return Matrix4X4(
-            this.a + mat.a, this.b + mat.b, this.c + mat.c, this.d + mat.d,
-            this.e + mat.e, this.f + mat.f, this.g + mat.g, this.h + mat.h,
-            this.i + mat.i, this.j + mat.j, this.k + mat.k, this.l + mat.l,
-            this.m + mat.m, this.n + mat.n, this.o + mat.o, this.p + mat.p
-        )
+    operator fun times(scalar: Number): Matrix {
+        return Matrix(Array(height) { i -> rows[i] * scalar })
     }
 
-    fun transpose() = Matrix4X4(
-        a, e, i, m,
-        b, f, j, n,
-        c, g, k, o,
-        d, h, l, p
-    )
-
-    override fun toString(): String {
-        return "| $a, $b, $c, $d |\n" +
-                "| $e, $f, $g, $h |\n" +
-                "| $i, $j, $k, $l |\n" +
-                "| $m, $n, $o, $p |"
-    }
-}
-
-class Matrix3x4(
-    var a: Double, var b: Double, var c: Double, var d: Double,
-    var e: Double, var f: Double, var g: Double, var h: Double,
-    var i: Double, var j: Double, var k: Double, var l: Double
-) {
-    operator fun times(v: Vec4): Vec {
-        return Vec(
-            v.x * a + v.y * b + v.z * c + v.w * d,
-            v.x * e + v.y * f + v.z * g + v.w * h,
-            v.x * i + v.y * j + v.z * k + v.w * l
-        )
+    operator fun plus(other: Matrix): Matrix {
+        return Matrix(height, width) { i, j -> rows[i][j] + other.rows[i][j] }
     }
 
-    operator fun minus(m: Matrix3x4): Matrix3x4 {
-        return Matrix3x4(
-            a - m.a, b - m.b, c - m.c, d - m.d,
-            e - m.e, f - m.f, g - m.g, h - m.h,
-            i - m.i, j - m.j, k - m.k, l - m.l
-        )
+    private operator fun minus(other: Matrix): Matrix {
+        return Matrix(height, width) { i, j -> rows[i][j] - other.rows[i][j] }
     }
 
-    override fun toString(): String {
-        return "| $a, $b, $c, $d |\n" +
-                "| $e, $f, $g, $h |\n" +
-                "| $i, $j, $k, $l |"
+    operator fun plus(scalar: Number): Matrix {
+        return Matrix(height, width) { i, j -> rows[i][j] + scalar.toDouble() }
     }
+
+    operator fun minus(scalar: Number): Matrix {
+        return Matrix(height, width) { i, j -> rows[i][j] - scalar.toDouble() }
+    }
+
+    fun transpose() = Matrix(width, height) { i, j -> rows[j][i] }
+    val size: Int
+        get() = height * width
 
     override fun equals(other: Any?): Boolean {
-        return if (other is Matrix3x4) {
-            val dif = this - other
-            val eps = 0.0001
-            dif.a < eps && dif.b < eps && dif.c < eps && dif.d < eps && dif.e < eps && dif.f < eps &&
-                    dif.g < eps && dif.h < eps && dif.i < eps && dif.j < eps && dif.k < eps && dif.l < eps
-        } else {
-            false
+        if (other !is Matrix) return false
+        if (other.height != this.height || other.width != this.width) return false
+        return (this - other).all { abs(it) < 0.00001 }
+    }
+
+    override fun iterator(): Iterator<Double> {
+        return object : Iterator<Double> {
+            var nextI: Int = 0
+            var nextJ: Int = 0
+
+            override fun hasNext(): Boolean {
+                return nextI < height
+            }
+
+            override fun next(): Double {
+                return rows[nextI][nextJ].apply {
+                    if (nextJ + 1 < width) {
+                        nextJ++
+                    } else {
+                        nextJ = 0
+                        nextI++
+                    }
+                }
+            }
         }
     }
 
-    operator fun times(m: Matrix4X4): Matrix3x4 {
-        return Matrix3x4 (
-            m.a * a + m.e * b + m.i * c + m.m * d,
-            m.b * a + m.f * b + m.j * c + m.n * d,
-            m.c * a + m.g * b + m.k * c + m.o * d,
-            m.d * a + m.h * b + m.l * c + m.p * d,
-            m.a * e + m.e * f + m.i * g + m.m * h,
-            m.b * e + m.f * f + m.j * g + m.n * h,
-            m.c * e + m.g * f + m.k * g + m.o * h,
-            m.d * e + m.h * f + m.l * g + m.p * h,
-            m.a * i + m.e * j + m.i * k + m.m * l,
-            m.b * i + m.f * j + m.j * k + m.n * l,
-            m.c * i + m.g * j + m.k * k + m.o * l,
-            m.d * i + m.h * j + m.l * k + m.p * l
-        )
-    }
-}
-
-class Matrix3x3(
-    var a: Double, var b: Double, var c: Double,
-    var d: Double, var e: Double, var f: Double,
-    var g: Double, var h: Double, var i: Double
-) {
-
-    operator fun times(v: Vec): Vec {
-        return Vec(
-            v.x * a + v.y * b + v.z * c,
-            v.x * d + v.y * e + v.z * f,
-            v.x * g + v.y * h + v.z * i
-        )
-    }
-
-    operator fun times(m: Matrix3x4): Matrix3x4 {
-        return Matrix3x4(
-            m.a * a + m.e * b + m.i * c,
-            m.b * a + m.f * b + m.j * c,
-            m.c * a + m.g * b + m.k * c,
-            m.d * a + m.h * b + m.l * c,
-            m.a * d + m.e * e + m.i * f,
-            m.b * d + m.f * e + m.j * f,
-            m.c * d + m.g * e + m.k * f,
-            m.d * d + m.h * e + m.l * f,
-            m.a * g + m.e * h + m.i * i,
-            m.b * g + m.f * h + m.j * i,
-            m.c * g + m.g * h + m.k * i,
-            m.d * g + m.h * h + m.l * i,
-        )
+    private fun all(operation: (Double) -> Boolean): Boolean {
+        val iterator = iterator()
+        while (iterator.hasNext()) {
+            if (!operation(iterator.next())) return false
+        }
+        return true
     }
 
     override fun toString(): String {
-        return "| $a, $b, $c |\n" +
-                "| $d, $e, $f |\n" +
-                "| $g, $h, $i |"
+        val maxDigitsBeforeComma = Array(width) { j -> column(j).maxOf { entry -> entry.digitsBeforeComma() } }
+        val maxDigitsAfterComma = Array(width) { j -> column(j).maxOf { entry -> entry.digitsAfterComma() } }
+        return rows.joinToString(prefix = "|", postfix = "|", separator = "|\n|") { row ->
+            var i: Int = 0
+            row.joinToString(separator = ", ") {
+                it.format(
+                    digitsBeforeComma = maxDigitsBeforeComma[i],
+                    digitsAfterComma = min(3, maxDigitsAfterComma[i++])
+                )
+            }
+        }
+    }
+
+    constructor(
+        height: Int,
+        width: Int,
+        vararg entries: Number
+    ) : this(Array(height) { i -> Vec(Array(width) { j -> entries[i * width + j].toDouble() }) })
+
+    constructor(height: Int, width: Int, operation: (i: Int, j: Int) -> Number) :
+            this(Array(height) { i -> Vec(Array(width) { j -> operation(i, j).toDouble() }) })
+
+    companion object {
+        fun eye(height: Int, width: Int) = Matrix(height, width) { i, j -> if (i == j) 1 else 0 }
+
+        fun zero(height: Int, width: Int): Matrix = Matrix(height, width) { _, _ -> 0 }
     }
 }

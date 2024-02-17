@@ -1,54 +1,87 @@
 package simulations
 
 import framework.Simulation
-import algebra.Point3d
-import physics.Seconds
-import java.awt.Color
-import java.awt.Graphics
+import algebra.Vec3
+import framework.WatchBoolean
+import framework.WatchDouble
+import framework.WatchInt
+import framework.physics.Seconds
+import times
+import toVec
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Fractal(private val dim: Int) : Simulation("Fractal") {
-    private lateinit var corners: Array<Point3d>
-    private lateinit var points: MutableList<Point3d>
+class Fractal() : Simulation("Fractal") {
+    @WatchInt("Corners", 3, 10)
+    private var dim: Int = 3
+        set(value) {
+            field = value
+            reset()
+        }
+    private val corners: ArrayList<Vec3> = ArrayList()
+    private val points: MutableList<Vec3> = ArrayList()
+    @WatchDouble("PointsPerSecond", 1.0, 10000.0)
+    private var pointsPerSecond: Double = 100.0
+    @WatchBoolean("Skip to End")
+    private var skip = false
+    private val secondsPerPoint: Double
+        get() = 1.0 / pointsPerSecond
+
+    private var secondsSinceLastPoint = 0.0
 
     init {
+        camera.x = 0.0
+        camera.y = 0.0
+        camera.z = 10.0
+        camera.focalLength = 1.0
+        camera.zoom = 0.022
+        camera.phi = 0.0
+        camera.theta = PI
         reset()
     }
 
     override fun tick(dt: Seconds) {
-        val speed = 5
-        for (i in 0 until speed) {
-            val corner = corners[(Math.random() * corners.size).toInt()]
-            val newPoint =
-                Point3d(points[points.size - 1].positionVector + points[points.size - 1].getConnectingVectorTo(corner) / 2)
+        if (!isInitialized()) return
+        if (!skip) {
+            secondsSinceLastPoint += dt
+            if (secondsSinceLastPoint < secondsPerPoint) return
+
+            secondsSinceLastPoint = 0.0
+        }
+        val corner = corners.random()
+        val last = points.last()
+        val newPoint = last + (corner - last) / 2
+        synchronized(points) {
             points.add(newPoint)
         }
     }
 
+    private fun isInitialized(): Boolean = corners.isNotEmpty()
+
     override fun render() {
-        TODO("Not yet implemented")
+        val color = Conf.colorScheme.smallObjectColor.toVec()
+        synchronized(points) {
+            points.indices.forEach { camera.renderPixel(points[it], color, null) }
+        }
     }
 
     override fun reset() {
         val radius = 100.0
-        points = ArrayList()
-        corners = Array(dim) { i ->
-            val phi = 2 * Math.PI / dim * i
-            val x = radius * cos(phi + Math.PI / 2)
-            val y = radius * sin(phi + Math.PI / 2)
-            Point3d(x, y, 0.0)
+        synchronized(points) {
+            points.clear()
+            corners.clear()
+            for (i in 0 until dim) {
+                val phi = 2 * Math.PI / dim * i
+                val x = radius * cos(phi + Math.PI / 2)
+                val y = radius * sin(phi + Math.PI / 2)
+                corners.add(Vec3(x, y, 0.0))
+            }
+            points.add(Vec3(Math.random() * radius * 2 - radius, Math.random() * radius * 2 - radius, 0.0))
         }
-        // for (int i = 0; i < (int)((double)corners.length / 2.0 + 0.6); i++) corners[i] = new Point3d(Math.random() * scale * 2 - scale, Math.random() * scale * 2 - scale, 0);
-        // for (int i = (int)((double)corners.length / 2.0 + 0.6); i < corners.length; i++) corners[i] = new Point3d(corners[i - corners.length / 2].getPositionVector().scale(-1));
-        //corners[0] = new Point3d(0,-100,0);
-        //corners[1] = new Point3d(-95,-31,0);
-        //corners[2] = new Point3d(-59,81,0);
-        //corners[3] = new Point3d(59,81,0);
-        //corners[4] = new Point3d(95,-31,0);
-        //corners[0] = new Point3d(0,-100,0);
-        //corners[1] = new Point3d(-95,-31,0);
-        //corners[2] = new Point3d(-59,81,0);
-        points.add(Point3d(Math.random() * radius * 2 - radius, Math.random() * radius * 2 - radius, 0.0))
     }
+}
+
+fun main() {
+    Fractal().start()
 }

@@ -1,11 +1,13 @@
 package simulations
 
-import algebra.Vec
-import physics.PhysicsSimulation
+import algebra.Vec3
+import framework.physics.PhysicsSimulation
 import framework.WatchDouble
 import framework.WatchInt
 import framework.interfaces.Status
-import physics.*
+import framework.physics.ImpulseConnection
+import framework.physics.Sphere
+import framework.physics.*
 import toVec
 import kotlin.math.PI
 
@@ -88,9 +90,8 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
 
     override fun calcForces() {
         synchronized(points) {
-            for (clothPoint in points) clothPoint.acceleration = Vec.zero
-            sphere.acceleration = Vec.zero
-            applyGravity(points + sphere)
+            for (clothPoint in points) clothPoint.acceleration = Vec3.zero
+            sphere.acceleration = Vec3.zero
         }
     }
 
@@ -101,4 +102,8 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
             brokenLinks.forEach { unregister(it) }
         }
     }
+}
+
+fun main() {
+    Cloth(20).start()
 }

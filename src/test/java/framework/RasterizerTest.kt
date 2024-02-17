@@ -1,12 +1,12 @@
 package framework
 
-import algebra.Vec
+import algebra.Vec3
 import framework.interfaces.Entity
 import framework.interfaces.Moveable
 import framework.interfaces.Status
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.FlowLayout
 import java.awt.image.BufferedImage
 import java.lang.Thread.sleep
@@ -31,20 +31,20 @@ class RasterizerTest {
 
     @Test
     fun testRasterization() {
-        val zero = Vec(0.0, 0.0, 0.0)
-        val c1 = Vec(0, 255, 0)
-        val c2 = Vec(255, 0, 255)
-        val c3 = Vec(255, 0, 0)
-        val c4 = Vec(0, 255, 255)
-        val c5 = Vec(255, 255, 0)
-        val c6 = Vec(0, 0, 255)
-        val v1 = Vertex(position = Vec(-10.0, -10.0, 1.0), color = c1, normal = zero)
-        val v2 = Vertex(position = Vec(-10.0, 10.0, 2.0), color = c2, normal = zero)
-        val v3 = Vertex(position = Vec(10.0, -10.0, 1.0), color = c3, normal = zero)
+        val zero = Vec3(0.0, 0.0, 0.0)
+        val c1 = Vec3(0, 255, 0)
+        val c2 = Vec3(255, 0, 255)
+        val c3 = Vec3(255, 0, 0)
+        val c4 = Vec3(0, 255, 255)
+        val c5 = Vec3(255, 255, 0)
+        val c6 = Vec3(0, 0, 255)
+        val v1 = Vertex(position = Vec3(-10.0, -10.0, 1.0), color = c1, normal = zero)
+        val v2 = Vertex(position = Vec3(-10.0, 10.0, 2.0), color = c2, normal = zero)
+        val v3 = Vertex(position = Vec3(10.0, -10.0, 1.0), color = c3, normal = zero)
         val triangle1 = Triangle(v1, v2, v3)
-        val v4 = Vertex(position = Vec(-10.0, 10.0, 1.0), color = c4, normal = zero)
-        val v5 = Vertex(position = Vec(-10.0, -10.0, 2.0), color = c5, normal = zero)
-        val v6 = Vertex(position = Vec(10.0, 10.0, 1.0), color = c6, normal = zero)
+        val v4 = Vertex(position = Vec3(-10.0, 10.0, 1.0), color = c4, normal = zero)
+        val v5 = Vertex(position = Vec3(-10.0, -10.0, 2.0), color = c5, normal = zero)
+        val v6 = Vertex(position = Vec3(10.0, 10.0, 1.0), color = c6, normal = zero)
         val triangle2 = Triangle(v4, v5, v6)
         val line = Line(v1, v4)
         rasterizer.rasterizeTriangle(triangle1, null)
@@ -60,17 +60,17 @@ class RasterizerTest {
             override fun tick(dt: Seconds) = Unit
             override fun render(camera: Camera) = Unit
             override var outlineRasterization: Boolean = false
-            override var color: Vec? = null
-            override var position: Vec = Vec(0.0, 0.0, 0.0)
-            override var velocity: Vec = Vec(0.0, 0.0, 0.0)
-            override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
+            override var color: Vec3? = null
+            override var position: Vec3 = Vec3(0.0, 0.0, 0.0)
+            override var velocity: Vec3 = Vec3(0.0, 0.0, 0.0)
+            override var acceleration: Vec3 = Vec3(0.0, 0.0, 0.0)
             override var status: Status = Status.Movable
         }
         rasterizer.rasterizeTriangle(
             Triangle(
-                Vertex(Vec(10.0, 20.0, -3.0), Vec.ones * 255, Vec.zero),
-                Vertex(Vec(10.0, -20.0, 7.0), Vec.ones * 255, Vec.zero),
-                Vertex(Vec(10.0, -35.0, -20.0), Vec.ones * 255, Vec.zero)
+                Vertex(Vec3(10.0, 20.0, -3.0), Vec3.ones * 255, Vec3.zero),
+                Vertex(Vec3(10.0, -20.0, 7.0), Vec3.ones * 255, Vec3.zero),
+                Vertex(Vec3(10.0, -35.0, -20.0), Vec3.ones * 255, Vec3.zero)
             ),
             entity
         )
@@ -83,15 +83,15 @@ class RasterizerTest {
             override fun tick(dt: Seconds) = Unit
             override fun render(camera: Camera) = Unit
             override var outlineRasterization: Boolean = false
-            override var color: Vec? = null
-            override var position: Vec = Vec(0.0, 0.0, 0.0)
-            override var velocity: Vec = Vec(0.0, 0.0, 0.0)
-            override var acceleration: Vec = Vec(0.0, 0.0, 0.0)
+            override var color: Vec3? = null
+            override var position: Vec3 = Vec3(0.0, 0.0, 0.0)
+            override var velocity: Vec3 = Vec3(0.0, 0.0, 0.0)
+            override var acceleration: Vec3 = Vec3(0.0, 0.0, 0.0)
             override var status: Status = Status.Movable
         }
         rasterizer.rasterizeSphere(
             Circle(
-                Vertex(Vec(10.0, 0.0, 0.0), Vec.ones * 255, Vec.zero),
+                Vertex(Vec3(10.0, 0.0, 0.0), Vec3.ones * 255, Vec3.zero),
                 9.0f
             ),
             entity
@@ -123,7 +123,7 @@ class RasterizerTest {
     fun testDepthCircle() {
         rasterizer.rasterizeSphere(
             Circle(
-                Vertex(10 * camera.lookingDirection, Vec.ones * 255, Vec.zero),
+                Vertex(10 * camera.lookingDirection, Vec3.ones * 255, Vec3.zero),
                 9.0f
             ),
             null

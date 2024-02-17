@@ -1,4 +1,4 @@
-package physics
+package framework.physics
 
 typealias Seconds = Double
 typealias MetersPerSecond = Double

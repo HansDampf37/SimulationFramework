@@ -1,8 +1,8 @@
 package simulations
 
 import framework.Simulation
-import physics.Seconds
-import physics.Sphere
+import framework.physics.Seconds
+import framework.physics.Sphere
 import kotlin.math.PI
 
 @Suppress("unused")
@@ -31,4 +31,8 @@ class JustASphere: Simulation("Sphere") {
         camera.focalLength = 10.0
         camera.zoom = 0.001
     }
+}
+
+fun main() {
+    JustASphere().start()
 }

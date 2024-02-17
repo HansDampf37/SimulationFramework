@@ -1,9 +1,9 @@
 package simulations
 
-import algebra.Vec
+import algebra.Vec3
 import framework.Simulation
 import framework.Vertex
-import physics.Seconds
+import framework.physics.Seconds
 import java.awt.Color
 import java.awt.Graphics
 
@@ -17,9 +17,9 @@ class EmptySimulation: Simulation("Test") {
     override fun tick(dt: Seconds) = Unit
 
     fun render(g: Graphics) {
-        val dx = Vec(sizeSquares, 0.0, 0.0)
-        val dy = Vec(0.0, sizeSquares, 0.0)
-        val dz = Vec(0.0, 0.0, sizeSquares)
+        val dx = Vec3(sizeSquares, 0.0, 0.0)
+        val dy = Vec3(0.0, sizeSquares, 0.0)
+        val dz = Vec3(0.0, 0.0, sizeSquares)
         val Z = dz * 50
         val Y = dy * 50
         val X = dx * 50
@@ -53,32 +53,32 @@ class EmptySimulation: Simulation("Test") {
     }
 
     override fun render() {
-        val dx = Vec(sizeSquares, 0.0, 0.0)
-        val dy = Vec(0.0, sizeSquares, 0.0)
-        val dz = Vec(0.0, 0.0, sizeSquares)
+        val dx = Vec3(sizeSquares, 0.0, 0.0)
+        val dy = Vec3(0.0, sizeSquares, 0.0)
+        val dz = Vec3(0.0, 0.0, sizeSquares)
         val Z = dz * 50
         val Y = dy * 50
         val X = dx * 50
         for (x in 0 until amountSquares) {
             for (y in 0 until amountSquares) {
-                var color = if ((y + x) % 2 == 0) Vec(255, 0, 0) else Vec(255, 255, 255)
+                var color = if ((y + x) % 2 == 0) Vec3(255, 0, 0) else Vec3(255, 255, 255)
                 camera.renderTriangle(
-                    Vertex(dx * x + dy * y, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y + dy, color, Vec.zero))
+                    Vertex(dx * x + dy * y, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y + dy, color, Vec3.zero))
                 camera.renderTriangle(
-                    Vertex(dx * x + dy * y, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y + dy, color, Vec.zero),
-                    Vertex(dy * y + dy + dx * x, color, Vec.zero))
-                color = if ((y + x) % 2 == 0) Vec(255, 0, 0) else Vec(255, 255, 255)
+                    Vertex(dx * x + dy * y, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y + dy, color, Vec3.zero),
+                    Vertex(dy * y + dy + dx * x, color, Vec3.zero))
+                color = if ((y + x) % 2 == 0) Vec3(255, 0, 0) else Vec3(255, 255, 255)
                 camera.renderTriangle(
-                    Vertex(dx * x + dy * y + Z, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y + Z, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec.zero))
+                    Vertex(dx * x + dy * y + Z, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y + Z, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec3.zero))
                 camera.renderTriangle(
-                    Vertex(dx * x + dy * y + Z, color, Vec.zero),
-                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec.zero),
-                    Vertex(dy * y + dy + dx * x + Z, color, Vec.zero))
+                    Vertex(dx * x + dy * y + Z, color, Vec3.zero),
+                    Vertex(dx * x + dx + dy * y + dy + Z, color, Vec3.zero),
+                    Vertex(dy * y + dy + dx * x + Z, color, Vec3.zero))
             }
         }
     }
@@ -100,7 +100,7 @@ class EmptySimulation: Simulation("Test") {
         g.drawLine(pr1.x.toInt(), pr1.y.toInt(), pr2.x.toInt(), pr2.y.toInt())
     }
 
-    fun drawRect(pos: Vec, pos1: Vec, pos2: Vec, pos3: Vec, color: Color, g: Graphics) {
+    fun drawRect(pos: Vec3, pos1: Vec3, pos2: Vec3, pos3: Vec3, color: Color, g: Graphics) {
         val (p1, d1) = camera.project(pos)
         val (p2, d2) = camera.project(pos1)
         val (p3, d3) = camera.project(pos2)
@@ -117,4 +117,8 @@ class EmptySimulation: Simulation("Test") {
         g.color = color
         g.fillPolygon(xPoints, yPoints, 4)
     }
+}
+
+fun main() {
+    EmptySimulation().start()
 }

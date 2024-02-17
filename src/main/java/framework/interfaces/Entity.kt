@@ -1,6 +1,6 @@
 package framework.interfaces
 
-import physics.PhysicsSimulation
+import framework.physics.PhysicsSimulation
 
 /**
  * An Entity can be simulated, [rendered][Renderable], and [moved][Moveable].

@@ -1,8 +1,9 @@
 package framework
 
 import algebra.*
+import format
 import framework.interfaces.Entity
-import physics.Meters
+import framework.physics.Meters
 import java.awt.image.BufferedImage
 import java.lang.Math.PI
 import kotlin.math.cos
@@ -37,7 +38,7 @@ class Camera(
 ) : Point3d(x, y, z) {
 
     constructor(
-        position: Vec,
+        position: Vec3,
         phi: Double = 0.0, theta: Double = 0.0,
         zoom: Double, focalLength: Double,
         screenWidth: Int, screenHeight: Int
@@ -60,7 +61,7 @@ class Camera(
         }
 
     /**
-     * [theta] describes the rotation around the [left]-vector from the z-axis from down (-PI / 2) to up (PI / 2).
+     * [theta] describes the rotation around the [left]-vector from the z-axis from down 0 to up PI.
      */
     @WatchDouble("θ", 0.0, PI)
     var theta: Double = theta
@@ -123,20 +124,20 @@ class Camera(
             field = value
         }
 
-    val lookingDirection: Vec
+    val lookingDirection: Vec3
         get() {
             val v: Vec4 = (matrixThetaInv * (matrixPhiInv * Vec4(0.0, 0.0, 1.0, 1.0)))
-            return Vec(v.x, v.y, v.z).normalize()
+            return Vec3(v.x, v.y, v.z).normalize()
         }
 
-    val up: Vec
+    val up: Vec3
         get() {
             val v: Vec4 = (matrixThetaInv * (matrixPhiInv * Vec4(0.0, 1.0, 0.0, 1.0)))
-            return Vec(v.x, v.y, v.z).normalize()
+            return Vec3(v.x, v.y, v.z).normalize()
         }
 
-    val left: Vec
-        get() = Vec(cos(phi), sin(phi), 0)
+    val left: Vec3
+        get() = Vec3(cos(phi), sin(phi), 0)
 
     var zoom: Double
         get() = zoomX
@@ -261,7 +262,7 @@ class Camera(
     fun moveDown(dt: Double = 1.0) = move(-up, dt)
     fun moveLeft(dt: Double = 1.0) = move(left, dt)
     fun moveRight(dt: Double = 1.0) = move(-left, dt)
-    private fun move(direction: Vec, dt: Double) {
+    private fun move(direction: Vec3, dt: Double) {
         add(direction.normalize() * movementSpeed * dt)
     }
 
@@ -287,7 +288,7 @@ class Camera(
      * @param v the 3-dimensional vector
      * @return pair containing the pixel coordinate and the distance from the camera
      */
-    fun project(v: Vec): Pair<Vec2, Meters> {
+    fun project(v: Vec3): Pair<Vec2, Meters> {
         if ((v - this.positionVector).angleWith(lookingDirection) <= PI / 2) {
             val vHom = Vec4(v.x, v.y, v.z, 1.0)
             val filmCoords = projectionMatrix * vHom
@@ -302,9 +303,8 @@ class Camera(
      * Returns a string describing the cameras position, orientation and looking direction
      */
     fun cameraSettingsToString(): String {
-        fun round(value: Double) = (value * 100).toInt().toDouble() / 100
-        return "x: ${round(x)}, y: ${round(y)}, z: ${round(z)}, \n" +
-                "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
+        return "x: ${x.format()}, y: ${y.format()}, z: ${z.format()}, \n" +
+                "lookingDirection: [${lookingDirection}], \n Zoom: $zoom"
     }
 
     /**
@@ -345,6 +345,16 @@ class Camera(
      */
     fun renderStrip(vertices: List<Vertex>, entity: Entity? = null) =
         rasterizer.rasterizeTriangleStrip(TriangleStrip(vertices), entity)
+
+    /**
+     * Draws a single Pixel on the [image] and registers the entity on each pixel that is filled.
+     * The entity can be retrieved by calling [getEntityAt]
+     * @param v the pixel in world coordinates
+     * @param color the color of the pixel
+     * @param entity the entity to register on each of the drawn pixels
+     */
+    fun renderPixel(v: Vec3, color: Vec3, entity: Entity? = null) =
+        rasterizer.rasterizePixel(v, color, entity)
 
     /**
      * Returns the [Entity] drawn at the specified coordinates. If no entity is drawn at the specified location,
