@@ -21,7 +21,7 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
     @WatchDouble("Speed",0.0, 2.0)
     protected var speed = 1.0
     @WatchBoolean("Anti-Aliasing")
-    private var antiAliasing = true
+    private var antiAliasing = false
     private var running = false
     protected val keyManager = KeyManager()
     protected val display: Display = Display(title, keyManager = keyManager)
