@@ -107,7 +107,6 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
     override fun calcForces() {
         synchronized(masses) {
             for (clothPoint in masses) clothPoint.acceleration = Vec3.zero
-            applyGravity(masses)
         }
     }
 }

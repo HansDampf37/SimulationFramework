@@ -15,7 +15,7 @@ import kotlin.math.pow
  * If at some point the connection holds more energy than [maxEnergy] it should [break][broken]. Implementations should
  * check that [broken] == false before [Rendering][render] or [ticking][tick].
  * @see ImpulseConnection
- * @see SpringConnection //TODO
+ * @see SpringConnection
  */
 abstract class Connection(
     protected val m1: PointMass,
@@ -79,6 +79,42 @@ class ImpulseConnection(
             } else if (m1.status == Status.Movable) {
                 m1.applyForce(force)
                 m1.set(m2 - ropeDir * maxDistance)
+            }
+        }
+    }
+}
+
+/**
+ * An SpringConnection is a [Connection] that sends pulls the two [masses][PointMass] if depending on their distance
+ */
+class SpringConnection(
+    m1: PointMass,
+    m2: PointMass,
+    var springConstant: Double,
+    var restingDistance: Double,
+    maxEnergy: Double
+) : Connection(m1, m2, maxEnergy) {
+    override var outlineRasterization: Boolean = false
+
+    override fun tick(dt: Seconds) {
+        if (broken) return
+        val dist = m1.getDistanceTo(m2)
+        if (dist >= restingDistance) {
+            val ropeDir = m1.getDirectionTo(m2)
+            val delta = dist - restingDistance
+            val force = ropeDir * (delta * springConstant)
+            val energy = springConstant * delta.pow(2) / 2
+            if (energy > maxEnergy) {
+                broken = true
+                return
+            }
+            if (m1.status == Status.Movable && m2.status == Status.Movable) {
+                m1.applyForce(force)
+                m2.applyForce(-force)
+            } else if (m2.status == Status.Movable) {
+                m2.applyForce(-force)
+            } else if (m1.status == Status.Movable) {
+                m1.applyForce(force)
             }
         }
     }

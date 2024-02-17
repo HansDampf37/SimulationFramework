@@ -92,7 +92,6 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
         synchronized(points) {
             for (clothPoint in points) clothPoint.acceleration = Vec3.zero
             sphere.acceleration = Vec3.zero
-            applyGravity(points + sphere)
         }
     }
 

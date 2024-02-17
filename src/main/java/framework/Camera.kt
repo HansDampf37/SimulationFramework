@@ -60,7 +60,7 @@ class Camera(
         }
 
     /**
-     * [theta] describes the rotation around the [left]-vector from the z-axis from down (-PI / 2) to up (PI / 2).
+     * [theta] describes the rotation around the [left]-vector from the z-axis from down 0 to up PI.
      */
     @WatchDouble("θ", 0.0, PI)
     var theta: Double = theta
