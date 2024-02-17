@@ -9,6 +9,7 @@ import framework.physics.Sphere
 import times
 import java.awt.Color
 import java.awt.Graphics
+import kotlin.concurrent.withLock
 import kotlin.math.PI
 import kotlin.math.pow
 
@@ -21,11 +22,11 @@ class PlatonSpace(amountOfPoint3ds: Int) : PhysicsSimulation("Platon") {
     private var amountOfPoint3ds: Int = amountOfPoint3ds
         set(value) {
             field = value
-            while (points.size > value) unregister(points.removeLast())
+            while (points.size > value) unregister(tickLock.withLock { points.removeLast() })
             while (points.size < value) {
                 val pos = Vec3.random.normalize() * radius
                 val sphere = Sphere(pos.x, pos.y, pos.z, sphereSize, 1.0)
-                register(sphere)
+                tickLock.withLock { register(sphere) }
                 points.add(sphere)
             }
         }
@@ -34,6 +35,7 @@ class PlatonSpace(amountOfPoint3ds: Int) : PhysicsSimulation("Platon") {
     private val radius = 4.0
     private var colorLines = Vec3(200, 200, 200)
     private var colorPoints = Vec3(163, 153, 239)
+
     @WatchDouble("Sphere size", 0.01, 3.0)
     private var sphereSize = 1.0
         set(value) {
@@ -85,46 +87,51 @@ class PlatonSpace(amountOfPoint3ds: Int) : PhysicsSimulation("Platon") {
     }
 
     override fun render() {
-        fun getShortestDist(): Double {
-            var shortestDist = Int.MAX_VALUE.toDouble()
-            for (i in 0 until points.size) {
-                for (j in i until points.size) {
-                    if (j != i) {
-                        try {
-                            val dist = points[i].getDistanceTo(points[j])
-                            if (dist < shortestDist) shortestDist = dist
-                        } catch (_: IndexOutOfBoundsException) {}
-                    }
-                }
-            }
-            return shortestDist
-        }
         super.render()
         val shortestDist = getShortestDist()
         for (i in 0 until points.size) {
-                for (j in i until points.size) {
-                    if (j != i) {
-                        try {
-                            if (points[i].getDistanceTo(points[j]) < 1.3 * shortestDist) {
-                                camera.renderLine(
-                                    Vertex(points[i].positionVector, colorLines, Vec3.zero),
-                                    Vertex(points[j].positionVector, colorLines, Vec3.zero)
-                                )
-                            }
-                        } catch (_: IndexOutOfBoundsException) {}
+            for (j in i until points.size) {
+                if (j != i) {
+                    try {
+                        if (points[i].getDistanceTo(points[j]) < 1.3 * shortestDist) {
+                            camera.renderLine(
+                                Vertex(points[i].positionVector, colorLines, Vec3.zero),
+                                Vertex(points[j].positionVector, colorLines, Vec3.zero)
+                            )
+                        }
+                    } catch (_: IndexOutOfBoundsException) {
                     }
                 }
             }
+        }
+    }
+
+    private fun getShortestDist(): Double {
+        var shortestDist = Int.MAX_VALUE.toDouble()
+        for (i in 0 until points.size) {
+            for (j in i until points.size) {
+                if (j != i) {
+                    try {
+                        val dist = points[i].getDistanceTo(points[j])
+                        if (dist < shortestDist) shortestDist = dist
+                    } catch (_: IndexOutOfBoundsException) {
+                    }
+                }
+            }
+        }
+        return shortestDist
     }
 
     override fun reset() {
         super.reset()
-        points.clear()
-        repeat(amountOfPoint3ds) {
-            val pos = Vec3.random.normalize() * radius
-            val sphere = Sphere(pos.x, pos.y, pos.z, sphereSize, 1.0)
-            register(sphere)
-            points.add(sphere)
+        synchronized(points) {
+            points.clear()
+            repeat(amountOfPoint3ds) {
+                val pos = Vec3.random.normalize() * radius
+                val sphere = Sphere(pos.x, pos.y, pos.z, sphereSize, 1.0)
+                register(sphere)
+                points.add(sphere)
+            }
         }
     }
 }

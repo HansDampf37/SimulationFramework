@@ -49,8 +49,10 @@ abstract class Simulation(title: String, private val renderingFrequency: Double 
         while (running) {
             val now = System.currentTimeMillis()
             val dt: Seconds = (now - lastTime) / 1000.0
-            listenForInput(dt)
-            if (display.isInitialized()) tick(dt * speed)
+            if (display.isInitialized()) {
+                listenForInput(dt)
+                tick(dt * speed)
+            }
             lastTime = now
         }
         stop()

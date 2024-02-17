@@ -1,6 +1,7 @@
 package framework
 
 import algebra.*
+import format
 import framework.interfaces.Entity
 import framework.physics.Meters
 import java.awt.image.BufferedImage
@@ -302,9 +303,8 @@ class Camera(
      * Returns a string describing the cameras position, orientation and looking direction
      */
     fun cameraSettingsToString(): String {
-        fun round(value: Double) = (value * 100).toInt().toDouble() / 100
-        return "x: ${round(x)}, y: ${round(y)}, z: ${round(z)}, \n" +
-                "lookingDirection: [${round(lookingDirection.x)}, ${round(lookingDirection.y)}, ${round(lookingDirection.z)}]"
+        return "x: ${x.format()}, y: ${y.format()}, z: ${z.format()}, \n" +
+                "lookingDirection: [${lookingDirection}], \n Zoom: $zoom"
     }
 
     /**

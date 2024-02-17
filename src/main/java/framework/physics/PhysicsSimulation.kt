@@ -33,16 +33,24 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
 
     private var collisionManager: CollisionManager = CollisionManager()
 
-    private val drawLock = ReentrantLock()
+    /**
+     * Make sure that [render] is not executed during an action by performing the action under this lock
+     */
+    protected val drawLock = ReentrantLock()
+
+    /**
+     * Make sure that [tick] is not executed during an action by performing the action under this lock
+     */
+    protected val tickLock = ReentrantLock()
 
     /**
      * Registers a [Tickable], [Renderable], or [Collidable] at this Simulation.
      * @throws IllegalArgumentException if specified object is neither [Tickable], [Renderable], nor [Collidable]
      */
-    fun register(obj: Any) {
-        if (obj is Tickable) synchronized(tickables) { tickables.add(obj) }
-        if (obj is Renderable) synchronized(renderables) { renderables.add(obj) }
-        if (obj is Moveable) synchronized(moveables) { moveables.add(obj) }
+    fun register(obj: Any) = tickLock.withLock {
+        if (obj is Renderable) drawLock.withLock { renderables.add(obj) }
+        if (obj is Tickable) tickables.add(obj)
+        if (obj is Moveable) moveables.add(obj)
         if (obj is Collidable) collisionManager.register(obj)
 
         if (obj !is Tickable && obj !is Renderable && obj !is Collidable && obj !is Moveable) {
@@ -54,10 +62,10 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
      * Unregisters a [Tickable], [Renderable], or [Collidable] from this Simulation.
      * @throws IllegalArgumentException if specified object is neither [Tickable], [Renderable], nor [Collidable]
      */
-    fun unregister(obj: Any) {
-        if (obj is Tickable) synchronized(tickables) { tickables.remove(obj) }
-        if (obj is Renderable) synchronized(renderables) { renderables.remove(obj) }
-        if (obj is Moveable) synchronized(moveables) { moveables.remove(obj) }
+    fun unregister(obj: Any) = tickLock.withLock {
+        if (obj is Renderable) drawLock.withLock { renderables.remove(obj) }
+        if (obj is Tickable) tickables.remove(obj)
+        if (obj is Moveable) moveables.remove(obj)
         if (obj is Collidable) collisionManager.unregister(obj)
 
         if (obj !is Tickable && obj !is Renderable && obj !is Moveable && obj !is Collidable) {
@@ -65,36 +73,30 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
         }
     }
 
-    override fun reset() {
-        synchronized(tickables) { tickables.clear() }
+    override fun reset() = tickLock.withLock {
+        tickables.clear()
+        moveables.clear()
         synchronized(renderables) { renderables.clear() }
-        synchronized(moveables) { moveables.clear() }
         collisionManager.reset()
     }
 
-    override fun tick(dt: Seconds) {
-        synchronized(moveables) {
-            moveables.forEach {
-                it.acceleration = gravity
-                it.velocity *= max(0.0, min(1.0, 1 - frictionPerSecond * dt))
-            }
+    override fun tick(dt: Seconds) = tickLock.withLock {
+        moveables.forEach {
+            it.acceleration = gravity
+            it.velocity *= max(0.0, min(1.0, 1 - frictionPerSecond * dt))
         }
         calcForces()
         drawLock.withLock {
             collisionManager.calculateCollisions()
-            synchronized(tickables) {
-                val order = randomOrder(tickables.size)
-                for (index in order) tickables[index].tick(dt)
-            }
+            val order = randomOrder(tickables.size)
+            for (index in order) tickables[index].tick(dt)
             correctState()
         }
 
     }
 
-    override fun render() {
-        drawLock.withLock {
-            synchronized(renderables) { renderables.forEach { it.render(camera) } }
-        }
+    override fun render() = drawLock.withLock {
+        synchronized(renderables) { renderables.forEach { it.render(camera) } }
     }
 
     /**
