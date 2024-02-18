@@ -12,7 +12,7 @@ The Simulation class handles the invocations of `tick` and `render` and implemen
 that handles the movement of the camera with `W,A,S,D,shift` and `space` and resetting of the 
 simulation with `n`. Additionally, a `MouseManager` is also implemented to drag element on the screen.
 ### Code
-```
+```Kotlin
 class JustASphere: Simulation("Sphere") {
     private val dot = Sphere(0.0, 0.0, 0.0, 1.0, 1.0)
     init {
@@ -51,7 +51,7 @@ The `setup` method defines the initial state.
 Each entity that should be taken care of by the `PhysicsSimulation` must be registered by the
 `register(Any)` method.
 ### Code
-```
+```Kotlin
 class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
     init {
         setup()
