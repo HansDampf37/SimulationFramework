@@ -1,4 +1,4 @@
-# Intro
+# Getting Started
 This framework provides the possibility to run small simulations. I see this project as a fun challenge for me. The Code is 100% Java/Kotlin and self written. The rendering is happening on the CPU and therefore not as performant.
 The following interfaces are available (in package `framework.interfaces` except simulation in package `framework`):
 ```mermaid
@@ -69,10 +69,12 @@ Volume  -->  Entity
 ```
 Additionally, some implementations of the interfaces are also available, mainly `PointMass`, `Sphere`, and `ImpulseConnection` (all in package physics)
 # Usage
+## Basic example
 The following example creates a Sphere located at the origin with no specified behaviour:
 The Simulation class handles the invocations of `tick` and `render` and implements a `KeyManager`
 that handles the movement of the camera with `W,A,S,D,shift` and `space` and resetting of the 
 simulation with `n`. Additionally, a `MouseManager` is also implemented to drag element on the screen.
+### Code
 ```
 class JustASphere: Simulation("Sphere") {
     private val dot = Sphere(0.0, 0.0, 0.0, 1.0, 1.0)
@@ -100,13 +102,9 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-<video src="https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4" width="320" height="240" controls></video>
-
 https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4
 
-![](https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4)
-
-
+## Add Behaviour
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
 Alternatively, the abstract class `PhysicsSimulation` together with the entities inside the package physics offers 
 additional built in behaviour like gravity, air resistance, collisions, or connections.
@@ -115,6 +113,7 @@ The `setup` method defines the initial state.
 
 Each entity that should be taken care of by the `PhysicsSimulation` must be registered by the
 `register(Any)` method.
+### Code
 ```
 class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
     init {
@@ -152,11 +151,7 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
 ```
 ### Result
 
-<video src="./ReadmeReferences/PutShotPendulum.mp4" width="320" height="240" controls></video>
-
-./ReadmeReferences/PutShotPendulum.mp4
-
-![](https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/PutShotPendulum.mp4)
+https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/PutShotPendulum.mp4
 
 # Todos
 1. GJK
