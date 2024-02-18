@@ -1,4 +1,4 @@
-### Intro
+# Intro
 This framework provides the possibility to run small simulations. I see this project as a fun challenge for me. The Code is 100% Java/Kotlin and self written. The rendering is happening on the CPU and therefore not as performant.
 The following interfaces are available (in package `framework.interfaces` except simulation in package `framework`):
 ```mermaid
@@ -98,7 +98,9 @@ class JustASphere: Simulation("Sphere") {
     }
 }
 ```
-https://github.com/HansDampf37/SimulationFramework/blob/master/ReadmeReferences/JustASphere.mp4
+### Result
+![](ReadmeReferences/JustASphere.mp4)
+
 
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
 Alternatively, the abstract class `PhysicsSimulation` together with the entities inside the package physics offers 
@@ -143,8 +145,8 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
     }
 }
 ```
-
-https://github.com/HansDampf37/SimulationFramework/blob/master/ReadmeReferences/PutShotPendulum.mp4
+### Result
+![](ReadmeReferences/PutShotPendulum.mp4)
 
 # Todos
 1. GJK
