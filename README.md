@@ -102,7 +102,7 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-<iframe src="https://player.vimeo.com/video/914137859?h=add79d45cf" width="640" height="564" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+[![Watch the video](https://i.vimeocdn.com/video/1800452706-77542562718331d0e22abff1182927c41c31b12ddd2e7eece559fea0e2e3685c-d?mw=1100&mh=619)](https://player.vimeo.com/video/914137859?h=add79d45cf)
 
 ## Add Behaviour
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
@@ -150,14 +150,8 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
 }
 ```
 ### Result
-![Video](ReadmeReferences/PutShotPendulum.mp4)
 
-<video width="320" height="240" controls>
-  <source src="ReadmeReferences/PutShotPendulum.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/PutShotPendulum.mp4
+[![Watch the video](https://i.vimeocdn.com/video/1800452433-3f19e6ee9f1b4fb8a671d700f7353cd97870a0356475c80cfa6c249ddd66cfd6-d?mw=960&mh=540)](https://player.vimeo.com/video/914137849?h=add79d45cf)
 
 # Todos
 1. GJK
