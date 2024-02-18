@@ -4,67 +4,80 @@ The following interfaces are available (in package `framework.interfaces` except
 ```mermaid
 classDiagram
 direction BT
+class Camera
 class Collidable {
 <<Interface>>
 
 }
+class CollisionManager
+class Display
 class Drawable {
 <<Interface>>
-   Boolean outlineRasterization
-   Vec? color
+
 }
 class Entity {
 <<Interface>>
 
 }
+class ISimulation {
+<<Interface>>
+
+}
+class KeyManager
 class Mass {
 <<Interface>>
-   Double mass
+
 }
 class Model {
 <<Interface>>
 
 }
+class MouseManager
 class Moveable {
 <<Interface>>
-   Vec position
-   Vec velocity
-   Vec acceleration
-   Status status
+
 }
-class PhysicsSimulation {
-   Vec gravity
-}
+class PhysicsSimulation
+class PointMass
 class Renderable {
 <<Interface>>
 
 }
-class Simulation {
-   Camera camera
-   Display display
-   KeyManager keyManager
-}
+class Simulation
+class Sphere
 class Tickable {
 <<Interface>>
 
 }
 class Volume {
 <<Interface>>
-   Double pitch
-   Double roll
-   List~Vec~ meshObjCoords
-   Double yaw
+
 }
 
 Collidable  -->  Mass 
+CollisionManager "1" *--> "collidables *" Collidable 
 Entity  -->  Moveable 
 Entity  -->  Renderable 
 Mass  -->  Entity 
 Model  -->  Collidable 
 Model  -->  Volume 
-Moveable  -->  Tickable
+MouseManager "1" *--> "camera 1" Camera 
+MouseManager "1" *--> "lastHoveredEntity 1" Entity 
+Moveable  -->  Tickable 
+PhysicsSimulation "1" *--> "collisionManager 1" CollisionManager 
+PhysicsSimulation "1" *--> "moveables *" Moveable 
+PhysicsSimulation "1" *--> "renderables *" Renderable 
 PhysicsSimulation  -->  Simulation 
+PhysicsSimulation "1" *--> "tickables *" Tickable 
+PointMass  ..>  Mass 
 Renderable  -->  Drawable 
+Simulation "1" *--> "camera 1" Camera 
+Simulation "1" *--> "display 1" Display 
+Simulation  ..>  ISimulation 
+Simulation "1" *--> "keyManager 1" KeyManager 
+Simulation "1" *--> "mouseManager 1" MouseManager 
+Sphere  ..>  Collidable 
+Sphere  -->  PointMass 
 Volume  -->  Entity 
 ```
 Additionally, some implementations of the interfaces are also available, mainly `PointMass`, `Sphere`, and `ImpulseConnection` (all in package physics)
