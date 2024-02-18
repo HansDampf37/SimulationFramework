@@ -13,10 +13,7 @@ class JustASphere: Simulation("Sphere") {
     }
 
     override fun tick(dt: Seconds) = Unit
-
-    override fun render() {
-        dot.render(camera)
-    }
+    override fun render() = dot.render(camera)
 
     override fun reset() {
         dot.x = 0.0
