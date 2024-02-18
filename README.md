@@ -100,9 +100,9 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-<video src="./ReadmeReferences/JustASphere.mp4" width="320" height="240" controls></video>
+<video src="https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4" width="320" height="240" controls></video>
 
-./ReadmeReferences/JustASphere.mp4
+https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4
 
 ![](https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4)
 
