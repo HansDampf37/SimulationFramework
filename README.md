@@ -102,12 +102,10 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-![Video](ReadmeReferences/JustASphere.mp4)
+https://vimeo.com/914137859?share=copy
 
-<video width="320" height="240" controls>
-  <source src="ReadmeReferences/JustASphere.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[![Watch the video](https://i.vimeocdn.com/video/914137859.jpg)](https://vimeo.com/914137859?share=copy)
+
 
 ## Add Behaviour
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
