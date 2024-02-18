@@ -102,7 +102,7 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-https://vimeo.com/914137859?share=copy
+https://vimeo.com/914137859
 
 [![Watch the video](https://i.vimeocdn.com/video/914137859.jpg)](https://vimeo.com/914137859?share=copy)
 
