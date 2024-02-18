@@ -104,7 +104,7 @@ class JustASphere: Simulation("Sphere") {
 
 ./ReadmeReferences/JustASphere.mp4
 
-![](ReadmeReferences/JustASphere.mp4)
+![](https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4)
 
 
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
@@ -156,7 +156,7 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
 
 ./ReadmeReferences/PutShotPendulum.mp4
 
-![](ReadmeReferences/PutShotPendulum.mp4)
+![](https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/PutShotPendulum.mp4)
 
 # Todos
 1. GJK
