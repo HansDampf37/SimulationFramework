@@ -99,6 +99,11 @@ class JustASphere: Simulation("Sphere") {
 }
 ```
 ### Result
+
+<video src="./ReadmeReferences/JustASphere.mp4" width="320" height="240" controls></video>
+
+./ReadmeReferences/JustASphere.mp4
+
 ![](ReadmeReferences/JustASphere.mp4)
 
 
@@ -146,6 +151,11 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
 }
 ```
 ### Result
+
+<video src="./ReadmeReferences/PutShotPendulum.mp4" width="320" height="240" controls></video>
+
+./ReadmeReferences/PutShotPendulum.mp4
+
 ![](ReadmeReferences/PutShotPendulum.mp4)
 
 # Todos
