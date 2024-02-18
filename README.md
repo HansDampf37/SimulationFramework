@@ -102,7 +102,12 @@ class JustASphere: Simulation("Sphere") {
 ```
 ### Result
 
-https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/JustASphere.mp4
+![Video](ReadmeReferences/JustASphere.mp4)
+
+<video width="320" height="240" controls>
+  <source src="ReadmeReferences/JustASphere.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Add Behaviour
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
@@ -150,6 +155,12 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
 }
 ```
 ### Result
+![Video](ReadmeReferences/PutShotPendulum.mp4)
+
+<video width="320" height="240" controls>
+  <source src="ReadmeReferences/PutShotPendulum.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 https://github.com/HansDampf37/SimulationFramework/raw/master/ReadmeReferences/PutShotPendulum.mp4
 
