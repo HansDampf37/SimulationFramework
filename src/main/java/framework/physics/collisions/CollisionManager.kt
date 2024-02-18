@@ -30,9 +30,11 @@ class CollisionManager {
 
     fun calculateCollisions() {
         synchronized(collidables) {
-            collidables.forEach { c1 ->
-                collidables.forEach { c2 ->
-                    if (c1 != c2) {
+            for (i in 0 until collidables.size) {
+                val c1 = collidables[i]
+                for (j in i until collidables.size) {
+                    val c2 = collidables[j]
+                    if (i != j) {
                         if (testCollision(c1, c2)) {
                             Collision.occur(c1, c2, 1.0)
                             if (c1 is Sphere && c2 is Sphere) {
