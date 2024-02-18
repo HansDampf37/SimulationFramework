@@ -98,9 +98,7 @@ class JustASphere: Simulation("Sphere") {
     }
 }
 ```
-<video style="margin-left: auto; margin-right: auto; display: block" width="320" height="240" controls>
-  <source src="ReadmeReferences/JustASphere.mp4" type="video/mp4">
-</video>
+https://github.com/HansDampf37/SimulationFramework/blob/master/ReadmeReferences/JustASphere.mp4
 
 To add complex behaviour to the ball we can implement it in the `tick(dt: Seconds)`.
 Alternatively, the abstract class `PhysicsSimulation` together with the entities inside the package physics offers 
@@ -145,9 +143,8 @@ class ShotPutPendulum: PhysicsSimulation("Shot put pendulum") {
     }
 }
 ```
-<video style="margin-left: auto; margin-right: auto; display: block" width="320" height="240" controls>
-  <source src="ReadmeReferences/PutShotPendulum.mp4" type="video/mp4">
-</video>
+
+https://github.com/HansDampf37/SimulationFramework/blob/master/ReadmeReferences/PutShotPendulum.mp4
 
 # Todos
 1. GJK
