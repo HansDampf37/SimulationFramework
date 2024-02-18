@@ -1,9 +1,9 @@
 package simulations
 
-import algebra.Vec
-import physics.PhysicsSimulation
-import physics.Plane
-import physics.Sphere
+import algebra.Vec3
+import framework.physics.PhysicsSimulation
+import framework.physics.Plane
+import framework.physics.Sphere
 import toVec
 import java.awt.Color
 import kotlin.math.PI
@@ -28,7 +28,7 @@ class BouncingBall: PhysicsSimulation("Bounce") {
     }
 
     /**
-     * Calc forces is invoked once per tick and enables us to apply gravity to the ball and invert its direction if needed.
+     * Calc forces is invoked once per tick and enables us to invert the balls directions if needed.
      */
     override fun calcForces() {
         for (ball in balls) {
@@ -37,20 +37,20 @@ class BouncingBall: PhysicsSimulation("Bounce") {
                 (ball.position.x + ball.radius > 10 && ball.velocity.x > 0) ) ball.velocity.x = -ball.velocity.x
             if ((ball.position.y - ball.radius < -10 && ball.velocity.y < 0) ||
                 (ball.position.y + ball.radius > 10 && ball.velocity.y > 0) ) ball.velocity.y = -ball.velocity.y
-            applyGravity(listOf(ball))
         }
     }
 
     /**
      * Reset the Ball
      */
-    override fun reset() {
-        super.reset()
-        floor = Plane(listOf(Vec(-10, -10, 0), Vec(-10, 10, 0), Vec(10, -10, 0), Vec(10, 10, 0)))
-        walls = listOf(Plane(listOf(Vec(10, -10, 0), Vec(-10, -10, 0), Vec(10, -10, 10), Vec(-10, -10, 10))),
-        Plane(listOf(Vec(-10, -10, 0), Vec(-10, 10, 0), Vec(-10, -10, 10), Vec(-10, 10, 10))),
-        Plane(listOf(Vec(10, 10, 0), Vec(-10, 10, 0), Vec(10, 10, 10), Vec(-10, 10, 10))),
-        Plane(listOf(Vec(10, -10, 0), Vec(10, 10, 0), Vec(10, -10, 10), Vec(10, 10, 10))))
+    override fun setup() {
+        floor = Plane(listOf(Vec3(-10, -10, 0), Vec3(-10, 10, 0), Vec3(10, -10, 0), Vec3(10, 10, 0)))
+        walls = listOf(
+            Plane(listOf(Vec3(10, -10, 0), Vec3(-10, -10, 0), Vec3(10, -10, 10), Vec3(-10, -10, 10))),
+        Plane(listOf(Vec3(-10, -10, 0), Vec3(-10, 10, 0), Vec3(-10, -10, 10), Vec3(-10, 10, 10))),
+        Plane(listOf(Vec3(10, 10, 0), Vec3(-10, 10, 0), Vec3(10, 10, 10), Vec3(-10, 10, 10))),
+        Plane(listOf(Vec3(10, -10, 0), Vec3(10, 10, 0), Vec3(10, -10, 10), Vec3(10, 10, 10)))
+        )
         balls = listOf(
             Sphere(1.0, 0.0, 4.0, 2.0, 1.0),
             Sphere(0.0, 1.0, 12.0, 2.0, 1.0),

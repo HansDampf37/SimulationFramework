@@ -73,11 +73,12 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
         }
     }
 
-    override fun reset() = tickLock.withLock {
+    final override fun reset() = tickLock.withLock {
         tickables.clear()
         moveables.clear()
         synchronized(renderables) { renderables.clear() }
         collisionManager.reset()
+        setup()
     }
 
     override fun tick(dt: Seconds) = tickLock.withLock {
@@ -86,13 +87,11 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
             it.velocity *= max(0.0, min(1.0, 1 - frictionPerSecond * dt))
         }
         calcForces()
+        collisionManager.calculateCollisions()
         drawLock.withLock {
-            collisionManager.calculateCollisions()
-            val order = randomOrder(tickables.size)
-            for (index in order) tickables[index].tick(dt)
+            tickables.parallelStream().forEach {it.tick(dt)}
             correctState()
         }
-
     }
 
     override fun render() = drawLock.withLock {
@@ -108,5 +107,10 @@ abstract class PhysicsSimulation(title: String) : Simulation(title) {
     /**
      * Calculate the forces and accelerations on the objects in this simulation
      */
-    abstract fun calcForces()
+    open fun calcForces() = Unit
+
+    /**
+     * Sets up the simulations initial state
+     */
+    protected abstract fun setup()
 }

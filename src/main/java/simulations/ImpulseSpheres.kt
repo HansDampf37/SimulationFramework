@@ -1,10 +1,10 @@
 package simulations
 
-import algebra.Vec
+import algebra.Vec3
 import framework.interfaces.Status
-import physics.ImpulseConnection
-import physics.PhysicsSimulation
-import physics.Sphere
+import framework.physics.ImpulseConnection
+import framework.physics.PhysicsSimulation
+import framework.physics.Sphere
 import toVec
 import java.awt.Color
 import kotlin.math.PI
@@ -31,22 +31,17 @@ class ImpulseSpheres: PhysicsSimulation("Bounce") {
     /**
      * Calc forces is invoked once per tick and enables us to apply gravity to the ball and invert its direction if needed.
      */
-    override fun calcForces() {
-        for (ball in balls) {
-            applyGravity(listOf(ball))
-        }
-    }
+    override fun calcForces() = Unit
 
     /**
      * Reset the Ball
      */
-    override fun reset() {
-        super.reset()
+    override fun setup() {
         balls = List(7) {Sphere(it.toDouble(), 0.0, 0.0, 0.5, 1.0)}
         anchors = List(7) {Sphere(it.toDouble(), 0.0, 4.0, 0.5, 1.0)}
         anchors.forEach { it.status = Status.Immovable }
         links = List(7) { ImpulseConnection(balls[it], anchors[it], 4.0, 1000.0) }
-        balls[0].set(Vec(-4, 0.0, 4.0))
+        balls[0].set(Vec3(-4, 0.0, 4.0))
         balls[0].color = Color.BLUE.toVec()
         balls[1].color = Color.RED.toVec()
         balls[2].color = Color.GREEN.toVec()

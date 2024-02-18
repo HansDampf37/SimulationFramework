@@ -97,7 +97,7 @@ class RubberNet : PhysicsSimulation("Net") {
         }
     }
 
-    override fun reset() {
+    override fun setup() {
         synchronized(points) {
             points.clear()
             for (x in 0 until size) {

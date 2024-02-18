@@ -25,8 +25,6 @@ abstract class Connection(
 ) : Tickable, Renderable {
     override var color: Vec3? = null
 
-    abstract override fun tick(dt: Seconds)
-
     override fun render(camera: Camera) {
         if (broken) return
         val v1 = Vertex(m1.positionVector, color ?: Vec3.zero, Vec3.zero)
@@ -57,27 +55,20 @@ class ImpulseConnection(
         if (broken) return
         val dist = m1.getDistanceTo(m2)
         if (dist >= maxDistance) {
-            val ropeDir = m1.getDirectionTo(m2)
             val delta = dist - maxDistance
-
+            val ropeDir = m1.getDirectionTo(m2)
             val difVelocity = m1.velocity - m2.velocity
             var energy: Double = if (!difVelocity.hasSharpAngleTo(ropeDir)) occur(m1, m2, 0.95) else 0.0
-            val force = ropeDir * (delta).pow(3) * springConstant / 3
-            energy += springConstant * delta.pow(4) / 4
             if (energy > maxEnergy) {
                 broken = true
                 return
             }
             if (m1.status == Status.Movable && m2.status == Status.Movable) {
-                m1.applyForce(force)
-                m2.applyForce(-force)
                 m1.set(m1 + ropeDir * delta)
                 m2.set(m2 - ropeDir * delta)
             } else if (m2.status == Status.Movable) {
-                m2.applyForce(-force)
                 m2.set(m1 + ropeDir * maxDistance)
             } else if (m1.status == Status.Movable) {
-                m1.applyForce(force)
                 m1.set(m2 - ropeDir * maxDistance)
             }
         }

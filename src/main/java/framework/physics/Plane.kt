@@ -1,21 +1,22 @@
-package physics
+package framework.physics
 
 import algebra.Vec
+import algebra.Vec3
 import framework.Camera
 import framework.Vertex
 import framework.interfaces.Entity
 import framework.interfaces.Status
-import framework.times
+import times
 import toVec
 import java.awt.Color
 
-class Plane(private val edges: List<Vec>): Entity {
+class Plane(private val edges: List<Vec3>): Entity {
 
     override var outlineRasterization: Boolean = false
-    override var color: Vec? = Color.BLACK.toVec()
-    override var position: Vec = edges[0]
-    override var velocity: Vec = Vec.zero
-    override var acceleration: Vec = Vec.zero
+    override var color: Vec3? = Color.BLACK.toVec()
+    override var position: Vec3 = edges[0]
+    override var velocity: Vec3 = Vec3.zero
+    override var acceleration: Vec3 = Vec3.zero
     override var status: Status = Status.Immovable
 
     override fun render(camera: Camera) {
@@ -25,8 +26,8 @@ class Plane(private val edges: List<Vec>): Entity {
             val p02 = alpha * edges[0] + (1 - alpha) * edges[2]
             val p13 = alpha * edges[1] + (1 - alpha) * edges[3]
             val p23 = alpha * edges[2] + (1 - alpha) * edges[3]
-            camera.renderLine(Vertex(p01, color!!, Vec.zero), Vertex(p23, color!!, Vec.zero), this)
-            camera.renderLine(Vertex(p02, color!!, Vec.zero), Vertex(p13, color!!, Vec.zero), this)
+            camera.renderLine(Vertex(p01, color!!, Vec3.zero), Vertex(p23, color!!, Vec3.zero), this)
+            camera.renderLine(Vertex(p02, color!!, Vec3.zero), Vertex(p13, color!!, Vec3.zero), this)
         }
     }
 }

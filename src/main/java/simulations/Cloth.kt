@@ -9,6 +9,7 @@ import framework.physics.ImpulseConnection
 import framework.physics.Sphere
 import framework.physics.*
 import toVec
+import kotlin.concurrent.withLock
 import kotlin.math.PI
 
 /**
@@ -49,20 +50,17 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
         camera.zoom = 0.01
     }
 
-    override fun reset() {
-        super.reset()
+    override fun setup() {
         // clothPoints
-        synchronized(points) {
-            points.clear()
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
-                    val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
-                    mass.status = if (isOnEdge) Status.Immovable else Status.Movable
-                    mass.color = Conf.colorScheme.smallObjectColor.toVec()
-                    register(mass)
-                    points.add(mass)
-                }
+        points.clear()
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                val isOnEdge = (x == 0) || (y == 0) || (x == size - 1) || (y == size - 1)
+                val mass = Sphere(x.toDouble() - size / 2.0 + 0.5, y.toDouble() - size / 2.0 + 0.5, 0.0, .25, 1.0)
+                mass.status = if (isOnEdge) Status.Immovable else Status.Movable
+                mass.color = Conf.colorScheme.smallObjectColor.toVec()
+                register(mass)
+                tickLock.withLock { points.add(mass) }
             }
         }
 
@@ -72,13 +70,13 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
                 if (x + 1 < size) {
                     val link = ImpulseConnection(points[x * size + y], points[(x + 1) * size + y], 1.1, 1000.0)
                     link.color = Conf.colorScheme.linkColor.toVec()
-                    links.add(link)
+                    tickLock.withLock { links.add(link) }
                     register(link)
                 }
                 if (y + 1 < size) {
                     val link = ImpulseConnection(points[x * size + y], points[x * size + y + 1], 1.6, 1000.0)
                     link.color = Conf.colorScheme.linkColor.toVec()
-                    links.add(link)
+                    tickLock.withLock { links.add(link) }
                     register(link)
                 }
             }
@@ -88,19 +86,10 @@ class Cloth(size: Int) : PhysicsSimulation("Cloth") {
         register(sphere)
     }
 
-    override fun calcForces() {
-        synchronized(points) {
-            for (clothPoint in points) clothPoint.acceleration = Vec3.zero
-            sphere.acceleration = Vec3.zero
-        }
-    }
-
     override fun correctState() {
-        synchronized(links) {
-            val brokenLinks = links.filter { it.broken }
-            links.removeAll(brokenLinks.toSet())
-            brokenLinks.forEach { unregister(it) }
-        }
+        val brokenLinks = links.filter { it.broken }
+        links.removeAll(brokenLinks.toSet())
+        brokenLinks.forEach { unregister(it) }
     }
 }
 

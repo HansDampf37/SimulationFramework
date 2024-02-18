@@ -54,7 +54,7 @@ class CollisionManager {
     }
 
     private fun testCollision(c1: Collidable, c2: Collidable): Boolean {
-        return gjk(c1, c2)
+        //return gjk(c1, c2)
         if (c1 is Sphere && c2 is Sphere) return c1.getDistanceTo(c2) <= c1.radius + c2.radius
         TODO("Not implemented")
     }

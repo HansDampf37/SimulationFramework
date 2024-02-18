@@ -6,13 +6,12 @@ import framework.WatchBoolean
 import framework.WatchDouble
 import framework.WatchInt
 import framework.physics.Seconds
-import times
 import toVec
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Fractal() : Simulation("Fractal") {
+class Fractal : Simulation("Fractal") {
     @WatchInt("Corners", 3, 10)
     private var dim: Int = 3
         set(value) {

@@ -9,6 +9,7 @@ import framework.physics.ImpulseConnection
 import framework.physics.PhysicsSimulation
 import framework.physics.PointMass
 import toVec
+import kotlin.concurrent.withLock
 import kotlin.math.PI
 
 @Suppress("unused")
@@ -20,50 +21,46 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
         set(value) = links.forEach { it.maxEnergy = value }
     private val maxRopeSegmentLength: Double
         get() = length / amountOfPoints
+
     @WatchDouble("Rope-Length", 1.0, 3.0)
     private var length: Double = length
         set(value) {
             field = value
-            synchronized(links) {
-                links.forEach { it.maxDistance = maxRopeSegmentLength }
-            }
+            links.forEach { it.maxDistance = maxRopeSegmentLength }
         }
+
     @WatchInt("Segments", 1, 100)
     private var amountOfPoints: Int = amountOfPoints
-        set(value) {
-            synchronized(links) {
-                synchronized(masses) {
-                    val delta = amountOfPoints - value
-                    if (delta > 0) {
-                        // field > value -> remove delta masses from the rope
-                        repeat(delta) {
-                            val removedMass = masses.removeLast()
-                            val lastMass = masses.last()
-                            val toBeRemoved = links.filter { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
-                            links.removeAll(toBeRemoved.toSet())
-                            toBeRemoved.forEach { unregister(it) }
-                        }
-                    } else if (delta < 0) {
-                        repeat(-delta) {
-                            val lastMass = masses.last()
-                            val mass = PointMass(
-                                lastMass.mass,
-                                lastMass.position.x,
-                                lastMass.position.y,
-                                lastMass.position.z - maxRopeSegmentLength * 0.8,
-                                radius,
-                            )
-                            mass.color = Conf.colorScheme.smallObjectColor.toVec()
-                            masses.add(mass)
-                            register(mass)
-                            val link = ImpulseConnection(lastMass, mass, maxRopeSegmentLength, maxEnergy)
-                            links.add(link)
-                            register(link)
-                        }
-                    }
+        set(value) = tickLock.withLock {
+            val delta = amountOfPoints - value
+            if (delta > 0) {
+                // field > value -> remove delta masses from the rope
+                repeat(delta) {
+                    val removedMass = masses.removeLast()
+                    val lastMass = masses.last()
+                    val toBeRemoved = links.filter { it.isConnectedTo(removedMass) && it.isConnectedTo(lastMass) }
+                    links.removeAll(toBeRemoved.toSet())
+                    toBeRemoved.forEach { unregister(it) }
                 }
-                links.forEach { it.maxDistance = maxRopeSegmentLength }
+            } else if (delta < 0) {
+                repeat(-delta) {
+                    val lastMass = masses.last()
+                    val mass = PointMass(
+                        lastMass.position.x,
+                        lastMass.position.y,
+                        lastMass.position.z - maxRopeSegmentLength * 0.8,
+                        radius,
+                        lastMass.mass,
+                    )
+                    mass.color = Conf.colorScheme.smallObjectColor.toVec()
+                    masses.add(mass)
+                    register(mass)
+                    val link = ImpulseConnection(lastMass, mass, maxRopeSegmentLength, maxEnergy)
+                    links.add(link)
+                    register(link)
+                }
             }
+            links.forEach { it.maxDistance = maxRopeSegmentLength }
             field = value
         }
 
@@ -71,33 +68,21 @@ class Pend(amountOfPoints: Int, length: Double) : PhysicsSimulation("String") {
         reset()
     }
 
-    override fun render() {
-        synchronized(masses) { for (m in masses) m.render(camera) }
-        synchronized(links) { links.filter { !it.broken }.forEach { it.render(camera) } }
-    }
-
-    override fun calcForces() = Unit
-
-    override fun reset() {
-        super.reset()
-        synchronized(masses) {
-            masses.clear()
-            for (i in 0 until amountOfPoints) {
-                val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
-                val mass = PointMass(1.0, pos.x, pos.y, pos.z, radius)
-                if (i == 0) mass.status = Status.Immovable
-                mass.color = Conf.colorScheme.smallObjectColor.toVec()
-                masses.add(mass)
-                register(mass)
-            }
+    override fun setup() = tickLock.withLock {
+        masses.clear()
+        for (i in 0 until amountOfPoints) {
+            val pos = Point3d(-i * maxRopeSegmentLength, 0.0, 0.0)
+            val mass = PointMass(pos.x, pos.y, pos.z, radius, 1.0)
+            if (i == 0) mass.status = Status.Immovable
+            mass.color = Conf.colorScheme.smallObjectColor.toVec()
+            masses.add(mass)
+            register(mass)
         }
-        synchronized(links) {
-            links.clear()
-            for (i in 0 until amountOfPoints - 1) {
-                val link = ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, maxEnergy)
-                links.add(link)
-                register(link)
-            }
+        links.clear()
+        for (i in 0 until amountOfPoints - 1) {
+            val link = ImpulseConnection(masses[i], masses[i + 1], maxRopeSegmentLength, maxEnergy)
+            links.add(link)
+            register(link)
         }
         camera.focalLength = 10.0
         camera.x = 0.0

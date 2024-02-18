@@ -122,8 +122,7 @@ class PlatonSpace(amountOfPoint3ds: Int) : PhysicsSimulation("Platon") {
         return shortestDist
     }
 
-    override fun reset() {
-        super.reset()
+    override fun setup() {
         synchronized(points) {
             points.clear()
             repeat(amountOfPoint3ds) {
